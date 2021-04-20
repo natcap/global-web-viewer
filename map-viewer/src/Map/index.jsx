@@ -14,29 +14,51 @@ const Wrapper = styled.div`
 export default class Map extends React.Component {
 
   componentDidMount() {
-    this.map = L.map('map', {
-      center: [58, 16],
-      zoom: 2,
-      zoomControl: false,
-      crs: L.CRS.EPSG3857,
-    });
-    L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token={accessToken}', {
+    let streets = L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token={accessToken}', {
         attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
         maxZoom: 18,
         id: 'mapbox/streets-v11',
         tileSize: 512,
         zoomOffset: -1,
         accessToken: 'pk.eyJ1IjoiZGRlbnUiLCJhIjoiY2ttZjRiNWdyMzFwYjJ5bzl5eHZiemFzZCJ9.KopFh5uduOIW8nSbBr4_ZQ'
-    }).addTo(this.map);
+    });//.addTo(this.map);
 
     let demLayer = L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token={accessToken}', {
         attribution: 'MapBox Global DEM',
         maxZoom: 18,
-        id: 'ddenu/ckn90yb4s1qab18pdbckcymyn',
+        id: 'ddenu/cknor6of301e317mcqa1337z2',
         tileSize: 512,
         zoomOffset: -1,
         accessToken: 'pk.eyJ1IjoiZGRlbnUiLCJhIjoiY2ttZjQwamU2MTE1bjJ3bGpmZGZncG52NCJ9.u2cSHaEPPDgZH7PYBZNhWw',
     });//.addTo(this.map);
+
+    let demMaxVector = L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token={accessToken}', {
+        attribution: 'MapBox Global DEM',
+        maxZoom: 18,
+        id: 'ddenu/cknor29xj2rlo17p1jdvyn4gg',
+        tileSize: 512,
+        zoomOffset: -1,
+        accessToken: 'pk.eyJ1IjoiZGRlbnUiLCJhIjoiY2ttZjQwamU2MTE1bjJ3bGpmZGZncG52NCJ9.u2cSHaEPPDgZH7PYBZNhWw',
+    });//.addTo(this.map);
+    
+    this.map = L.map('map', {
+      center: [58, 16],
+      zoom: 2,
+      zoomControl: false,
+      crs: L.CRS.EPSG3857,
+      layers: [demMaxVector, demLayer],
+    });
+    
+    const baseMaps = {
+      "Streets": streets,
+      "DEM": demLayer,
+    };
+
+    const overlayMaps = {
+      "Max DEM": demMaxVector,
+    };
+    
+    L.control.layers(baseMaps, overlayMaps).addTo(this.map);
 
     //https://api.mapbox.com/styles/v1/YOUR_USERNAME/YOUR_STYLE_ID/tiles/256/{z}/{x}/{y}?access_token=YOUR_ACCESS_TOKEN
 
@@ -50,6 +72,7 @@ export default class Map extends React.Component {
     //  return turf.difference(bboxPoly, mask);
     //}
 
+/*
     let boundary = {
       "type": "Feature", 
       "properties": { "id": 1 }, 
@@ -74,7 +97,7 @@ export default class Map extends React.Component {
 
     let boundaryLayer = L.TileLayer.BoundaryCanvas.createFromLayer(
       demLayer, {boundary: boundary}).addTo(this.map);
-
+      */
     /*
     var marker = L.marker([58.5, 16]).addTo(this.map);
     var circle = L.circle([58.508, 16.11], {
