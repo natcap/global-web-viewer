@@ -13,7 +13,8 @@ import Row from 'react-bootstrap/Row';
 
 import React, { useSate } from 'react';
 
-import Map from './Map';
+//import Map from './Map';
+import Map from './MapBox';
 
 function MapViewer(props) {
 
