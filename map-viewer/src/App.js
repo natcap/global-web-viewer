@@ -14,7 +14,8 @@ import Row from 'react-bootstrap/Row';
 import React, { useSate } from 'react';
 
 //import Map from './Map';
-import Map from './MapBox';
+//import Map from './MapBox';
+import Map from './Map';
 
 function MapViewer(props) {
 
