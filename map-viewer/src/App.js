@@ -10,10 +10,9 @@ import './App.css';
 
 function App() {
     return (
-      <Container className="p-3" fluid>
-        <Row className="banner">
-          <Col>
-            <h1 className="header">NatCap Viewer Title</h1>
+      <Container fluid>
+        <Row>
+          <Col className="banner">Natural Capital Project Global Viewer
           </Col>
         </Row>
         <Row>

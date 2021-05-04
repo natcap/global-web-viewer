@@ -1,12 +1,19 @@
 .banner {
-  background-color: #148F68;
-  padding: 1rem;
+  background-color: rgba(44, 162, 95, 0.9);
+  font: 32px Arial, sans-serif;
+  padding-left: 2rem;
+  padding-top: 1rem;
   margin-left: 0rem;
   margin-right: 0rem;
-  margin-bottom: 1rem;
+  margin-bottom: 0rem;
+  margin-top: 0rem;
   width: 100%;
   min-height: 5rem;
-  justify-content: space-between;
+  border: 3px solid #2c7fb8;
+}
+
+.p-3 {
+  padding: 0rem;
 }
 
 .layer {

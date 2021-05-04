@@ -30,13 +30,21 @@ const Map = () => {
       layerID: 'dem-stats',
       name: 'Max DEM',
     },
+    {
+      layerID: 'hybas-lev06-seddep',
+      name: 'HyBasin SedDep Sum',
+    },
+    {
+      layerID: 'dem-global',
+      name: 'DEM Raster',
+    },
   ]
 
   const mapContainer = useRef(null);
   const [map, setMap] = useState(null);
-  const [lng, setLng] = useState(-70.9);
-  const [lat, setLat] = useState(42.35);
-  const [zoom, setZoom] = useState(9);
+  const [lng, setLng] = useState(16.8);
+  const [lat, setLat] = useState(30.0);
+  const [zoom, setZoom] = useState(1.64);
 
   useEffect(() => {
     const map = new mapboxgl.Map({
@@ -45,6 +53,9 @@ const Map = () => {
       center: [lng, lat],
       zoom: zoom
     });
+
+    // Add zoom and rotation controls to the map.
+    map.addControl(new mapboxgl.NavigationControl());
 
     map.on('load', () => {
       map.addSource('dem-stats', {
@@ -59,10 +70,77 @@ const Map = () => {
         source: 'dem-stats',
         'source-layer': 'hello_world', // layer name from Tilesets > hello world > Vector Layers
         paint: {
-          'fill-color': 'rgba(200, 100, 240, 0.4)',
           'fill-outline-color': 'rgba(200, 100, 240, 1)',
+          'fill-color': [
+            'interpolate',
+            ['linear'],
+            ['get', 'max'],
+            -600,
+            '#F2F12D',
+            0,
+            '#EED322',
+            1000,
+            '#E6B71E',
+            2000,
+            '#DA9C20',
+            3000,
+            '#CA8323',
+            5000,
+            '#B86B25',
+            7000,
+            '#A25626',
+          ],
+          'fill-opacity': 0.75
+        },
+        layout: {
+          visibility: 'none',
         },
       });
+
+      map.addSource('dem-global', {
+        type: 'raster',
+        url: 'mapbox://ddenu.global-dem'
+      });
+
+      map.addLayer({
+        id: 'dem-global',
+        type: 'raster',
+        layout: {
+          visibility: 'none',
+        },
+        source: 'dem-global',
+      });
+      
+      map.addSource('hybas-lev06-seddep', {
+        type: 'vector',
+        url: 'mapbox://ddenu.hybas-06-seddep'
+        //ddenu.hybas-06-seddep
+      });
+
+      map.addLayer({
+        id: 'hybas-lev06-seddep',
+        type: 'fill',
+        source: 'hybas-lev06-seddep',
+        //hybas_lev06_seddep
+        'source-layer': 'hybas_lev06_seddep', // layer name from Tilesets > hello world > Vector Layers
+        paint: {
+          'fill-outline-color': 'rgba(200, 100, 240, 1)',
+          'fill-color': [
+            'interpolate',
+            ['linear'],
+            ['get', 'sum'],
+            0,
+            '#4ce0fa',
+            700000,
+            '#047f95',
+          ],
+          'fill-opacity': 0.75
+        },
+        layout: {
+          visibility: 'none',
+        },
+      });
+
       setMap(map);
     });
 
@@ -70,6 +148,24 @@ const Map = () => {
       setLng(map.getCenter().lng.toFixed(4));
       setLat(map.getCenter().lat.toFixed(4));
       setZoom(map.getZoom().toFixed(2));
+    });
+
+    // When a click event occurs on a feature in the states layer, open a popup at the
+    // location of the click, with description HTML from its properties.
+    map.on('click', 'dem-stats', function (e) {
+    new mapboxgl.Popup()
+    .setLngLat(e.lngLat)
+    .setHTML(`Max Dem Value: ${e.features[0].properties.max}`)
+    .addTo(map);
+    });
+    
+    // When a click event occurs on a feature in the states layer, open a popup at the
+    // location of the click, with description HTML from its properties.
+    map.on('click', 'hybas-lev06-seddep', function (e) {
+    new mapboxgl.Popup()
+    .setLngLat(e.lngLat)
+    .setHTML(`Sed Sum Value: ${e.features[0].properties.sum}`)
+    .addTo(map);
     });
 
     // Clean up on unmount

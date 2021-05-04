@@ -38,4 +38,6 @@
   background-color: #99ccff;
   padding: 0.25rem;
 }
-
+.mapboxgl-popup {
+  font: 12px/20px 'Helvetica Neue', Arial, Helvetica, sans-serif;
+}
