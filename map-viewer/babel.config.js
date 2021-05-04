@@ -7,4 +7,5 @@ module.exports = {
     '@babel/plugin-transform-runtime',
     '@babel/plugin-styled-components',
   ],
+  ignore: [ './node_modules/mapbox-gl/dist/mapbox-gl.js' ]
 };

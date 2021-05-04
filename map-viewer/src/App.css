@@ -1,32 +1,23 @@
-body {
-	background-color: LightGray; 
-	margin: 0 auto;
-	padding: 0rem;
-	overflow-y: hidden;
-}
-
 .banner {
-	background-color: #148F68;
-  padding: 1rem;
+  background-color: rgba(44, 162, 95, 0.9);
+  font: 32px Arial, sans-serif;
+  padding-left: 2rem;
+  padding-top: 1rem;
   margin-left: 0rem;
   margin-right: 0rem;
-  margin-bottom: 1rem;
+  margin-bottom: 0rem;
+  margin-top: 0rem;
   width: 100%;
+  min-height: 5rem;
+  border: 3px solid #2c7fb8;
 }
 
-.map-col {
-  margin-left: 1rem;
-  margin-right: 1rem;
-  margin-bottom: 1rem;
-  margin-top: 1rem;
+.p-3 {
+  padding: 0rem;
 }
 
 .layer {
   padding: 1rem;
-}
-.form-check-label {
-  background-color: #99ccff;
-  padding: 0.25rem;
 }
 
 .side-bar {
