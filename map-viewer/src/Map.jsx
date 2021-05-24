@@ -35,8 +35,8 @@ const Map = () => {
       name: 'HyBasin SedDep Sum',
     },
     {
-      layerID: 'dem-global',
-      name: 'DEM Raster',
+      layerID: 'sed-pct-global',
+      name: 'Sediment Deposition Pct',
     },
   ]
 
@@ -97,18 +97,18 @@ const Map = () => {
         },
       });
 
-      map.addSource('dem-global', {
+      map.addSource('sed-pct-global', {
         type: 'raster',
-        url: 'mapbox://ddenu.global-dem'
+        url: 'mapbox://ddenu.sed-pct-global'
       });
 
       map.addLayer({
-        id: 'dem-global',
+        id: 'sed-pct-global',
         type: 'raster',
         layout: {
           visibility: 'none',
         },
-        source: 'dem-global',
+        source: 'sed-pct-global',
       });
       
       map.addSource('hybas-lev06-seddep', {
