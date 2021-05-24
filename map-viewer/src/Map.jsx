@@ -11,10 +11,13 @@ import Form from 'react-bootstrap/Form';
 //import mapboxgl from 'mapbox-gl/dist/mapbox-gl-csp';
 //import MapboxWorker from 'worker-loader!mapbox-gl/dist/mapbox-gl-csp-worker';
 import mapboxgl from 'mapbox-gl';
+// Had to npm install @mapbox/mapbox-gl-geocoder and import like below
+import * as MapboxGeocoder from '@mapbox/mapbox-gl-geocoder';
 
 import './Map.css';
 
 import LayerSelect from './components/LayerSelect';
+import Legend from './components/Legend';
 
 // import MyComponent from './components/MyComponent';
 
@@ -40,6 +43,13 @@ const Map = () => {
     },
   ]
 
+  let legend = [
+    {
+      legendID: 'sed-pct-global',
+      name: 'Sediment Deposition Pct',
+    },
+  ]
+
   const mapContainer = useRef(null);
   const [map, setMap] = useState(null);
   const [lng, setLng] = useState(16.8);
@@ -54,8 +64,17 @@ const Map = () => {
       zoom: zoom
     });
 
+    // Add the control to the map.
+    map.addControl(
+      new MapboxGeocoder({
+        accessToken: mapboxgl.accessToken,
+        mapboxgl: mapboxgl
+    })
+    );
+
     // Add zoom and rotation controls to the map.
     map.addControl(new mapboxgl.NavigationControl());
+
 
     map.on('load', () => {
       map.addSource('dem-stats', {
@@ -190,13 +209,18 @@ const Map = () => {
 
   return (
     <div>
-      <div className="map-container" ref={mapContainer} />
-      <LayerSelect
-        layers={layers}
-        changeVisibilityState={changeVisibilityState}
-      />
-      <div className="coordinatebar">
-        Longitude: {lng} | Latitude: {lat} | Zoom: {zoom}
+      <div className="map-container" ref={mapContainer} >
+        <LayerSelect
+          layers={layers}
+          changeVisibilityState={changeVisibilityState}
+        />
+        <div className="coordinatebar">
+          Longitude: {lng} | Latitude: {lat} | Zoom: {zoom}
+        </div>
+        <Legend
+          legend={legend}
+          //changeVisibilityState={changeVisibilityState}
+        />
       </div>
     </div>
   );
