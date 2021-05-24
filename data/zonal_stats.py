@@ -183,13 +183,15 @@ def build_vector_path_list(vector_directory):
     return vector_list
 
 def calculate_percentiles_to_vector(
-    input_vector_path, field_to_percentile, target_vector_path):
+    input_vector_path, target_vector_path, field_to_percentile,
+    percentile_field_name):
     """Calculate percentiles.
 
     Args:
         input_vector_path (string):
-        field_to_percentile (string):
         target_vector_path (string):
+        field_to_percentile (string):
+        percentile_field_name (string): name for the output percentile field
 
     Returns:
         None
@@ -219,7 +221,7 @@ def calculate_percentiles_to_vector(
     five_perc_counter = int(number_features_target * 0.05)
 
     # Create new percentile field
-    target_field = ogr.FieldDefn('pcttile', ogr.OFTReal)
+    target_field = ogr.FieldDefn(percentile_field_name, ogr.OFTReal)
     target_layer.CreateField(target_field)
 
     target_layer_dfn = target_layer.GetLayerDefn()
@@ -264,7 +266,7 @@ def calculate_percentiles_to_vector(
         pct_group = country_pctile_dict[country_name]
 
         pct_idx = numpy.where(mean_value <= pct_group)[0][0] * 5
-        feat.SetField('pcttile', float(pct_idx))
+        feat.SetField(percentile_field_name, float(pct_idx))
 
         target_layer.SetFeature(feat)
         feat = None
@@ -564,10 +566,12 @@ if __name__ == "__main__":
                 output_stat_dir,
                 os.path.splitext(hydro_basin_basename)[0] + f'_{field_prefix}_perc.gpkg')
 
+            percentile_field_name = field_prefix + "_pct"
             percentile_to_vector_task = task_graph.add_task(
                 func=calculate_percentiles_to_vector,
                 args=(
-                    output_vector_path, field_name, output_perc_vector_path),
+                    output_vector_path, output_perc_vector_path, field_name,
+                    percentile_field_name),
                 target_path_list=[output_perc_vector_path],
                 dependent_task_list=[stats_to_vector_task],
                 task_name=f'percentile_{hydro_basin_basename[0:8]}_{field_prefix}_task')
@@ -606,13 +610,16 @@ if __name__ == "__main__":
                 dependent_task_list=[stats_task],
                 task_name=f'stat_to_gadm_task_{field_prefix}')
 
+            percentile_field_name = field_prefix + "_pct"
             if 'gadm36_1' in input_vector_path:
                 output_perc_vector_path = os.path.join(
                     output_stat_dir,
                     os.path.splitext(gadm_basename)[0] + f'_{field_prefix}_perc.gpkg')
                 percentile_to_vector_task = task_graph.add_task(
                     func=calculate_percentiles_to_vector,
-                    args=(gadm_vector_path, field_name, output_perc_vector_path),
+                    args=(
+                        gadm_vector_path, output_perc_vector_path, field_name,
+                        percentile_field_name),
                     target_path_list=[output_perc_vector_path],
                     dependent_task_list=[stats_task, stats_to_vector_task],
                     task_name=f'perc_to_gadm_task_{field_prefix}')
