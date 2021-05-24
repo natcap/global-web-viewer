@@ -1,8 +1,10 @@
 import sys
 import os
+import argparse
 import math
 import logging
 from osgeo import osr
+from osgeo import gdal
 
 import pygeoprocessing
 import taskgraph
@@ -40,32 +42,52 @@ def _m2_area_of_wg84_pixel(pixel_size, center_lat):
                 math.sin(math.radians(f)) / (zp*zm)))
     return abs(pixel_size / 360. * (area_list[0] - area_list[1]))
 
+def gdaldem_color_relief(input_raster_path, color_file_path, out_raster_path):
+    """Conver input raster to a stylized RGB raster using gdaldem.
+
+    Args:
+        input_raster_path (string):
+        color_file_path (string):
+        out_raster_path (string):
+
+    Returns:
+        None
+    """
+    gdaldem_options = gdal.DEMProcessingOptions(
+        colorFilename=color_file_path, format="GTiff", addAlpha=True,
+        creationOptions=["COMPRESS=LZW"])
+    gdal.DEMProcessing(
+        out_raster_path, input_raster_path, "color-relief",
+        options=gdaldem_options)
+
 if __name__ == "__main__":
 
     LOGGER.debug("Starting Reprojecting Processing")
 
-    data_common_root_dir = os.path.join(
-        'C:', os.sep, 'Users', 'ddenu', 'Workspace', 'NatCap', 'Repositories',
-        'global-web-viewer')
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-s', '--src',
+        help="The input raster to reproject.", required=True)
+    parser.add_argument('-d', '--dst',
+            help="The reprojected output raster path.", required=True)
+    parser.add_argument('-c', '--color-file',
+            help="The color style file for the raster.", required=True)
 
-    input_path = os.path.join(
-        data_common_root_dir, 'data', 'pixel-data',
-        'realized_sedimentdeposition_nathab_md5_96c3424924c752e9b1f7ccfffe9b102a.tif')
+    args = vars(parser.parse_args())
+    LOGGER.info(f"Source: {args['src']}, Dest: {args['dst']}")
 
-    out_dir = os.path.join(
-        data_common_root_dir, 'processed-data', 'pixel-processed')
+    input_path = args['src']
+    input_basename = os.path.splitext(os.path.basename(input_path))[0]
 
+    out_path = args['dst']
+    out_dir = os.path.dirname(out_path)
     if not os.path.exists(out_dir):
         os.makedirs(out_dir)
 
-    out_path = os.path.join(
-        out_dir, 'realized_sedimentdeposition_3857.tif')
-
     ### TaskGraph Set Up
     taskgraph_working_dir = os.path.join(
-        data_common_root_dir, 'processed-data', '_taskgraph_working_dir')
+        out_dir, '_taskgraph_working_dir')
 
-    n_workers = 4
+    n_workers = -1
     task_graph = taskgraph.TaskGraph(taskgraph_working_dir, n_workers)
     ###
 
@@ -88,14 +110,47 @@ if __name__ == "__main__":
         math.sqrt(meters_squared) * scale_x, math.sqrt(meters_squared) * scale_y)
     LOGGER.debug(f"target_pixel_size : {target_pixel_size}")
 
-    input_bb = [-180.0, -86.0, 180.0, 86.0]
-    target_bb = pygeoprocessing.transform_bounding_box(
-        input_bb, input_info['projection_wkt'], projection_wkt)
+    input_bb = input_info['bounding_box']
+    if input_bb[1] < -87:
+        input_bb[1] = -86
+    if input_bb[3] > 87:
+        input_bb[3] = 86
 
-    LOGGER.debug(f"input_bb : {input_info['bounding_box']}")
+    LOGGER.debug(f"Actual input_bb : {input_info['bounding_box']}")
+    LOGGER.debug(f"Used input_bb : {input_bb}")
+
+    bb_task = task_graph.add_task(
+        func=pygeoprocessing.transform_bounding_box,
+        args=(
+            input_bb, input_info['projection_wkt'], projection_wkt,
+        ),
+        store_result=True,
+        task_name=f'bb_{input_basename}_task')
+
+    target_bb = bb_task.get()
+
     LOGGER.debug(f"target_bb : {target_bb}")
 
-    pygeoprocessing.warp_raster(
-        input_path, target_pixel_size, out_path, 'near',
-        target_bb=target_bb, target_projection_wkt=projection_wkt)
+    reproject_task = task_graph.add_task(
+        func=pygeoprocessing.warp_raster,
+        args=(
+            input_path, target_pixel_size, out_path, 'near',
+        ),
+        kwargs={
+            'target_bb': target_bb, 'target_projection_wkt': projection_wkt
+        },
+        target_path_list=[out_path],
+        task_name=f'warp_{input_basename}_task')
+
+    gdaldem_out_path = os.path.splitext(out_path)[0] + '_rgb.tif'
+    # Convert percentile raster to styled RGB
+    gdaldem_task = task_graph.add_task(
+        func=gdaldem_color_relief,
+        args=(out_path, args['color_file'], gdaldem_out_path),
+        target_path_list=[gdaldem_out_path],
+        task_name=f'gdaldem_{input_basename}_task',
+        dependent_task_list=[reproject_task])
+
+    task_graph.close()
+    task_graph.join()
 
