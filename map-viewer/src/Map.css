@@ -19,7 +19,7 @@
   margin: 12px;
   border-radius: 4px;
 }
-.layer-group {
+.vertical-menu {
   background-color: rgba(35, 55, 75, 0.9);
   color: #ffffff;
   padding: 6px 12px;
@@ -28,8 +28,20 @@
   position: absolute;
   left: 0;
   top: 0;
-  margin: 1rem;
   border-radius: 4px;
+}
+.accordion-header {
+  background-color: rgba(35, 55, 75, 0.9);
+  color: #ffffff;
+}
+.scale-options {
+  background-color: rgba(35, 55, 75, 0.9);
+  color: #ffffff;
+}
+.layer-group {
+  color: #ffffff;
+  font: 15px/24px monospace;
+  z-index: 1;
 }
 .layer-label {
 

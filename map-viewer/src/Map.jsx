@@ -16,7 +16,7 @@ import * as MapboxGeocoder from '@mapbox/mapbox-gl-geocoder';
 
 import './Map.css';
 
-import LayerSelect from './components/LayerSelect';
+import VerticalMenu from './components/VerticalMenu';
 import Legend from './components/Legend';
 
 // import MyComponent from './components/MyComponent';
@@ -32,58 +32,7 @@ const Map = () => {
     {
       layerID: 'dem-stats',
       name: 'Max DEM',
-    },
-    {
-      layerID: 'hybas-lev06-seddep',
-      name: 'HyBasin SedDep Sum',
-    },
-    {
-      layerID: 'sed-pct-global',
-      name: 'Sediment Deposition Pct',
-    },
-  ]
-
-  let legend = [
-    {
-      legendID: 'sed-pct-global',
-      name: 'Sediment Deposition Pct',
-    },
-  ]
-
-  const mapContainer = useRef(null);
-  const [map, setMap] = useState(null);
-  const [lng, setLng] = useState(16.8);
-  const [lat, setLat] = useState(30.0);
-  const [zoom, setZoom] = useState(1.64);
-
-  useEffect(() => {
-    const map = new mapboxgl.Map({
-      container: mapContainer.current,
-      style: 'mapbox://styles/mapbox/streets-v11',
-      center: [lng, lat],
-      zoom: zoom
-    });
-
-    // Add the control to the map.
-    map.addControl(
-      new MapboxGeocoder({
-        accessToken: mapboxgl.accessToken,
-        mapboxgl: mapboxgl
-    })
-    );
-
-    // Add zoom and rotation controls to the map.
-    map.addControl(new mapboxgl.NavigationControl());
-
-
-    map.on('load', () => {
-      map.addSource('dem-stats', {
-        type: 'vector',
-        url: 'mapbox://ddenu.hello-world-tiles'
-        //url: 'mapbox://styles/ddenu/cknor29xj2rlo17p1jdvyn4gg'
-      });
-
-      map.addLayer({
+      mapLayer: {
         id: 'dem-stats',
         type: 'fill',
         source: 'dem-stats',
@@ -114,29 +63,12 @@ const Map = () => {
         layout: {
           visibility: 'none',
         },
-      });
-
-      map.addSource('sed-pct-global', {
-        type: 'raster',
-        url: 'mapbox://ddenu.sed-pct-global'
-      });
-
-      map.addLayer({
-        id: 'sed-pct-global',
-        type: 'raster',
-        layout: {
-          visibility: 'none',
-        },
-        source: 'sed-pct-global',
-      });
-      
-      map.addSource('hybas-lev06-seddep', {
-        type: 'vector',
-        url: 'mapbox://ddenu.hybas-06-seddep'
-        //ddenu.hybas-06-seddep
-      });
-
-      map.addLayer({
+      }
+    },
+    {
+      layerID: 'hybas-lev06-seddep',
+      name: 'HyBasin SedDep Sum',
+      mapLayer: {
         id: 'hybas-lev06-seddep',
         type: 'fill',
         source: 'hybas-lev06-seddep',
@@ -158,9 +90,184 @@ const Map = () => {
         layout: {
           visibility: 'none',
         },
+      }
+    },
+    {
+      layerID: 'sed-pct-global',
+      name: 'Sediment Deposition Pct',
+      mapLayer: {
+        id: 'sed-pct-global',
+        type: 'raster',
+        layout: {
+          visibility: 'none',
+        },
+        source: 'sed-pct-global',
+      },
+    },
+    {
+      layerID: 'global-nit-pct',
+      name: 'Nitrogen Pct',
+      mapLayer: {
+        id: 'global-nit-pct',
+        type: 'raster',
+        layout: {
+          visibility: 'none',
+        },
+        source: 'global-nit-pct',
+      },
+    },
+    {
+      layerID: 'gadm1-sed-pct',
+      name: 'GADM1 Sed Dep Pct',
+      mapLayer: {
+        id: 'gadm1-sed-pct',
+        type: 'raster',
+        layout: {
+          visibility: 'none',
+        },
+        source: 'gadm1-sed-pct',
+      },
+    },
+    {
+      layerID: 'gadm1-nit-pct',
+      name: 'GADM1 Nit Dep Pct',
+      mapLayer: {
+        id: 'gadm1-nit-pct',
+        type: 'raster',
+        layout: {
+          visibility: 'none',
+        },
+        source: 'gadm1-nit-pct',
+      },
+    },
+    {
+      layerID: 'hybas-sed-pct',
+      name: 'HYBAS Sed Dep Pct',
+      mapLayer: {
+        id: 'hybas-sed-pct',
+        type: 'raster',
+        layout: {
+          visibility: 'none',
+        },
+        source: 'hybas-sed-pct',
+      },
+    },
+    {
+      layerID: 'hybas-nit-pct',
+      name: 'HYBAS Nit Dep Pct',
+      mapLayer: {
+        id: 'hybas-nit-pct',
+        type: 'raster',
+        layout: {
+          visibility: 'none',
+        },
+        source: 'hybas-nit-pct',
+      }
+    },
+  ]
+
+  let legend = [
+    {
+      legendID: 'sed-pct-global',
+      name: 'Sediment Deposition Pct',
+    },
+  ]
+
+  const basemaps = [
+    {
+      layerID: 'light-v10',
+      name: 'light',
+    },
+    {
+      layerID: 'dark-v10',
+      name: 'dark',
+    },
+    {
+      layerID: 'streets-v11',
+      name: 'streets',
+    },
+    {
+      layerID: 'satellite-v9',
+      name: 'satellite',
+    },
+  ]
+
+  const mapContainer = useRef(null);
+  const [map, setMap] = useState(null);
+  const [lng, setLng] = useState(16.8);
+  const [lat, setLat] = useState(30.0);
+  const [zoom, setZoom] = useState(1.64);
+  const [mapLayers, setLayers] = useState(layers);
+
+  function addSources(map) {
+    map.addSource('dem-stats', {
+      type: 'vector',
+      url: 'mapbox://ddenu.hello-world-tiles'
+      //url: 'mapbox://styles/ddenu/cknor29xj2rlo17p1jdvyn4gg'
+    });
+    map.addSource('sed-pct-global', {
+      type: 'raster',
+      url: 'mapbox://ddenu.sed-pct-global'
+    });
+    map.addSource('global-nit-pct', {
+      type: 'raster',
+      url: 'mapbox://ddenu.global_nit_pct'
+    });
+    map.addSource('gadm1-sed-pct', {
+      type: 'raster',
+      url: 'mapbox://ddenu.gadm1_sed_pct'
+    });
+    map.addSource('gadm1-nit-pct', {
+      type: 'raster',
+      url: 'mapbox://ddenu.gadm1_nit_pct'
+    });
+    map.addSource('hybas-sed-pct', {
+      type: 'raster',
+      url: 'mapbox://ddenu.hybas_sed_pct'
+    });
+    map.addSource('hybas-nit-pct', {
+      type: 'raster',
+      url: 'mapbox://ddenu.hybas_nit_pct'
+    });
+
+    map.addSource('hybas-lev06-seddep', {
+      type: 'vector',
+      url: 'mapbox://ddenu.hybas-06-seddep'
+    });
+
+    setMap(map);
+  }
+
+  useEffect(() => {
+    const map = new mapboxgl.Map({
+      container: mapContainer.current,
+      style: 'mapbox://styles/mapbox/streets-v11',
+      center: [lng, lat],
+      zoom: zoom,
+      minZoom: 1.6,
+    });
+
+    // Add the control to the map.
+    map.addControl(
+      new MapboxGeocoder({
+        accessToken: mapboxgl.accessToken,
+        mapboxgl: mapboxgl
+      })
+    );
+
+    // Add zoom and rotation controls to the map.
+    map.addControl(new mapboxgl.NavigationControl());
+
+    map.on('load', () => {
+      console.log("LOAD EVENT");
+      addSources(map);
+      mapLayers.forEach((layer) => {
+        map.addLayer(layer.mapLayer);
       });
 
       setMap(map);
+      const sedLayer = map.getLayer('sed-pct-global');
+      console.log(sedLayer);
     });
 
     map.on('move', () => {
@@ -177,7 +284,7 @@ const Map = () => {
     .setHTML(`Max Dem Value: ${e.features[0].properties.max}`)
     .addTo(map);
     });
-    
+
     // When a click event occurs on a feature in the states layer, open a popup at the
     // location of the click, with description HTML from its properties.
     map.on('click', 'hybas-lev06-seddep', function (e) {
@@ -192,27 +299,45 @@ const Map = () => {
   }, []); // eslint-disable-line-react-hooks/exhaustive-deps
 
   const changeVisibilityState = (i, checked) => {
-    //setActive(options[i]);
-    //map.setPaintProperty('countries', 'fill-color', {
-    //  property: active.property,
-    //  stops: active.stops
-    //});
     console.log("i ", i);
     console.log("checked ", checked);
     if(!checked) {
-      map.setLayoutProperty(layers[i]['layerID'], 'visibility', 'none');
+      map.setLayoutProperty(mapLayers[i]['layerID'], 'visibility', 'none');
+      let tmpLayers = mapLayers;
+      tmpLayers[i]['mapLayer']['layout']['visibility'] = 'none';
+      setLayers(tmpLayers);
     }
     else {
-      map.setLayoutProperty(layers[i]['layerID'], 'visibility', 'visible');
+      map.setLayoutProperty(mapLayers[i]['layerID'], 'visibility', 'visible');
+      let tmpLayers = mapLayers;
+      tmpLayers[i]['mapLayer']['layout']['visibility'] = 'visible';
+      setLayers(tmpLayers);
     }
+    setMap(map);
+  };
+
+  async function changeBasemapState(basemapId, checked){
+    console.log("basemapId ", basemapId);
+    console.log("checked ", checked);
+    await map.setStyle('mapbox://styles/mapbox/' + basemapId);
+    setTimeout(() => {
+      addSources(map);
+      mapLayers.forEach((layer) => {
+        map.addLayer(layer.mapLayer);
+      });
+    }, 1000);
+
+    setMap(map);
   };
 
   return (
     <div>
       <div className="map-container" ref={mapContainer} >
-        <LayerSelect
+        <VerticalMenu
           layers={layers}
           changeVisibilityState={changeVisibilityState}
+          basemaps={basemaps}
+          changeBasemapState={changeBasemapState}
         />
         <div className="coordinatebar">
           Longitude: {lng} | Latitude: {lat} | Zoom: {zoom}
