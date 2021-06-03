@@ -33,33 +33,38 @@ if __name__ == "__main__":
 
     hybas_root_dir = os.path.join(
         'C:', os.sep, 'Users', 'ddenu', 'Workspace', 'NatCap', 'Repositories',
-        'global-web-viewer', 'processed-data')
+        'global-web-viewer', 'processed-data', 'hybas_stats_vectors')
 
-    hydro_basin_paths_full = build_vector_path_list(hybas_root_dir)
+    hybas_process_dir = os.path.join(
+        hybas_root_dir, 'hybas_sed_processed_vectors')
+
+    hybas_path_list = build_vector_path_list(hybas_process_dir)
 
     # Refine hydro files by level
-    hydro_level = 'lev06'
-    hydro_basin_paths = [x for x in hydro_basin_paths_full if hydro_level in x]
-    LOGGER.debug(f'hydro basin paths {hydro_basin_paths}')
+    file_matcher = 'sed_perc'
+    hybas_selected_path_list = [x for x in hybas_path_list if file_matcher in x]
+    LOGGER.debug(f'hydro basin paths {hybas_selected_path_list}')
 
-    merged_out_dir = os.path.join(hybas_root_dir, f"hybas_all_{hydro_level}")
-    if not os.path.exists(merged_out_dir):
+    hybas_id = 'sed'
+
+    merged_out_dir = os.path.join(hybas_root_dir, f'merged_{hybas_id}_vectors')
+    if not os.path.isdir(merged_out_dir):
         os.makedirs(merged_out_dir)
 
     merged_out_path = os.path.join(
-        merged_out_dir, f"hybas_all_{hydro_level}.shp")
+        merged_out_dir, f"hybas_all_{hybas_id}.shp")
     # if this file already exists, then remove it
     if os.path.isfile(merged_out_path):
         os.remove(merged_out_path)
 
-    number_of_vectors = len(hydro_basin_paths)
+    number_of_vectors = len(hybas_selected_path_list)
 
-    for idx, hybas_path in enumerate(hydro_basin_paths):
+    for idx, hybas_path in enumerate(hybas_selected_path_list):
         if idx == 0:
             # ogr2ogr -f "ESRI Shapefile" merged a.ship
+            # ogr2ogr -f "GeoJSONSeq" merged a.ship
             subprocess.run(
-                ["ogr2ogr", "-f", "ESRI Shapefile", merged_out_path,
-                 hybas_path])
+                ["ogr2ogr", "-f", "ESRI Shapefile", merged_out_path, hybas_path])
         else:
             # ogr2ogr -f "ESRI Shapefile" -append -update merged b.ship
             subprocess.run(
