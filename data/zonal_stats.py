@@ -21,35 +21,6 @@ logging.basicConfig(
     stream=sys.stdout)
 LOGGER = logging.getLogger(__name__)
 
-def merge_vectors_ogr2ogr(vector_path_list, merged_vector_out_path):
-    """Merge vectors into one Shapefile using ogr2ogr subprocess call."""
-    # if this file already exists, then remove it
-    if os.path.isfile(merged_vector_out_path):
-        os.remove(merged_vector_out_path)
-
-    number_of_vectors = len(vector_path_list)
-
-    # Example for using the -fieldmap setting. The first field of the source
-    # layer is used to fill the third field (index 2 = third field) of the
-    # target layer, the second field of the source layer is ignored,
-    # the third field of the source layer used to fill the fifth field of the
-    # target layer.
-    # fieldmap example: ogr2ogr -append -fieldmap 2,-1,4 dst.shp src.shp
-
-    for idx, vector_path in enumerate(vector_path_list):
-        if idx == 0:
-            # ogr2ogr -f "ESRI Shapefile" merged a.ship
-            subprocess.run(
-                ["ogr2ogr", "-f", "ESRI Shapefile", merged_vector_out_path,
-                 vector_path])
-        else:
-            # ogr2ogr -f "ESRI Shapefile" -append -update merged b.ship
-            subprocess.run(
-                ["ogr2ogr", "-f", "ESRI Shapefile", "-append", "-update",
-                 merged_vector_out_path, vector_path])
-
-        LOGGER.debug(f"{idx + 1} out of {number_of_vectors} merged")
-
 def stats_to_vector(
         base_vector_path, stats_pickle_path, vector_out_path, mean_attr):
     """Add zonal statistics to vector.
@@ -167,7 +138,7 @@ def pickle_zonal_stats(
     LOGGER.info(
         f'Taking zonal statistics of {base_vector_path} over {base_raster_path}')
     zonal_stats = pygeoprocessing.zonal_statistics(
-        (base_raster_path, 1), base_vector_path)
+        (base_raster_path, 1), base_vector_path, polygons_might_overlap=False)
     with open(target_pickle_path, 'wb') as pickle_file:
         pickle.dump(zonal_stats, pickle_file)
 
@@ -245,7 +216,7 @@ def calculate_percentiles_to_vector(
 
     country_pctile_dict = {}
     for key, value in country_means_dict.items():
-        percentile_groups = numpy.percentile(value, range(0, 105, 5))
+        percentile_groups = numpy.percentile(value, range(0, 100, 5))
         country_pctile_dict[key] = percentile_groups
 
     country_means_dict = None
