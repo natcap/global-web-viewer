@@ -30,69 +30,6 @@ const Map = () => {
 
   let layers = [
     {
-      layerID: 'dem-stats',
-      name: 'Max DEM',
-      mapLayer: {
-        id: 'dem-stats',
-        type: 'fill',
-        source: 'dem-stats',
-        'source-layer': 'hello_world', // layer name from Tilesets > hello world > Vector Layers
-        paint: {
-          'fill-outline-color': 'rgba(200, 100, 240, 1)',
-          'fill-color': [
-            'interpolate',
-            ['linear'],
-            ['get', 'max'],
-            -600,
-            '#F2F12D',
-            0,
-            '#EED322',
-            1000,
-            '#E6B71E',
-            2000,
-            '#DA9C20',
-            3000,
-            '#CA8323',
-            5000,
-            '#B86B25',
-            7000,
-            '#A25626',
-          ],
-          'fill-opacity': 0.75
-        },
-        layout: {
-          visibility: 'none',
-        },
-      }
-    },
-    {
-      layerID: 'hybas-lev06-seddep',
-      name: 'HyBasin SedDep Sum',
-      mapLayer: {
-        id: 'hybas-lev06-seddep',
-        type: 'fill',
-        source: 'hybas-lev06-seddep',
-        //hybas_lev06_seddep
-        'source-layer': 'hybas_lev06_seddep', // layer name from Tilesets > hello world > Vector Layers
-        paint: {
-          'fill-outline-color': 'rgba(200, 100, 240, 1)',
-          'fill-color': [
-            'interpolate',
-            ['linear'],
-            ['get', 'sum'],
-            0,
-            '#4ce0fa',
-            700000,
-            '#047f95',
-          ],
-          'fill-opacity': 0.75
-        },
-        layout: {
-          visibility: 'none',
-        },
-      }
-    },
-    {
       layerID: 'sed-pct-global',
       name: 'Sediment Deposition Pct',
       mapLayer: {
@@ -114,6 +51,30 @@ const Map = () => {
           visibility: 'none',
         },
         source: 'global-nit-pct',
+      },
+    },
+    {
+      layerID: 'gadm0-sed-pct',
+      name: 'GADM0 Sed Dep Pct',
+      mapLayer: {
+        id: 'gadm0-sed-pct',
+        type: 'raster',
+        layout: {
+          visibility: 'none',
+        },
+        source: 'gadm0-sed-pct',
+      },
+    },
+    {
+      layerID: 'gadm0-nit-pct',
+      name: 'GADM0 Nit Dep Pct',
+      mapLayer: {
+        id: 'gadm0-nit-pct',
+        type: 'raster',
+        layout: {
+          visibility: 'none',
+        },
+        source: 'gadm0-nit-pct',
       },
     },
     {
@@ -164,6 +125,23 @@ const Map = () => {
         source: 'hybas-nit-pct',
       }
     },
+    {
+      layerID: 'hybas-sed-stats',
+      name: 'Hybas Lev08 Sed',
+      mapLayer: {
+        id: 'hybas-sed-stats',
+        type: 'fill',
+        source: 'hybas-sed-stats',
+        'source-layer': 'hybas_sed_stats',
+        paint: {
+          'fill-color': 'rgba(99, 99, 99, 0.0)',
+          'fill-outline-color': 'rgba(43, 140, 190, 1.0)',
+        },
+        layout: {
+          visibility: 'none',
+        },
+      }
+    },
   ]
 
   let legend = [
@@ -200,11 +178,6 @@ const Map = () => {
   const [mapLayers, setLayers] = useState(layers);
 
   function addSources(map) {
-    map.addSource('dem-stats', {
-      type: 'vector',
-      url: 'mapbox://ddenu.hello-world-tiles'
-      //url: 'mapbox://styles/ddenu/cknor29xj2rlo17p1jdvyn4gg'
-    });
     map.addSource('sed-pct-global', {
       type: 'raster',
       url: 'mapbox://ddenu.sed-pct-global'
@@ -212,6 +185,14 @@ const Map = () => {
     map.addSource('global-nit-pct', {
       type: 'raster',
       url: 'mapbox://ddenu.global_nit_pct'
+    });
+    map.addSource('gadm0-sed-pct', {
+      type: 'raster',
+      url: 'mapbox://ddenu.gadm0_sed_pct'
+    });
+    map.addSource('gadm0-nit-pct', {
+      type: 'raster',
+      url: 'mapbox://ddenu.gadm0_nit_pct'
     });
     map.addSource('gadm1-sed-pct', {
       type: 'raster',
@@ -230,9 +211,9 @@ const Map = () => {
       url: 'mapbox://ddenu.hybas_nit_pct'
     });
 
-    map.addSource('hybas-lev06-seddep', {
+    map.addSource('hybas-sed-stats', {
       type: 'vector',
-      url: 'mapbox://ddenu.hybas-06-seddep'
+      url: 'mapbox://ddenu.hybas-sed-stats'
     });
 
     setMap(map);
@@ -245,6 +226,7 @@ const Map = () => {
       center: [lng, lat],
       zoom: zoom,
       minZoom: 1.6,
+      maxZoom: 9.1,
     });
 
     // Add the control to the map.
@@ -287,10 +269,10 @@ const Map = () => {
 
     // When a click event occurs on a feature in the states layer, open a popup at the
     // location of the click, with description HTML from its properties.
-    map.on('click', 'hybas-lev06-seddep', function (e) {
+    map.on('click', 'hybas-sed-stats', function (e) {
     new mapboxgl.Popup()
     .setLngLat(e.lngLat)
-    .setHTML(`Sed Sum Value: ${e.features[0].properties.sum}`)
+    .setHTML(`Sed mean Value: ${e.features[0].properties.sed_mean} <br/> Sed Pct Value: ${e.features[0].properties.pcttile} `)
     .addTo(map);
     });
 
