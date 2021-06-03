@@ -1,24 +1,45 @@
 import os
+import sys
 import math
+import argparse
 from osgeo import osr
+import logging
 
 import pygeoprocessing
 
-#input_path = os.path.join(
-#    'C', os.sep, 'Users', 'ddenu', 'Downloads', 
-#    'realized_sedimentdeposition_nathab_md5_96c3424924c752e9b1f7ccfffe9b102a.tif')
+logging.basicConfig(
+    level=logging.DEBUG,
+    format=(
+        '%(asctime)s (%(relativeCreated)d) %(levelname)s %(name)s'
+        ' [%(funcName)s:%(lineno)d] %(message)s'),
+    stream=sys.stdout)
+LOGGER = logging.getLogger(__name__)
 
-input_path = os.path.join(
-    'C', os.sep, 'Users', 'ddenu', 'Workspace', 'NatCap', 'Repositories',
-    'leaflet-tutorial', 'map-viewer', 'public', 'Base_Data', 'global_dem.tif')
+if __name__ == "__main__":
 
-out_path = os.path.join(
-    'C', os.sep, 'Users', 'ddenu', 'Workspace', 'NatCap', 'Repositories',
-    'leaflet-tutorial', 'map-viewer', 'public', 'Base_Data',
-    'global-dem', 'global_dem_3857.tif')
+    LOGGER.debug("Starting Reprojecting Processing")
 
-projection_srs = osr.SpatialReference()
-projection_srs.ImportFromEPSG(3857)
-projection_wkt = projection_srs.ExportToWkt()
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-s', '--src',
+        help="The input vector to reproject.", required=True)
+    parser.add_argument('-d', '--dst',
+            help="The reprojected output vector path.", required=True)
 
-pygeoprocessing.reproject_vector(input_path, projection_wkt, out_path)
+    args = vars(parser.parse_args())
+    LOGGER.info(f"Source: {args['src']}, Dest: {args['dst']}")
+
+    input_path = args['src']
+    input_basename = os.path.splitext(os.path.basename(input_path))[0]
+
+    out_path = args['dst']
+    out_dir = os.path.dirname(out_path)
+    if not os.path.exists(out_dir):
+        os.makedirs(out_dir)
+
+    projection_srs = osr.SpatialReference()
+    projection_srs.ImportFromEPSG(3857)
+    projection_wkt = projection_srs.ExportToWkt()
+
+    pygeoprocessing.reproject_vector(
+        input_path, projection_wkt, out_path,
+        driver_name='GeoJSONSeq')
