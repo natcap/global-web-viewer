@@ -1,15 +1,31 @@
 .banner {
-  background-color: rgba(44, 162, 95, 0.9);
+  background-color: rgba(35, 55, 75, 0.9);
   font: 32px Arial, sans-serif;
+  color: #ffffff;
   padding-left: 2rem;
   padding-top: 1rem;
   margin-left: 0rem;
   margin-right: 0rem;
   margin-bottom: 0rem;
   margin-top: 0rem;
-  width: 100%;
   min-height: 5rem;
-  border: 3px solid #2c7fb8;
+}
+
+.footer {
+  background-color: rgba(35, 55, 75, 0.9);
+  /*
+  position: absolute;
+  bottom: 0;
+  */
+  position: relative;
+  height: 2rem;
+  width: 100%;
+}
+
+.appContainer {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
 }
 
 .p-3 {
@@ -26,7 +42,7 @@
   outline-color: Black;
 }
 
-.App-header {
+.App-header-old {
   background-color: #282c34;
   min-height: 100vh;
   display: flex;
@@ -37,6 +53,6 @@
   color: white;
 }
 
-.App-link {
+.App-link-old {
   color: #61dafb;
 }
