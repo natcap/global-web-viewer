@@ -18,8 +18,16 @@
   bottom: 0;
   */
   position: relative;
-  height: 2rem;
-  width: 100%;
+  height: 2.5rem;
+}
+.welcomeButton {
+  font: 8px;
+  color: #000000;
+  padding: 0.2rem;
+  padding-left: 0.3rem;
+  padding-right: 0.3rem;
+  background-color: rgba(237, 244, 245, 1.0);
+  border-style: none;
 }
 
 .appContainer {
