@@ -2,8 +2,6 @@ import React, { useRef, useEffect, useState } from 'react';
 import ReactDOM from 'react-dom';
 
 import Button from 'react-bootstrap/Button';
-import Col from 'react-bootstrap/Col';
-import Row from 'react-bootstrap/Row';
 import Navbar from 'react-bootstrap/Navbar';
 import Form from 'react-bootstrap/Form';
 import Card from 'react-bootstrap/Card';

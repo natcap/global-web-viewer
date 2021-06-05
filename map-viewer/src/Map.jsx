@@ -313,8 +313,7 @@ const Map = () => {
   };
 
   return (
-    <div>
-      <div className="map-container" ref={mapContainer} >
+      <Col className="map-container" ref={mapContainer} >
         <VerticalMenu
           layers={layers}
           changeVisibilityState={changeVisibilityState}
@@ -328,8 +327,7 @@ const Map = () => {
           legend={legend}
           //changeVisibilityState={changeVisibilityState}
         />
-      </div>
-    </div>
+      </Col>
   );
 };
 
