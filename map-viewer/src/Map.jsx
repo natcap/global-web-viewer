@@ -18,6 +18,7 @@ import './Map.css';
 
 import VerticalMenu from './components/VerticalMenu';
 import Legend from './components/Legend';
+import BasemapControl from './components/BasemapControl';
 
 // import MyComponent from './components/MyComponent';
 
@@ -317,15 +318,17 @@ const Map = () => {
         <VerticalMenu
           layers={layers}
           changeVisibilityState={changeVisibilityState}
-          basemaps={basemaps}
-          changeBasemapState={changeBasemapState}
         />
-        <div className="coordinatebar">
-          Longitude: {lng} | Latitude: {lat} | Zoom: {zoom}
-        </div>
         <Legend
           legend={legend}
           //changeVisibilityState={changeVisibilityState}
+        />
+        <BasemapControl className="basemap-control"
+          basemaps={basemaps}
+          changeBasemapState={changeBasemapState}
+          lng={lng}
+          lat={lat}
+          zoom={zoom}
         />
       </Col>
   );

@@ -11,19 +11,6 @@
   */
   height: 100%;
 }
-.coordinatebar {
-  height: 2rem;
-  background-color: rgba(35, 55, 75, 0.9);
-  color: #ffffff;
-  padding: 6px 12px;
-  font: 15px/24px monospace;
-  z-index: 1;
-  position: absolute;
-  top: 0;
-  left: 30%;
-  margin: 12px;
-  border-radius: 4px;
-}
 .vertical-menu {
   background-color: rgba(35, 55, 75, 0.9);
   color: #ffffff;
@@ -49,8 +36,22 @@
   z-index: 1;
 }
 .layer-label {
-
 }
+
+.basemap-control {
+  z-index: 1;
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  background-color: #f5f6f7;
+  color: #000000;
+  padding: 6px 12px;
+  font: 15px/24px monospace;
+  border-radius: 4px;
+  margin-bottom: 2rem;
+  margin-right: 0.5rem;
+}
+
 .dep-form-check-label {
   background-color: #99ccff;
   padding: 0.25rem;

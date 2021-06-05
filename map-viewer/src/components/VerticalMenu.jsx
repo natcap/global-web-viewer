@@ -10,7 +10,7 @@ import Accordion from 'react-bootstrap/Accordion';
 import LayerSelect from './LayerSelect';
 
 const VerticalMenu = (props) => {
-  
+
   function handleChange(event) {
     const { id, checked } = event.target;
     console.log("event value: ", checked);
@@ -55,30 +55,7 @@ const VerticalMenu = (props) => {
           </Accordion.Collapse>
         </Card>
       </Accordion>
-      
-        <Accordion defaultActiveKey="0">
-        <Card>
-          <Accordion.Toggle as={Card.Header} eventKey="1" className="accordion-header">
-            Basemap Settings v
-          </Accordion.Toggle>
-          <Accordion.Collapse eventKey="1" className="accordion-header">
-            <Card.Body>
-              {props.basemaps.map((basemap) => (
-                <Form.Check
-                  defaultChecked={basemap.layerID == 'streets-v11'}
-                  key={`radio-key-${basemap.layerID}`}
-                  type="radio"
-                  id={`${basemap.layerID}`}
-                  name="radio-basemaps"
-                  label={`${basemap.name}`}
-                  onChange={handleChange}
-                  inline
-                />
-              ))}
-            </Card.Body>
-          </Accordion.Collapse>
-        </Card>
-      </Accordion>
+
     </Form>
   );
 };
