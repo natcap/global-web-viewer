@@ -6,6 +6,7 @@ import numpy
 import json
 import tempfile
 import pickle
+import time
 from rtree import index
 import shapely
 import shapely.wkb
@@ -269,12 +270,12 @@ if __name__ == "__main__":
     taskgraph_working_dir = os.path.join(
         taskgraph_pct_dir, '_taskgraph_working_dir')
 
-    n_workers = 3
+    n_workers = 5
     task_graph = taskgraph.TaskGraph(taskgraph_working_dir, n_workers)
     ###
 
-    run_gadm = True
-    run_hydro_basins = False
+    run_gadm = False
+    run_hydro_basins = True
     run_global = False
 
     if run_gadm:
