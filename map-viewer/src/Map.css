@@ -21,6 +21,8 @@
   left: 0;
   top: 0;
   border-radius: 4px;
+  max-width: 25rem;
+  height: 95%;
 }
 .accordion-header {
   background-color: rgba(35, 55, 75, 0.9);
@@ -59,6 +61,17 @@
   outline-color: blue;
 }
 
+.menu-main-text {
+  font: 16px/24px monospace;
+  font-weight: bold;
+  padding-right: .3rem;
+  display: inline;
+}
+.menu-desc-text {
+  display: inline;
+  font: 14px/16px monospace;
+}
+
 .dep-form-check-label {
   background-color: #99ccff;
   padding: 0.25rem;
@@ -70,14 +83,13 @@
 .legend-group {
   z-index: 1;
   position: absolute;
-  right: 10%;
-  top: 80%;
+  right: 3rem;
+  bottom: 10rem;
   padding: 10px;
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
   background-color: rgba(222, 235, 247, 0.8);
   line-height: 18px;
   height: 100px;
-  margin-bottom: 40px;
   width: 200px;
 }
 .legend-key {
@@ -86,4 +98,20 @@
   width: 10px;
   height: 10px;
   margin-right: 5px;
+}
+
+.labelIcons {
+  font-size: 30px;
+  padding-right: .3rem;
+}
+
+.mapboxgl-popup-close-button {
+  display: none;
+}
+.mapboxgl-popup-content {
+  font: 400 15px/22px 'Source Sans Pro', 'Helvetica Neue', Sans-serif;
+  padding: 1rem;
+}
+.mapboxgl-popup-content-wrapper {
+  padding: 1%;
 }

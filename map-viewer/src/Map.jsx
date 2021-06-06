@@ -261,20 +261,11 @@ const Map = () => {
 
     // When a click event occurs on a feature in the states layer, open a popup at the
     // location of the click, with description HTML from its properties.
-    map.on('click', 'dem-stats', function (e) {
-    new mapboxgl.Popup()
-    .setLngLat(e.lngLat)
-    .setHTML(`Max Dem Value: ${e.features[0].properties.max}`)
-    .addTo(map);
-    });
-
-    // When a click event occurs on a feature in the states layer, open a popup at the
-    // location of the click, with description HTML from its properties.
     map.on('click', 'hybas-sed-stats', function (e) {
-    new mapboxgl.Popup()
-    .setLngLat(e.lngLat)
-    .setHTML(`Sed mean Value: ${e.features[0].properties.sed_mean} <br/> Sed Pct Value: ${e.features[0].properties.pcttile} `)
-    .addTo(map);
+      new mapboxgl.Popup({closeButton:false})
+      .setLngLat(e.lngLat)
+      .setHTML(`Sed mean Value: ${e.features[0].properties.sed_mean.toFixed(2)} <br/> Sed Pct Value: ${e.features[0].properties.pcttile} `)
+      .addTo(map);
     });
 
     // Clean up on unmount
