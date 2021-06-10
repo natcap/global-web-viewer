@@ -11,6 +11,9 @@ import Form from 'react-bootstrap/Form';
 //import mapboxgl from 'mapbox-gl/dist/mapbox-gl-csp';
 //import MapboxWorker from 'worker-loader!mapbox-gl/dist/mapbox-gl-csp-worker';
 import mapboxgl from 'mapbox-gl';
+// Had to npm install @mapbox/mapbox-gl-draw and import like below
+import MapboxDraw from '@mapbox/mapbox-gl-draw';
+import '@mapbox/mapbox-gl-draw/dist/mapbox-gl-draw.css';
 // Had to npm install @mapbox/mapbox-gl-geocoder and import like below
 import * as MapboxGeocoder from '@mapbox/mapbox-gl-geocoder';
 
@@ -172,11 +175,29 @@ const Map = () => {
   ]
 
   const mapContainer = useRef(null);
+  //If you are using hooks, you also created a map useRef to store the
+  //initialize the map. The ref will prevent the map from reloading when the
+  //user interacts with the map.
+  //const map = useRef(null);
   const [map, setMap] = useState(null);
   const [lng, setLng] = useState(16.8);
   const [lat, setLat] = useState(30.0);
   const [zoom, setZoom] = useState(1.64);
   const [mapLayers, setLayers] = useState(layers);
+
+  /*
+  useEffect(() => {
+    if (map.current) return; // initialize map only once
+    map.current = new mapboxgl.Map({
+      container: mapContainer.current,
+      style: 'mapbox://styles/mapbox/streets-v11',
+      center: [lng, lat],
+      zoom: zoom,
+      minZoom: 1.6,
+      maxZoom: 9.1,
+    });
+  });
+  */
 
   function addSources(map) {
     map.addSource('sed-pct-global', {
@@ -241,6 +262,43 @@ const Map = () => {
     // Add zoom and rotation controls to the map.
     map.addControl(new mapboxgl.NavigationControl());
 
+    const draw = new MapboxDraw({
+      displayControlsDefault: false,
+      controls: {
+        polygon: true,
+        trash: true,
+      },
+      defaultMode: 'draw_polygon',
+    });
+    map.addControl(draw);
+
+    map.on('draw.create', updateArea);
+    map.on('draw.delete', updateArea);
+    map.on('draw.update', updateArea);
+
+    function updateArea(e) {
+      const data = draw.getAll();
+      if (data.features.length > 0) {
+        console.log(data);
+        let minY = 100.0;
+        let minX = 200.0;
+        let maxY = -100.0;
+        let maxX = -200.0;
+        const geoms = data.features[0].geometry.coordinates[0];
+        console.log(geoms);
+        let arrayX = [];
+        let arrayY = [];
+        geoms.forEach((point) => {
+          arrayX.push(point[0]);
+          arrayY.push(point[1]);
+        });
+
+        const bbox = [Math.min(...arrayX), Math.min(...arrayY), Math.max(...arrayX), Math.max(...arrayY)];
+        console.log(bbox);
+      }
+
+    }
+
     map.on('load', () => {
       console.log("LOAD EVENT");
       addSources(map);
@@ -253,9 +311,20 @@ const Map = () => {
       console.log(sedLayer);
     });
 
+    /*
+    useEffect(() => {
+      if (!map.current) return; // wait for map to initialize
+      map.current.on('move', () => {
+        setLng(map.current.getCenter().lng.toFixed(4));
+        setLat(map.current.getCenter().lat.toFixed(4));
+        setZoom(map.current.getZoom().toFixed(2));
+      });
+    });
+    */
+
     map.on('move', () => {
-      setLng(map.getCenter().lng.toFixed(4));
-      setLat(map.getCenter().lat.toFixed(4));
+      setLng(map.getCenter().lng.toFixed(2));
+      setLat(map.getCenter().lat.toFixed(2));
       setZoom(map.getZoom().toFixed(2));
     });
 

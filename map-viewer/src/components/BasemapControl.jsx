@@ -35,13 +35,14 @@ const BasemapControl = (props) => {
                 type="radio"
                 id={`${basemap.layerID}`}
                 name="radio-basemaps"
-                //label={`${basemap.name}`}
                 label={
-                  <img
-                    src="./icons/street-map-small.jpg"
-                    className="img-fluid"
-                    alt="map"
-                  />
+                  <span>
+                    <img
+                      src="./icons/street-map-small.jpg"
+                      className="img-fluid labelMaps"
+                      alt={`${basemap.name}`}
+                    />
+                  </span>
                 }
                 onChange={handleChange}
                 inline

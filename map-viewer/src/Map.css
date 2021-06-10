@@ -47,7 +47,8 @@
   bottom: 0;
   background-color: #f5f6f7;
   color: #000000;
-  padding: 6px 12px;
+  padding-top: 6px;
+  padding-left: 12px;
   font: 15px/24px monospace;
   border-radius: 4px;
   margin-bottom: 2rem;
@@ -103,6 +104,10 @@
 .labelIcons {
   font-size: 30px;
   padding-right: .3rem;
+}
+.labelMaps {
+  width: 70px;
+  height: auto;
 }
 
 .mapboxgl-popup-close-button {
