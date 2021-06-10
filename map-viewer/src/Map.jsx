@@ -32,10 +32,11 @@ mapboxgl.accessToken =
 
 const Map = () => {
 
-  let layers = [
+  const layers = [
     {
       layerID: 'sed-pct-global',
       name: 'Sediment Deposition Pct',
+      serviceType: 'sediment',
       mapLayer: {
         id: 'sed-pct-global',
         type: 'raster',
@@ -48,6 +49,7 @@ const Map = () => {
     {
       layerID: 'global-nit-pct',
       name: 'Nitrogen Pct',
+      serviceType: 'nitrogen',
       mapLayer: {
         id: 'global-nit-pct',
         type: 'raster',
@@ -60,6 +62,7 @@ const Map = () => {
     {
       layerID: 'gadm0-sed-pct',
       name: 'GADM0 Sed Dep Pct',
+      serviceType: 'sediment',
       mapLayer: {
         id: 'gadm0-sed-pct',
         type: 'raster',
@@ -72,6 +75,7 @@ const Map = () => {
     {
       layerID: 'gadm0-nit-pct',
       name: 'GADM0 Nit Dep Pct',
+      serviceType: 'nitrogen',
       mapLayer: {
         id: 'gadm0-nit-pct',
         type: 'raster',
@@ -84,6 +88,7 @@ const Map = () => {
     {
       layerID: 'gadm1-sed-pct',
       name: 'GADM1 Sed Dep Pct',
+      serviceType: 'sediment',
       mapLayer: {
         id: 'gadm1-sed-pct',
         type: 'raster',
@@ -96,6 +101,7 @@ const Map = () => {
     {
       layerID: 'gadm1-nit-pct',
       name: 'GADM1 Nit Dep Pct',
+      serviceType: 'nitrogen',
       mapLayer: {
         id: 'gadm1-nit-pct',
         type: 'raster',
@@ -108,6 +114,7 @@ const Map = () => {
     {
       layerID: 'hybas-sed-pct',
       name: 'HYBAS Sed Dep Pct',
+      serviceType: 'sediment',
       mapLayer: {
         id: 'hybas-sed-pct',
         type: 'raster',
@@ -120,6 +127,7 @@ const Map = () => {
     {
       layerID: 'hybas-nit-pct',
       name: 'HYBAS Nit Dep Pct',
+      serviceType: 'nitrogen',
       mapLayer: {
         id: 'hybas-nit-pct',
         type: 'raster',
@@ -132,6 +140,7 @@ const Map = () => {
     {
       layerID: 'hybas-sed-stats',
       name: 'Hybas Lev08 Sed',
+      serviceType: 'sediment',
       mapLayer: {
         id: 'hybas-sed-stats',
         type: 'fill',
@@ -148,12 +157,18 @@ const Map = () => {
     },
   ]
 
-  let legend = [
-    {
-      legendID: 'sed-pct-global',
+  let legendStyle = {
+    'sediment': {
       name: 'Sediment Deposition Pct',
+      colorStops: ['0-26', '26-51', '51-76', '76-100', '101+'],
+      colors: ['#ffffb2', '#fecc5c', '#fd8d3c', '#f03b20', '#bd0026'],
+      },
+    'nitrogen': {
+      name: 'Nitrogen Pct',
+      colorStops: ['0-26', '26-51', '51-76', '76-100', '101+'],
+      colors: ['#f7fcf5', '#caeac3', '#7bc87c', '#2a924a', '#00441b'],
     },
-  ]
+  }
 
   const basemaps = [
     {
@@ -337,24 +352,36 @@ const Map = () => {
       .addTo(map);
     });
 
+    console.log("main useeffect");
     // Clean up on unmount
     return () => map.remove();
   }, []); // eslint-disable-line-react-hooks/exhaustive-deps
+
+  useEffect(() => {
+    console.log("mapLayers change");
+
+  }, [mapLayers]);
 
   const changeVisibilityState = (i, checked) => {
     console.log("i ", i);
     console.log("checked ", checked);
     if(!checked) {
       map.setLayoutProperty(mapLayers[i]['layerID'], 'visibility', 'none');
-      let tmpLayers = mapLayers;
+      const tmpLayers = mapLayers;
       tmpLayers[i]['mapLayer']['layout']['visibility'] = 'none';
-      setLayers(tmpLayers);
+      setLayers([...tmpLayers]);
     }
     else {
       map.setLayoutProperty(mapLayers[i]['layerID'], 'visibility', 'visible');
-      let tmpLayers = mapLayers;
+      const tmpLayers = mapLayers;
       tmpLayers[i]['mapLayer']['layout']['visibility'] = 'visible';
-      setLayers(tmpLayers);
+      //You're calling setNumbers and passing it the array it already has.
+      //You've changed one of its values but it's still the same array, and
+      //I suspect React doesn't see any reason to re-render because state
+      //hasn't changed; the new array is the old array. 
+      //One easy way to avoid this is by spreading the array into a new array:
+      setLayers([...tmpLayers]);
+      console.log(mapLayers);
     }
     setMap(map);
   };
@@ -376,11 +403,12 @@ const Map = () => {
   return (
       <Col className="map-container" ref={mapContainer} >
         <VerticalMenu
-          layers={layers}
+          layers={mapLayers}
           changeVisibilityState={changeVisibilityState}
         />
         <Legend
-          legend={legend}
+          legend={legendStyle}
+          layers={mapLayers}
           //changeVisibilityState={changeVisibilityState}
         />
         <BasemapControl className="basemap-control"
