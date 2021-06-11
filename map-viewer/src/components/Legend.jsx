@@ -1,11 +1,15 @@
 import React, { useRef, useEffect, useState } from 'react';
 import ReactDOM from 'react-dom';
 
+import * as d3 from "d3";
+
 import Button from 'react-bootstrap/Button';
 import Col from 'react-bootstrap/Col';
 import Row from 'react-bootstrap/Row';
-import Navbar from 'react-bootstrap/Navbar';
-import Form from 'react-bootstrap/Form';
+import ListGroup from 'react-bootstrap/ListGroup';
+
+import D3Legend from './D3Legend';
+
 
 const Legend = (props) => {
 
@@ -54,46 +58,25 @@ const Legend = (props) => {
         <div>Hello!</div>
       //</span>
     */
-  function styleLegend(serviceType) {
-    const serviceStops = props.legend[serviceType].colorStops;
-    const colors = props.legend[serviceType].colors;
-    console.log("styleLegend");
-    console.log(serviceStops);
-    const returnItems = serviceStops.map((stop, i) =>
-      <div>
-        <span className='legend-key' style={{ backgroundColor:colors[i] }}/>
-        <span>{stop}</span>
-      </div>
-    );
-    return (
-      <div>{returnItems}</div>
-    );
-  }
 
   const renderLegend = (layer, i) => {
+    if(layer.mapLayer.layout.visibility === 'visible'){
+      return (
+        <ListGroup.Item key={`legendStyle-${i}`} className="legend-container">
+          <div>{layer.name}</div>
+          <D3Legend serviceType={layer.serviceType}/>
+        </ListGroup.Item>
+      );
+    }
     return (
-      <div key={`legendStyle-${i}`} className="legend-container">
-        <Form.Label
-          //onChange={() => props.changeVisibilityState(i)}
-          //onChange={handleChange}
-          id={`legendStyle-${i}`}
-          className="legend-label"
-        >
-          {layer.mapLayer.layout.visibility === 'visible' &&
-              styleLegend(layer.serviceType)
-              //<h2> Hello! </h2>
-          }
-        </Form.Label>
-      </div>
+      null
     );
   };
 
-  console.log("Legend");
-
   return (
-    <Form className="legend-group">
+    <ListGroup variant="flush" className="legend-group">
       {props.layers.map(renderLegend)}
-    </Form>
+    </ListGroup>
   );
 };
 

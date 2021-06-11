@@ -23,6 +23,7 @@
   border-radius: 4px;
   max-width: 25rem;
   height: 95%;
+  overflow-y: auto;
 }
 .accordion-header {
   background-color: rgba(35, 55, 75, 0.9);
@@ -92,8 +93,9 @@
   background-color: #f5f6f7;
   border-radius: 4px;
   line-height: 18px;
-  height: 100px;
-  width: 200px;
+  height: 150px;
+  width: 280px;
+  overflow-y: auto;
 }
 .legend-key {
   display: inline-block;
@@ -101,6 +103,14 @@
   width: 10px;
   height: 10px;
   margin-right: 5px;
+}
+.d3-legend {
+  z-index: 1;
+  width: 200px;
+  height: 20px;
+}
+.d3-x-axis:not(:last-child) {
+  padding-right: 4rem;
 }
 
 .labelIcons {

@@ -157,19 +157,6 @@ const Map = () => {
     },
   ]
 
-  let legendStyle = {
-    'sediment': {
-      name: 'Sediment Deposition Pct',
-      colorStops: ['0-26', '26-51', '51-76', '76-100', '101+'],
-      colors: ['#ffffb2', '#fecc5c', '#fd8d3c', '#f03b20', '#bd0026'],
-      },
-    'nitrogen': {
-      name: 'Nitrogen Pct',
-      colorStops: ['0-26', '26-51', '51-76', '76-100', '101+'],
-      colors: ['#f7fcf5', '#caeac3', '#7bc87c', '#2a924a', '#00441b'],
-    },
-  }
-
   const basemaps = [
     {
       layerID: 'light-v10',
@@ -283,7 +270,6 @@ const Map = () => {
         polygon: true,
         trash: true,
       },
-      defaultMode: 'draw_polygon',
     });
     map.addControl(draw);
 
@@ -337,6 +323,10 @@ const Map = () => {
     });
     */
 
+    map.on('mousemove', function (e) {
+      setLng(e.lngLat.lng.toFixed(2));
+      setLat(e.lngLat.lat.toFixed(2));
+    });
     map.on('move', () => {
       setLng(map.getCenter().lng.toFixed(2));
       setLat(map.getCenter().lat.toFixed(2));
@@ -407,8 +397,8 @@ const Map = () => {
           changeVisibilityState={changeVisibilityState}
         />
         <Legend
-          legend={legendStyle}
           layers={mapLayers}
+          //svgLegends={legends}
           //changeVisibilityState={changeVisibilityState}
         />
         <BasemapControl className="basemap-control"
