@@ -12,7 +12,7 @@ import Card from 'react-bootstrap/Card';
 import Accordion from 'react-bootstrap/Accordion';
 
 import LayerSelect from './LayerSelect';
-import scales from '../ScaleDefinitions';
+import { scales } from '../ScaleDefinitions';
 
 const IconMap = {
   fcglobe: <FcGlobe className="labelIcons"/>,
@@ -22,10 +22,9 @@ const IconMap = {
 
 const VerticalMenu = (props) => {
 
-  function handleChange(event) {
+  function handleScaleChange(event) {
     const { id, checked } = event.target;
-    console.log("event value: ", checked);
-    props.changeBasemapState(id, checked);
+    props.changeScaleState(id, checked);
   };
 
   return (
@@ -39,16 +38,18 @@ const VerticalMenu = (props) => {
             <Card.Body>
               {scales.map((scaleObj) => (
                 <Form.Check
-                  key={`radio-key-${scaleObj.scale}`}
+                  key={`radio-key-${scaleObj.id}`}
                   type="radio"
-                  id={`radio-${scaleObj.scale}`}
+                  onChange={handleScaleChange}
+                  defaultChecked={scaleObj.defaultChecked}
+                  id={scaleObj.id}
                   name="radio-scales"
                       //<p className="menu-desc-text">{scaleObj.label}</p>
                       //{IconMap[`${scaleObj.iconKey}`]}
                   label={
                       <span className="menu-main-label">
                         {IconMap[`${scaleObj.iconKey}`]}
-                        <span className="menu-main-text">{scaleObj.scale}</span>
+                        <span className="menu-main-text">{scaleObj.name}</span>
                         <span className="menu-desc-text">{scaleObj.label}</span>
                       </span>
                   }
@@ -62,19 +63,18 @@ const VerticalMenu = (props) => {
       <Accordion>
         <Card>
           <Accordion.Toggle as={Card.Header} eventKey="1" className="accordion-header">
-            Explore Services v
+            Explore Ecosystem Services v
           </Accordion.Toggle>
           <Accordion.Collapse eventKey="1" className="accordion-header">
             <Card.Body>
               <LayerSelect
-                layers={props.layers}
                 changeVisibilityState={props.changeVisibilityState}
               />
             </Card.Body>
           </Accordion.Collapse>
         </Card>
       </Accordion>
-      
+
       <Accordion>
         <Card>
           <Accordion.Toggle as={Card.Header} eventKey="2" className="accordion-header">
@@ -87,7 +87,7 @@ const VerticalMenu = (props) => {
           </Accordion.Collapse>
         </Card>
       </Accordion>
-      
+
       <Accordion>
         <Card>
           <Accordion.Toggle as={Card.Header} eventKey="3" className="accordion-header">

@@ -59,23 +59,19 @@ const Legend = (props) => {
       //</span>
     */
 
-  const renderLegend = (layer, i) => {
-    if(layer.mapLayer.layout.visibility === 'visible'){
+  const renderLegend = (serviceType, i) => {
+      console.log("Legend service type: ", serviceType);
       return (
         <ListGroup.Item key={`legendStyle-${i}`} className="legend-container">
-          <div>{layer.name}</div>
-          <D3Legend serviceType={layer.serviceType}/>
+          <div>{props.layers[serviceType].name}</div>
+          <D3Legend serviceType={serviceType}/>
         </ListGroup.Item>
       );
-    }
-    return (
-      null
-    );
   };
 
   return (
     <ListGroup variant="flush" className="legend-group">
-      {props.layers.map(renderLegend)}
+      {props.services.map(renderLegend)}
     </ListGroup>
   );
 };

@@ -22,6 +22,7 @@ import './Map.css';
 import VerticalMenu from './components/VerticalMenu';
 import Legend from './components/Legend';
 import BasemapControl from './components/BasemapControl';
+import mapLayers from './LayerDefinitions';
 
 // import MyComponent from './components/MyComponent';
 
@@ -31,131 +32,6 @@ mapboxgl.accessToken =
 
 
 const Map = () => {
-
-  const layers = [
-    {
-      layerID: 'sed-pct-global',
-      name: 'Sediment Deposition Pct',
-      serviceType: 'sediment',
-      mapLayer: {
-        id: 'sed-pct-global',
-        type: 'raster',
-        layout: {
-          visibility: 'none',
-        },
-        source: 'sed-pct-global',
-      },
-    },
-    {
-      layerID: 'global-nit-pct',
-      name: 'Nitrogen Pct',
-      serviceType: 'nitrogen',
-      mapLayer: {
-        id: 'global-nit-pct',
-        type: 'raster',
-        layout: {
-          visibility: 'none',
-        },
-        source: 'global-nit-pct',
-      },
-    },
-    {
-      layerID: 'gadm0-sed-pct',
-      name: 'GADM0 Sed Dep Pct',
-      serviceType: 'sediment',
-      mapLayer: {
-        id: 'gadm0-sed-pct',
-        type: 'raster',
-        layout: {
-          visibility: 'none',
-        },
-        source: 'gadm0-sed-pct',
-      },
-    },
-    {
-      layerID: 'gadm0-nit-pct',
-      name: 'GADM0 Nit Dep Pct',
-      serviceType: 'nitrogen',
-      mapLayer: {
-        id: 'gadm0-nit-pct',
-        type: 'raster',
-        layout: {
-          visibility: 'none',
-        },
-        source: 'gadm0-nit-pct',
-      },
-    },
-    {
-      layerID: 'gadm1-sed-pct',
-      name: 'GADM1 Sed Dep Pct',
-      serviceType: 'sediment',
-      mapLayer: {
-        id: 'gadm1-sed-pct',
-        type: 'raster',
-        layout: {
-          visibility: 'none',
-        },
-        source: 'gadm1-sed-pct',
-      },
-    },
-    {
-      layerID: 'gadm1-nit-pct',
-      name: 'GADM1 Nit Dep Pct',
-      serviceType: 'nitrogen',
-      mapLayer: {
-        id: 'gadm1-nit-pct',
-        type: 'raster',
-        layout: {
-          visibility: 'none',
-        },
-        source: 'gadm1-nit-pct',
-      },
-    },
-    {
-      layerID: 'hybas-sed-pct',
-      name: 'HYBAS Sed Dep Pct',
-      serviceType: 'sediment',
-      mapLayer: {
-        id: 'hybas-sed-pct',
-        type: 'raster',
-        layout: {
-          visibility: 'none',
-        },
-        source: 'hybas-sed-pct',
-      },
-    },
-    {
-      layerID: 'hybas-nit-pct',
-      name: 'HYBAS Nit Dep Pct',
-      serviceType: 'nitrogen',
-      mapLayer: {
-        id: 'hybas-nit-pct',
-        type: 'raster',
-        layout: {
-          visibility: 'none',
-        },
-        source: 'hybas-nit-pct',
-      }
-    },
-    {
-      layerID: 'hybas-sed-stats',
-      name: 'Hybas Lev08 Sed',
-      serviceType: 'sediment',
-      mapLayer: {
-        id: 'hybas-sed-stats',
-        type: 'fill',
-        source: 'hybas-sed-stats',
-        'source-layer': 'hybas_sed_stats',
-        paint: {
-          'fill-color': 'rgba(99, 99, 99, 0.0)',
-          'fill-outline-color': 'rgba(43, 140, 190, 1.0)',
-        },
-        layout: {
-          visibility: 'none',
-        },
-      }
-    },
-  ]
 
   const basemaps = [
     {
@@ -175,31 +51,6 @@ const Map = () => {
       name: 'satellite',
     },
   ]
-
-  const mapContainer = useRef(null);
-  //If you are using hooks, you also created a map useRef to store the
-  //initialize the map. The ref will prevent the map from reloading when the
-  //user interacts with the map.
-  //const map = useRef(null);
-  const [map, setMap] = useState(null);
-  const [lng, setLng] = useState(16.8);
-  const [lat, setLat] = useState(30.0);
-  const [zoom, setZoom] = useState(1.64);
-  const [mapLayers, setLayers] = useState(layers);
-
-  /*
-  useEffect(() => {
-    if (map.current) return; // initialize map only once
-    map.current = new mapboxgl.Map({
-      container: mapContainer.current,
-      style: 'mapbox://styles/mapbox/streets-v11',
-      center: [lng, lat],
-      zoom: zoom,
-      minZoom: 1.6,
-      maxZoom: 9.1,
-    });
-  });
-  */
 
   function addSources(map) {
     map.addSource('sed-pct-global', {
@@ -242,6 +93,34 @@ const Map = () => {
 
     setMap(map);
   }
+
+  const mapContainer = useRef(null);
+  //If you are using hooks, you also created a map useRef to store the
+  //initialize the map. The ref will prevent the map from reloading when the
+  //user interacts with the map.
+  //const map = useRef(null);
+  const [map, setMap] = useState(null);
+  const [lng, setLng] = useState(16.8);
+  const [lat, setLat] = useState(30.0);
+  const [zoom, setZoom] = useState(1.64);
+  //const [mapLayers, setLayers] = useState(layers);
+  const [scale, setScale] = useState('global');
+  const [selectedServices, setServices] = useState([]);
+  const [visibleLayers, setLayers] = useState({});
+
+  /*
+  useEffect(() => {
+    if (map.current) return; // initialize map only once
+    map.current = new mapboxgl.Map({
+      container: mapContainer.current,
+      style: 'mapbox://styles/mapbox/streets-v11',
+      center: [lng, lat],
+      zoom: zoom,
+      minZoom: 1.6,
+      maxZoom: 9.1,
+    });
+  });
+  */
 
   useEffect(() => {
     const map = new mapboxgl.Map({
@@ -308,8 +187,6 @@ const Map = () => {
       });
 
       setMap(map);
-      const sedLayer = map.getLayer('sed-pct-global');
-      console.log(sedLayer);
     });
 
     /*
@@ -350,29 +227,64 @@ const Map = () => {
   useEffect(() => {
     console.log("mapLayers change");
 
-  }, [mapLayers]);
+  }, [visibleLayers]);
 
-  const changeVisibilityState = (i, checked) => {
-    console.log("i ", i);
+  const changeScaleState = (scaleResult, checked) => {
+    console.log("scaleResult ", scaleResult);
     console.log("checked ", checked);
+    setScale(scaleResult);
+    let visibleLayersUpdate = {};
+    mapLayers.forEach((layer) => {
+      if(layer.scaleID === scaleResult && selectedServices.includes(layer.serviceType)) {
+        map.setLayoutProperty(layer.layerID, 'visibility', 'visible');
+        visibleLayersUpdate[layer.serviceType] = layer;
+      }
+      else {
+        map.setLayoutProperty(layer.layerID, 'visibility', 'none');
+      }
+    });
+    console.log("scale state: ", scale);
+    console.log("layers state: ", visibleLayersUpdate);
+    setLayers({...visibleLayersUpdate});
+    setMap(map);
+  };
+
+  const changeVisibilityState = (serviceResult, checked) => {
+    console.log("service ", serviceResult);
+    console.log("checked ", checked);
+    let visibleLayersUpdate = visibleLayers;
+    let selectedServicesUpdate = selectedServices;
     if(!checked) {
-      map.setLayoutProperty(mapLayers[i]['layerID'], 'visibility', 'none');
-      const tmpLayers = mapLayers;
-      tmpLayers[i]['mapLayer']['layout']['visibility'] = 'none';
-      setLayers([...tmpLayers]);
+      const removeIndex = selectedServicesUpdate.indexOf(serviceResult);
+      if (removeIndex > -1) {
+        selectedServicesUpdate.splice(removeIndex, 1);
+      }
+      setServices([...selectedServicesUpdate]);
+
+      const layer = visibleLayers[serviceResult];
+      map.setLayoutProperty(layer.layerID, 'visibility', 'none');
+      delete visibleLayersUpdate[serviceResult];
+      setLayers({...visibleLayersUpdate});
     }
     else {
-      map.setLayoutProperty(mapLayers[i]['layerID'], 'visibility', 'visible');
-      const tmpLayers = mapLayers;
-      tmpLayers[i]['mapLayer']['layout']['visibility'] = 'visible';
+      selectedServicesUpdate.push(serviceResult);
       //You're calling setNumbers and passing it the array it already has.
       //You've changed one of its values but it's still the same array, and
       //I suspect React doesn't see any reason to re-render because state
       //hasn't changed; the new array is the old array. 
       //One easy way to avoid this is by spreading the array into a new array:
-      setLayers([...tmpLayers]);
-      console.log(mapLayers);
+      setServices([...selectedServicesUpdate]);
+      mapLayers.forEach((layer) => {
+        if(layer.scaleID === scale && layer.serviceType === serviceResult) {
+          map.setLayoutProperty(layer.layerID, 'visibility', 'visible');
+          visibleLayersUpdate[serviceResult] = layer;
+          setLayers({...visibleLayersUpdate});
+          console.log("add visible layer: ");
+          console.log(visibleLayersUpdate);
+        }
+      });
     }
+    console.log("selectedServices: after visibility change ", selectedServices);
     setMap(map);
   };
 
@@ -382,9 +294,10 @@ const Map = () => {
     await map.setStyle('mapbox://styles/mapbox/' + basemapId);
     setTimeout(() => {
       addSources(map);
-      mapLayers.forEach((layer) => {
-        map.addLayer(layer.mapLayer);
-      });
+      for (const key in visibleLayers) {
+        map.addLayer(visibleLayers.key);
+        map.setLayoutProperty(visibleLayers.key.layerID, 'visibility', 'visible');
+      }
     }, 1000);
 
     setMap(map);
@@ -393,11 +306,14 @@ const Map = () => {
   return (
       <Col className="map-container" ref={mapContainer} >
         <VerticalMenu
-          layers={mapLayers}
+          //scale={scale}
+          //layers={visibleLayers}
           changeVisibilityState={changeVisibilityState}
+          changeScaleState={changeScaleState}
         />
         <Legend
-          layers={mapLayers}
+          layers={visibleLayers}
+          services={selectedServices}
           //svgLegends={legends}
           //changeVisibilityState={changeVisibilityState}
         />
