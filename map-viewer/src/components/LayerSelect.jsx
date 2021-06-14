@@ -1,17 +1,14 @@
-import React, { useRef, useEffect, useState } from 'react';
-import ReactDOM from 'react-dom';
+import React from 'react';
+import PropTypes from 'prop-types';
 
 import { FcGlobe } from 'react-icons/fc';
 import { GrMapLocation } from 'react-icons/gr';
 import { GiAfrica } from 'react-icons/gi';
 
-import Button from 'react-bootstrap/Button';
-import Col from 'react-bootstrap/Col';
-import Row from 'react-bootstrap/Row';
-import Navbar from 'react-bootstrap/Navbar';
 import Form from 'react-bootstrap/Form';
 
 import { serviceMenuDetails } from '../ScaleDefinitions';
+import InfoPopover from './InfoPopover';
 
 const IconMap = {
   fcglobe: <FcGlobe className="labelIcons"/>,
@@ -26,7 +23,7 @@ const LayerSelect = (props) => {
     console.log("event: ", event.target);
     //props.changeVisibilityState(parseInt(id.slice(id.length - 1)), checked);
     props.changeVisibilityState(id, checked);
-  };
+  }
 
   const renderLayers = (service, i) => {
     return (
@@ -43,6 +40,10 @@ const LayerSelect = (props) => {
             <span className="menu-main-label">
               {IconMap[`${service.iconKey}`]}
               <span className="menu-desc-text">{service.label}</span>
+              <InfoPopover
+                title={`Cool Title`}
+                content={`Cool Content`}
+              />
             </span>
           }
         />
@@ -56,5 +57,9 @@ const LayerSelect = (props) => {
     </div>
   );
 };
+
+LayerSelect.propTypes = {
+  changeVisibilityState: PropTypes.func.isRequired,
+}
 
 export default LayerSelect;

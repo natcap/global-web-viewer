@@ -13,8 +13,9 @@
     "d3": "^6.7.0",
     "leaflet": "^1.7.1",
     "mapbox-gl": "^2.2.0",
+    "prop-types": "^15.7.2",
     "react": "^17.0.2",
-    "react-bootstrap": "^1.5.2",
+    "react-bootstrap": "^1.6.1",
     "react-dom": "^17.0.2",
     "react-icons": "^4.2.0",
     "react-scripts": "4.0.3",
@@ -33,7 +34,14 @@
     "extends": [
       "react-app",
       "react-app/jest"
-    ]
+    ],
+    "plugins": [
+      "react-hooks"
+    ],
+    "rules": {
+      "react-hooks/rules-of-hooks": "error",
+      "react-hooks/exhaustive-deps": "warn"
+    }
   },
   "browserslist": {
     "production": [
@@ -51,6 +59,9 @@
     ]
   },
   "devDependencies": {
-    "babel-plugin-styled-components": "^1.12.0"
+    "babel-plugin-styled-components": "^1.12.0",
+    "eslint": "^7.28.0",
+    "eslint-plugin-react": "^7.24.0",
+    "eslint-plugin-react-hooks": "^4.2.0"
   }
 }

@@ -1,5 +1,5 @@
 import React  from 'react';
-import ReactDOM from 'react-dom';
+import PropTypes from 'prop-types';
 
 import Col from 'react-bootstrap/Col';
 import Button from 'react-bootstrap/Button';
@@ -15,6 +15,10 @@ const WelcomeModalButton = (props) => {
       </Button>
     </Col>
   );
+}
+
+WelcomeModalButton.propTypes = {
+  onClick: PropTypes.func.isRequired,
 }
 
 export default WelcomeModalButton;

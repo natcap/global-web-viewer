@@ -1,18 +1,17 @@
-import React, { useRef, useEffect, useState } from 'react';
-import ReactDOM from 'react-dom';
+import React from 'react';
+import PropTypes from 'prop-types';
 
 import { FcGlobe } from 'react-icons/fc';
 import { GrMapLocation } from 'react-icons/gr';
 import { GiAfrica } from 'react-icons/gi';
 
-import Button from 'react-bootstrap/Button';
-import Navbar from 'react-bootstrap/Navbar';
 import Form from 'react-bootstrap/Form';
 import Card from 'react-bootstrap/Card';
 import Accordion from 'react-bootstrap/Accordion';
 
 import LayerSelect from './LayerSelect';
 import { scales } from '../ScaleDefinitions';
+import InfoPopover from './InfoPopover';
 
 const IconMap = {
   fcglobe: <FcGlobe className="labelIcons"/>,
@@ -25,7 +24,7 @@ const VerticalMenu = (props) => {
   function handleScaleChange(event) {
     const { id, checked } = event.target;
     props.changeScaleState(id, checked);
-  };
+  }
 
   return (
     <Form className="vertical-menu">
@@ -51,6 +50,10 @@ const VerticalMenu = (props) => {
                         {IconMap[`${scaleObj.iconKey}`]}
                         <span className="menu-main-text">{scaleObj.name}</span>
                         <span className="menu-desc-text">{scaleObj.label}</span>
+                        <InfoPopover
+                          title={`Cool Title`}
+                          content={`Cool Content`}
+                        />
                       </span>
                   }
                 />
@@ -104,5 +107,10 @@ const VerticalMenu = (props) => {
     </Form>
   );
 };
+
+VerticalMenu.propTypes = {
+  changeScaleState: PropTypes.func.isRequired,
+  changeVisibilityState: PropTypes.func.isRequired,
+}
 
 export default VerticalMenu;

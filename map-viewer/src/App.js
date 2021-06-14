@@ -2,7 +2,7 @@ import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 
-import React, { useSate, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 
 import Map from './Map';
 import WelcomeModal from './components/WelcomeModal';
@@ -11,7 +11,7 @@ import './App.css';
 
 
 function App() {
-  const [modalShow, setModalShow] = React.useState(false);
+  const [modalShow, setModalShow] = useState(false);
 
   useEffect(() => {
     let visited_status = localStorage.getItem('visited_status')

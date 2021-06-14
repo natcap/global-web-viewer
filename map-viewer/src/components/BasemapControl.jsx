@@ -1,7 +1,6 @@
-import React, { useRef, useEffect, useState } from 'react';
-import ReactDOM from 'react-dom';
+import React from 'react';
+import PropTypes from 'prop-types'; // ES6
 
-import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
 import OverlayTrigger from 'react-bootstrap/OverlayTrigger';
 import Tooltip from 'react-bootstrap/Tooltip';
@@ -12,7 +11,7 @@ const BasemapControl = (props) => {
     const { id, checked } = event.target;
     console.log("event value: ", checked);
     props.changeBasemapState(id, checked);
-  };
+  }
 
   return (
     <Form className="basemap-control">
@@ -56,5 +55,13 @@ const BasemapControl = (props) => {
     </Form>
   );
 };
+
+BasemapControl.propTypes = {
+  lng: PropTypes.number.isRequired,
+  lat: PropTypes.number.isRequired,
+  zoom: PropTypes.number.isRequired,
+  basemaps: PropTypes.array.isRequired,
+  changeBasemapState: PropTypes.func.isRequired,
+}
 
 export default BasemapControl;

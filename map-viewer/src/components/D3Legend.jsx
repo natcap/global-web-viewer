@@ -1,5 +1,5 @@
-import React, { useRef, useEffect, useState } from 'react';
-import ReactDOM from 'react-dom';
+import React, { useRef, useEffect } from 'react';
+import PropTypes from 'prop-types';
 
 import * as d3 from "d3";
 
@@ -65,6 +65,10 @@ const D3Legend = (props) => {
       <span className="d3-x-axis">High</span>
     </>
   );
+}
+
+D3Legend.propTypes = {
+  serviceType: PropTypes.string.isRequired,
 }
 
 export default D3Legend;

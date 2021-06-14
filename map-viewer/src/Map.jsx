@@ -1,15 +1,7 @@
 import React, { useRef, useEffect, useState } from 'react';
-import ReactDOM from 'react-dom';
 
-import Button from 'react-bootstrap/Button';
 import Col from 'react-bootstrap/Col';
-import Row from 'react-bootstrap/Row';
-import Navbar from 'react-bootstrap/Navbar';
-import Form from 'react-bootstrap/Form';
 
-// eslint-disable-next-line import/no-webpack-loader-syntax
-//import mapboxgl from 'mapbox-gl/dist/mapbox-gl-csp';
-//import MapboxWorker from 'worker-loader!mapbox-gl/dist/mapbox-gl-csp-worker';
 import mapboxgl from 'mapbox-gl';
 // Had to npm install @mapbox/mapbox-gl-draw and import like below
 import MapboxDraw from '@mapbox/mapbox-gl-draw';
@@ -90,8 +82,6 @@ const Map = () => {
       type: 'vector',
       url: 'mapbox://ddenu.hybas-sed-stats'
     });
-
-    setMap(map);
   }
 
   const mapContainer = useRef(null);
@@ -121,7 +111,8 @@ const Map = () => {
     });
   });
   */
-
+  //By using this Hook, you tell React that your component needs to do
+  //something after render.
   useEffect(() => {
     const map = new mapboxgl.Map({
       container: mapContainer.current,
@@ -159,7 +150,9 @@ const Map = () => {
     function updateArea(e) {
       const data = draw.getAll();
       if (data.features.length > 0) {
+        console.log(e);
         console.log(data);
+        /*
         let minY = 100.0;
         let minX = 200.0;
         let maxY = -100.0;
@@ -175,6 +168,7 @@ const Map = () => {
 
         const bbox = [Math.min(...arrayX), Math.min(...arrayY), Math.max(...arrayX), Math.max(...arrayY)];
         console.log(bbox);
+        */
       }
 
     }
@@ -189,26 +183,17 @@ const Map = () => {
       setMap(map);
     });
 
-    /*
-    useEffect(() => {
-      if (!map.current) return; // wait for map to initialize
-      map.current.on('move', () => {
-        setLng(map.current.getCenter().lng.toFixed(4));
-        setLat(map.current.getCenter().lat.toFixed(4));
-        setZoom(map.current.getZoom().toFixed(2));
-      });
-    });
-    */
-
     map.on('mousemove', function (e) {
       setLng(e.lngLat.lng.toFixed(2));
       setLat(e.lngLat.lat.toFixed(2));
     });
+    /*
     map.on('move', () => {
       setLng(map.getCenter().lng.toFixed(2));
       setLat(map.getCenter().lat.toFixed(2));
       setZoom(map.getZoom().toFixed(2));
     });
+    */
 
     // When a click event occurs on a feature in the states layer, open a popup at the
     // location of the click, with description HTML from its properties.
@@ -225,6 +210,16 @@ const Map = () => {
   }, []); // eslint-disable-line-react-hooks/exhaustive-deps
 
   useEffect(() => {
+    if (map == null || !map.current) return; // wait for map to initialize
+    map.current.on('move', () => {
+      setLng(map.current.getCenter().lng.toFixed(2));
+      setLat(map.current.getCenter().lat.toFixed(2));
+      setZoom(map.current.getZoom().toFixed(2));
+    });
+  });
+
+
+  useEffect(() => {
     console.log("mapLayers change");
 
   }, [visibleLayers]);
@@ -234,14 +229,13 @@ const Map = () => {
     console.log("checked ", checked);
     setScale(scaleResult);
     let visibleLayersUpdate = {};
+    let visibleVar = 'none';
     mapLayers.forEach((layer) => {
       if(layer.scaleID === scaleResult && selectedServices.includes(layer.serviceType)) {
-        map.setLayoutProperty(layer.layerID, 'visibility', 'visible');
         visibleLayersUpdate[layer.serviceType] = layer;
+        visibleVar = 'visible';
       }
-      else {
-        map.setLayoutProperty(layer.layerID, 'visibility', 'none');
-      }
+      map.setLayoutProperty(layer.layerID, 'visibility', visibleVar);
     });
     console.log("scale state: ", scale);
     console.log("layers state: ", visibleLayersUpdate);
@@ -295,13 +289,13 @@ const Map = () => {
     setTimeout(() => {
       addSources(map);
       for (const key in visibleLayers) {
-        map.addLayer(visibleLayers.key);
-        map.setLayoutProperty(visibleLayers.key.layerID, 'visibility', 'visible');
+        map.addLayer(visibleLayers[key]);
+        map.setLayoutProperty(visibleLayers[key].layerID, 'visibility', 'visible');
       }
     }, 1000);
 
     setMap(map);
-  };
+  }
 
   return (
       <Col className="map-container" ref={mapContainer} >

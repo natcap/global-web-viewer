@@ -1,5 +1,5 @@
-import React, { useRef, useEffect, useState } from 'react';
-import ReactDOM from 'react-dom';
+import React from 'react';
+import PropTypes from 'prop-types';
 
 import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
@@ -31,6 +31,10 @@ const WelcomeModal = (props) => {
       </Modal.Footer>
     </Modal>
   );
+}
+
+WelcomeModal.propTypes = {
+  onHide: PropTypes.func.isRequired,
 }
 
 export default WelcomeModal;
