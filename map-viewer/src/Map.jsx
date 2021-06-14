@@ -288,11 +288,16 @@ const Map = () => {
     await map.setStyle('mapbox://styles/mapbox/' + basemapId);
     setTimeout(() => {
       addSources(map);
-      for (const key in visibleLayers) {
-        map.addLayer(visibleLayers[key]);
-        map.setLayoutProperty(visibleLayers[key].layerID, 'visibility', 'visible');
+      mapLayers.forEach((layer) => {
+        map.addLayer(layer.mapLayer);
+      });
+      for (const serviceType in visibleLayers) {
+        map.setLayoutProperty(visibleLayers[serviceType].layerID, 'visibility', 'visible');
       }
     }, 1000);
+
+    console.log("change BM visible layers:");
+    console.log(visibleLayers);
 
     setMap(map);
   }
