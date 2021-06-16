@@ -25,7 +25,7 @@ logging.basicConfig(
     stream=sys.stdout)
 LOGGER = logging.getLogger(__name__)
 
-logging.getLogger('taskgraph').setLevel('DEBUG')
+logging.getLogger('taskgraph').setLevel('INFO')
 
 #gdal.UseExceptions()
 
@@ -81,11 +81,15 @@ def create_percentile_rasters(
         [(base_raster_path, 1)], raster_percentile, target_raster_path,
         gdal.GDT_Byte, target_nodata)
 
-def get_unique_vector_attributes(input_vector_path, feature_attribute):
+def get_unique_vector_attributes(
+        input_vector_path, input_raster_path, feature_attribute):
     """Return a list of unique values from the vector features field.
+
+    Only return the values if the feature geometry intersects the raster.
 
     Args:
         input_vector_path (string): path to a GDAL vector file.
+        input_raster_path (string): path to a GDAL raster file.
         feature_attribute (string): attribute name to be compiled into list.
 
     Returns:
@@ -93,6 +97,7 @@ def get_unique_vector_attributes(input_vector_path, feature_attribute):
     """
     LOGGER.debug(f"Get unique feature attributes.")
 
+    raster_info = pygeoprocessing.get_raster_info(input_raster_path)
     input_vector = gdal.OpenEx(input_vector_path, gdal.OF_VECTOR)
     input_layer = input_vector.GetLayer(0)
 
@@ -100,8 +105,20 @@ def get_unique_vector_attributes(input_vector_path, feature_attribute):
     for feat in input_layer:
         feat_fid = feat.GetFID()
         feat_value = feat.GetFieldAsString(feature_attribute)
+
+        feature_geom = feat.GetGeometryRef()
+        envelope = feature_geom.GetEnvelope()
+        feature_bb = [envelope[i] for i in [0, 2, 1, 3]]
+
         if feat_value not in unique_list:
-            unique_list.append((feat_value, feat_fid))
+            try:
+                target_bb = pygeoprocessing.merge_bounding_box_list(
+                    [feature_bb, raster_info['bounding_box']], 'intersection')
+                unique_list.append((feat_value, feat_fid))
+            except ValueError:
+                LOGGER.info(
+                    f'Bounding box with raster and polygon did not overlap.'
+                    f' {feat_value} and {input_raster_path}')
 
         feat = None
 
@@ -270,8 +287,9 @@ if __name__ == "__main__":
     taskgraph_working_dir = os.path.join(
         taskgraph_pct_dir, '_taskgraph_working_dir')
 
-    n_workers = 5
-    task_graph = taskgraph.TaskGraph(taskgraph_working_dir, n_workers)
+    n_workers = 6
+    task_graph = taskgraph.TaskGraph(
+        taskgraph_working_dir, n_workers, reporting_interval=60.0*30.0)
     ###
 
     run_gadm = False
@@ -345,11 +363,13 @@ if __name__ == "__main__":
     if run_hydro_basins:
         # For each boundary feature
         for input_raster_path, service_id in zip(input_raster_path_list, raster_service_id_list):
+            if 'crop' not in service_id:
+                continue
             stitch_global_path_band_list = []
             for boundary_vector_path, boundary_identifier, boundary_field_attr in hydro_basin_info_list:
                 # Get unique attribute for each boundary feature
                 unique_boundary_names = get_unique_vector_attributes(
-                    boundary_vector_path, boundary_field_attr)
+                    boundary_vector_path, input_raster_path, boundary_field_attr)
                 LOGGER.debug(
                     f"Number of {boundary_identifier} features is {len(unique_boundary_names)}")
 
