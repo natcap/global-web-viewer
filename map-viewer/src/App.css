@@ -1,5 +1,5 @@
 .banner {
-  background-color: rgba(35, 55, 75, 0.9);
+  background-color: #2f2f30;
   font: 32px Arial, sans-serif;
   color: #ffffff;
   padding-left: 2rem;
@@ -12,7 +12,7 @@
 }
 
 .footer {
-  background-color: rgba(35, 55, 75, 0.9);
+  background-color: #2f2f30;
   /*
   position: absolute;
   bottom: 0;
@@ -63,4 +63,25 @@
 
 .App-link-old {
   color: #61dafb;
+}
+
+/* --- Scrollbar Styling --- */
+/* width */
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+  background: #888;
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+  background: #555;
 }

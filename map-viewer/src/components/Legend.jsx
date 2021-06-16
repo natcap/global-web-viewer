@@ -18,11 +18,16 @@ const Legend = (props) => {
       );
   };
 
-  return (
-    <ListGroup variant="flush" className="legend-group">
-      {props.services.map(renderLegend)}
-    </ListGroup>
-  );
+  if (props.services.length > 0) {
+    return (
+      <ListGroup variant="flush" className="legend-group">
+        {props.services.map(renderLegend)}
+      </ListGroup>
+    );
+  }
+  else {
+    return null;
+  }
 };
 
 Legend.propTypes = {

@@ -12,7 +12,7 @@
   height: 100%;
 }
 .vertical-menu {
-  background-color: rgba(35, 55, 75, 0.9);
+  background-color: #2f2f30;
   color: #ffffff;
   padding: 6px 12px;
   font: 15px/24px monospace;
@@ -26,11 +26,11 @@
   overflow-y: auto;
 }
 .accordion-header {
-  background-color: rgba(35, 55, 75, 0.9);
+  background-color: #2f2f30;
   color: #ffffff;
 }
 .scale-options {
-  background-color: rgba(35, 55, 75, 0.9);
+  background-color: #2f2f30;
   color: #ffffff;
 }
 .layer-group {
@@ -38,7 +38,27 @@
   font: 15px/24px monospace;
   z-index: 1;
 }
-.layer-label {
+
+.custom-control-input:focus ~ .custom-control-label::before {
+/* when the button is toggled off it is still in focus and a green border will appear */
+  border-color: green !important;
+/* box shadow is blue by default but we do not want any shadow hence we have set all the values as 0 */
+  box-shadow:
+    0 0 0 0rem rgba(0, 0, 0, 0) !important;
+  }
+/*sets the background color of switch to green when it is checked*/
+.custom-control-input:checked ~ .custom-control-label::before {
+  border-color: green !important;
+  background-color: green !important;
+}
+/*sets the background color of switch to green when it is active*/
+.custom-control-input:active ~ .custom-control-label::before {
+  background-color: green !important;
+  border-color: green !important;
+}
+/*sets the border color of switch to green when it is not checked*/
+.custom-control-input:focus: not(:checked) ~ .custom-control-label::before {
+  border-color: green !important;
 }
 
 .btn {
@@ -53,7 +73,6 @@
   margin: 0;
   border: 0;
   outline-style: none;
-  transition: none !important;
 }
 .button-info:hover {
   background-color: transparent;
@@ -61,7 +80,6 @@
 .button-info:active {
   background-color: transparent;
   border: 0;
-  transition: none !important;
 }
 .button-info:focus {
   background-color: transparent;
@@ -70,13 +88,11 @@
   outline: none;
   outline-color: transparent;
   box-shadow: none;
-  transition: none !important;
 }
-.no-transition {
-    -webkit-transition: none !important;
-    -moz-transition: none !important;
-    -o-transition: none !important;
-    transition: none !important;
+
+.dropdown-icon {
+  font-size: 25px;
+  padding-left: .3rem;
 }
 
 .basemap-control {

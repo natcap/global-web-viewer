@@ -51,8 +51,12 @@ const D3Legend = (props) => {
         .remove();
     }
   },
-
-  [props.serviceType, d3Container.current])
+  //React Hook useEffect has an unnecessary dependency: 'd3Container.current'.
+  //Either exclude it or remove the dependency array. Mutable values like 
+  //'d3Container.current' aren't valid dependencies because mutating them 
+  //doesn't re-render the component  react-hooks/exhaustive-deps
+  //[props.serviceType, d3Container.current])
+  [props.serviceType])
 
   return (
     <>

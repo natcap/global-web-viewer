@@ -207,7 +207,8 @@ const Map = () => {
     console.log("main useeffect");
     // Clean up on unmount
     return () => map.remove();
-  }, []); // eslint-disable-line-react-hooks/exhaustive-deps
+  }, []);
+  //}, [lng, lat, zoom]); // eslint-disable-line-react-hooks/exhaustive-deps
 
   useEffect(() => {
     if (map == null || !map.current) return; // wait for map to initialize
@@ -236,6 +237,7 @@ const Map = () => {
         visibleVar = 'visible';
       }
       map.setLayoutProperty(layer.layerID, 'visibility', visibleVar);
+      visibleVar = 'none';
     });
     console.log("scale state: ", scale);
     console.log("layers state: ", visibleLayersUpdate);
