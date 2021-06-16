@@ -5,6 +5,7 @@ import math
 import logging
 from osgeo import osr
 from osgeo import gdal
+import numpy
 
 import pygeoprocessing
 import taskgraph
@@ -16,6 +17,17 @@ logging.basicConfig(
         ' [%(funcName)s:%(lineno)d] %(message)s'),
     stream=sys.stdout)
 LOGGER = logging.getLogger(__name__)
+
+def new_rasterize_raster(base_raster_path, target_raster_path, vector_path):
+    """ """
+    raster_info = pygeoprocessing.get_raster_info(base_raster_path)
+    # create mask for differentiating nodata in ocean and nodata covered by
+    # land polygons. rasterize gadm0 layer onto input path
+    pygeoprocessing.new_raster_from_base(
+        base_raster_path, target_raster_path, raster_info['datatype'], [255])
+
+    pygeoprocessing.rasterize(
+        vector_path, target_raster_path, burn_values=[199])
 
 def _m2_area_of_wg84_pixel(pixel_size, center_lat):
     """Calculate m^2 area of a square wgs84 pixel.
@@ -91,6 +103,60 @@ if __name__ == "__main__":
     task_graph = taskgraph.TaskGraph(taskgraph_working_dir, n_workers)
     ###
 
+    data_common_root_dir = os.path.join(
+        'C:', os.sep, 'Users', 'ddenu', 'Workspace', 'NatCap', 'Repositories',
+        'global-web-viewer', 'data')
+    gadm_0_1_directory = os.path.join(
+        data_common_root_dir, 'boundaries', 'GADM36_levels_0_1',
+        'GADM36_levels_0_1')
+    gadm0_path = os.path.join(gadm_0_1_directory, 'gadm36_0.shp')
+
+    # create mask for differentiating nodata in ocean and nodata covered by
+    # land polygons. rasterize gadm0 layer onto input path
+    rasterize_path = os.path.splitext(out_path)[0] + '_rasterize.tif'
+
+    new_rasterize_task = task_graph.add_task(
+        func=new_rasterize_raster,
+        args=(
+            input_path, rasterize_path, gadm0_path
+        ),
+        target_path_list=[rasterize_path],
+        task_name=f'new_rasterize_{input_basename}_task')
+
+    new_rasterize_task.join()
+
+    input_raster_info = pygeoprocessing.get_raster_info(input_path)
+    rasterize_info = pygeoprocessing.get_raster_info(rasterize_path)
+    input_nodata = input_raster_info['nodata'][0]
+    rasterize_nodata = rasterize_info['nodata'][0]
+
+    input_nodata_path = os.path.splitext(out_path)[0] + '_nodata_mask.tif'
+
+    rasterize_value = 199
+
+    def nodata_op(base_array, rasterize_array):
+        result_array = numpy.full_like(base_array, input_nodata)
+        base_nodata_mask = numpy.isclose(base_array, input_nodata)
+        rasterize_value_mask = numpy.isclose(rasterize_array, rasterize_value)
+        result_value_mask = base_nodata_mask & rasterize_value_mask
+        result_array[~base_nodata_mask] = base_array[~base_nodata_mask]
+        result_array[result_value_mask] = rasterize_array[result_value_mask]
+
+        return result_array
+
+    nodata_mask_task = task_graph.add_task(
+        func=pygeoprocessing.raster_calculator,
+        args=(
+            [(input_path, 1), (rasterize_path, 1)], nodata_op,
+            input_nodata_path, input_raster_info['datatype'], input_nodata,
+            ),
+        kwargs={
+            'calc_raster_stats': False
+        },
+        target_path_list=[input_nodata_path],
+        dependent_task_list=[new_rasterize_task],
+        task_name=f'nodata_mask_{input_basename}_task')
+
     projection_srs = osr.SpatialReference()
     projection_srs.ImportFromEPSG(3857)
     projection_wkt = projection_srs.ExportToWkt()
@@ -134,7 +200,7 @@ if __name__ == "__main__":
     reproject_task = task_graph.add_task(
         func=pygeoprocessing.warp_raster,
         args=(
-            input_path, target_pixel_size, out_path, 'near',
+            input_nodata_path, target_pixel_size, out_path, 'near',
         ),
         kwargs={
             'target_bb': target_bb, 'target_projection_wkt': projection_wkt
