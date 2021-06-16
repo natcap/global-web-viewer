@@ -417,8 +417,6 @@ if __name__ == "__main__":
         'C:', os.sep, 'Users', 'ddenu', 'Workspace', 'NatCap', 'Repositories',
         'global-web-viewer', 'processed-data')
 
-    pickled_dir = os.path.join(output_root_dir, 'pickled-data')
-
     if not os.path.exists(output_root_dir):
         os.makedirs(output_root_dir)
     if not os.path.exists(pickled_dir):
@@ -427,10 +425,15 @@ if __name__ == "__main__":
     sed_retention_path = os.path.join(
         data_common_root_dir, 'pixel-data', 'Sediment-Retention',
         'realized_sedimentdeposition_nathab_md5_96c3424924c752e9b1f7ccfffe9b102a.tif')
-
     nit_retention_path = os.path.join(
         data_common_root_dir, 'pixel-data', 'Nitrogen-Retention',
         'realized_nitrogenretention_nathab_md5_7656b23f9ad0eb1d55b18367bad00635.tif')
+    nature_access_path = os.path.join(
+        data_common_root_dir, 'pixel-data', 'Nature-Access',
+        'realized_natureaccess10_nathab_md5_af07e76ecea7fb5be0fa307dc7ff4eed.tif')
+    crop_pollination_path = os.path.join(
+        data_common_root_dir, 'pixel-data', 'Realized-Crop-Pollination',
+        'realized_pollination_nathab_md5_feab479b3d6bf25a928c355547c9d9ab.tif')
 
     gadm_0_1_directory = os.path.join(
         data_common_root_dir, 'boundaries', 'GADM36_levels_0_1',
@@ -448,7 +451,7 @@ if __name__ == "__main__":
 
     ### TaskGraph Set Up
     taskgraph_working_dir = os.path.join(
-        output_root_dir, '_taskgraph_working_dir')
+        output_root_dir, '_stats_taskgraph_working_dir')
 
     n_workers = 5
     task_graph = taskgraph.TaskGraph(taskgraph_working_dir, n_workers)
@@ -464,9 +467,10 @@ if __name__ == "__main__":
     hydro_basin_paths = [x for x in hydro_basin_paths_full if hydro_level in x]
     LOGGER.debug(f'hydro basin paths {hydro_basin_paths}')
 
-    input_vector_path_list = gadm_vector_paths + hydro_basin_paths
-    input_raster_path_list = [sed_retention_path, nit_retention_path]
-    raster_field_prefix_list = ['sed', 'nit']
+    input_raster_path_list = [
+        sed_retention_path, nit_retention_path, nature_access_path,
+        crop_pollination_path]
+    raster_field_prefix_list = ['sed', 'nit', 'acc', 'crop']
 
     output_vector_path_list = []
     output_pickled_path_list = []
@@ -475,125 +479,133 @@ if __name__ == "__main__":
     perc_to_vector_task_list = []
 
     compute_country_join = False
+    run_gadm = False
+    run_hydro_basins = True
 
-    for hydro_basin_path in hydro_basin_paths:
+    if run_hydro_basins:
+        for hydro_basin_path in hydro_basin_paths:
+            hydro_basin_basename = os.path.basename(hydro_basin_path)
+            if compute_country_join:
+                # Map country to hydro basin
+                output_hydro_country_path = os.path.join(
+                    output_root_dir,
+                    os.path.splitext(hydro_basin_basename)[0] + '_country.gpkg')
+                output_vector_path_list.append(output_hydro_country_path)
 
-        hydro_basin_basename = os.path.basename(hydro_basin_path)
-        if compute_country_join:
-            # Map country to hydro basin
-            output_hydro_country_path = os.path.join(
-                output_root_dir,
-                os.path.splitext(hydro_basin_basename)[0] + '_country.gpkg')
-            output_vector_path_list.append(output_hydro_country_path)
+                country_attr = "NAME_0"
+                map_country_to_hydro_task = task_graph.add_task(
+                    func=spatial_join_vector_attribute,
+                    args=(
+                        hydro_basin_path, gadm_0_path, output_hydro_country_path,
+                        country_attr),
+                    target_path_list=[output_hydro_country_path],
+                    task_name=f'map_country_to_{hydro_basin_basename[0:8]}_task')
+                stats_dep_tasks = [map_country_to_hydro_task]
+            else:
+                output_hydro_country_path = hydro_basin_path
+                stats_dep_tasks = []
 
-            country_attr = "NAME_0"
-            map_country_to_hydro_task = task_graph.add_task(
-                func=spatial_join_vector_attribute,
-                args=(
-                    hydro_basin_path, gadm_0_path, output_hydro_country_path,
-                    country_attr),
-                target_path_list=[output_hydro_country_path],
-                task_name=f'map_country_to_{hydro_basin_basename[0:8]}_task')
-            stats_dep_tasks = [map_country_to_hydro_task]
-        else:
-            output_hydro_country_path = hydro_basin_path
-            stats_dep_tasks = []
+            for input_raster_path, field_prefix in zip(input_raster_path_list, raster_field_prefix_list):
+                if not field_prefix == 'nit':
+                    continue
+                output_stat_dir = os.path.join(
+                    output_root_dir, 'hybas_stats_vectors', f'hybas_{field_prefix}_processed_vectors')
+                if not os.path.exists(output_stat_dir):
+                    os.makedirs(output_stat_dir)
 
-        for input_raster_path, field_prefix in zip(input_raster_path_list, raster_field_prefix_list):
-            if not field_prefix == 'nit':
-                continue
-            output_stat_dir = os.path.join(
-                output_root_dir, f'hybas_{field_prefix}_processed')
-            if not os.path.exists(output_stat_dir):
-                os.makedirs(output_stat_dir)
+                pickle_path = os.path.join(
+                    output_stats_dir,
+                    os.path.splitext(hydro_basin_basename)[0] + f'_{field_prefix}_pickled.pickle')
 
-            pickle_path = os.path.join(
-                pickled_dir,
-                os.path.splitext(hydro_basin_basename)[0] + f'_{field_prefix}_pickled.pickle')
+                stats_task = task_graph.add_task(
+                    func=pickle_zonal_stats,
+                    args=(
+                        output_hydro_country_path, input_raster_path, pickle_path),
+                    target_path_list=[pickle_path],
+                    dependent_task_list=stats_dep_tasks,
+                    task_name=f'{hydro_basin_basename[0:8]}_{field_prefix}_stat_task')
 
-            stats_task = task_graph.add_task(
-                func=pickle_zonal_stats,
-                args=(
-                    output_hydro_country_path, input_raster_path, pickle_path),
-                target_path_list=[pickle_path],
-                dependent_task_list=stats_dep_tasks,
-                task_name=f'{hydro_basin_basename[0:8]}_{field_prefix}_stat_task')
+                output_vector_path = os.path.join(
+                    output_stat_dir,
+                    os.path.splitext(hydro_basin_basename)[0] + f'_{field_prefix}_stats.gpkg')
 
-            output_vector_path = os.path.join(
-                output_stat_dir,
-                os.path.splitext(hydro_basin_basename)[0] + f'_{field_prefix}_stats.gpkg')
+                field_name = field_prefix + "_mean"
+                stats_to_vector_task = task_graph.add_task(
+                    func=stats_to_vector,
+                    args=(
+                        output_hydro_country_path, pickle_path, output_vector_path,
+                        field_name),
+                    target_path_list=[output_vector_path],
+                    dependent_task_list=[stats_task],
+                    task_name=f'stats_to_{hydro_basin_basename[0:8]}_{field_prefix}_task')
 
-            field_name = field_prefix + "_mean"
-            stats_to_vector_task = task_graph.add_task(
-                func=stats_to_vector,
-                args=(
-                    output_hydro_country_path, pickle_path, output_vector_path,
-                    field_name),
-                target_path_list=[output_vector_path],
-                dependent_task_list=[stats_task],
-                task_name=f'stats_to_{hydro_basin_basename[0:8]}_{field_prefix}_task')
-
-            output_perc_vector_path = os.path.join(
-                output_stat_dir,
-                os.path.splitext(hydro_basin_basename)[0] + f'_{field_prefix}_perc.gpkg')
-
-            percentile_field_name = field_prefix + "_pct"
-            percentile_to_vector_task = task_graph.add_task(
-                func=calculate_percentiles_to_vector,
-                args=(
-                    output_vector_path, output_perc_vector_path, field_name,
-                    percentile_field_name),
-                target_path_list=[output_perc_vector_path],
-                dependent_task_list=[stats_to_vector_task],
-                task_name=f'percentile_{hydro_basin_basename[0:8]}_{field_prefix}_task')
-
-    for gadm_vector_path in gadm_vector_paths:
-        break
-        for input_raster_path, field_prefix in zip(input_raster_path_list, raster_field_prefix_list):
-            output_stat_dir = os.path.join(
-                output_root_dir, f'gadm_processed')
-            if not os.path.exists(output_stat_dir):
-                os.makedirs(output_stat_dir)
-
-            gadm_basename = os.path.basename(gadm_vector_path)
-            pickle_path = os.path.join(
-                pickled_dir,
-                os.path.splitext(gadm_basename)[0] + f'_{field_prefix}_pickled.pickle')
-            output_pickled_path_list.append(pickle_path)
-
-            stats_task = task_graph.add_task(
-                func=pickle_zonal_stats,
-                args=(gadm_vector_path, input_raster_path, pickle_path),
-                target_path_list=[pickle_path],
-                task_name=f'stat_gadm_task_{field_prefix}')
-
-            output_vector_path = os.path.join(
-                output_stat_dir,
-                os.path.splitext(gadm_basename)[0] + f'_{field_prefix}_stats.gpkg')
-
-            field_name = field_prefix + "_mean"
-            stats_to_vector_task = task_graph.add_task(
-                func=stats_to_vector,
-                args=(
-                    gadm_vector_path, pickle_path, output_vector_path,
-                    field_name),
-                target_path_list=[output_vector_path],
-                dependent_task_list=[stats_task],
-                task_name=f'stat_to_gadm_task_{field_prefix}')
-
-            percentile_field_name = field_prefix + "_pct"
-            if 'gadm36_1' in input_vector_path:
                 output_perc_vector_path = os.path.join(
                     output_stat_dir,
-                    os.path.splitext(gadm_basename)[0] + f'_{field_prefix}_perc.gpkg')
+                    os.path.splitext(hydro_basin_basename)[0] + f'_{field_prefix}_perc.gpkg')
+
+                percentile_field_name = field_prefix + "_pct"
                 percentile_to_vector_task = task_graph.add_task(
                     func=calculate_percentiles_to_vector,
                     args=(
-                        gadm_vector_path, output_perc_vector_path, field_name,
+                        output_vector_path, output_perc_vector_path, field_name,
                         percentile_field_name),
                     target_path_list=[output_perc_vector_path],
-                    dependent_task_list=[stats_task, stats_to_vector_task],
-                    task_name=f'perc_to_gadm_task_{field_prefix}')
+                    dependent_task_list=[stats_to_vector_task],
+                    task_name=f'percentile_{hydro_basin_basename[0:8]}_{field_prefix}_task')
+
+    if run_gadm:
+        output_stat_dir = os.path.join(output_root_dir, f'gadm_stats_vectors')
+        if not os.path.exists(output_stat_dir):
+            os.makedirs(output_stat_dir)
+
+        for gadm_vector_path in gadm_vector_paths:
+            # gadm36_[0|1].shp
+            gadm_basename = os.path.basename(gadm_vector_path)
+            # gadm36_[0|1]
+            gadm_type = os.path.splitext(gadm_vector_path)[0]
+            output_stat_gadm_dir = os.path.join(
+                output_stat_dir, f'{gadm_type}_stats')
+            if not os.path.exists(output_stat_gadm_dir):
+                os.makedirs(output_stat_gadm_dir)
+            for input_raster_path, field_prefix in zip(input_raster_path_list, raster_field_prefix_list):
+                pickle_path = os.path.join(
+                    output_stat_gadm_dir,
+                    f'{gadm_type}_{field_prefix}_pickled.pickle')
+                output_pickled_path_list.append(pickle_path)
+
+                stats_task = task_graph.add_task(
+                    func=pickle_zonal_stats,
+                    args=(gadm_vector_path, input_raster_path, pickle_path),
+                    target_path_list=[pickle_path],
+                    task_name=f'stat_{gadm_type}_task_{field_prefix}')
+
+                output_vector_path = os.path.join(
+                    output_stat_gadm_dir,
+                    f'{gadm_type}_{field_prefix}_stats.gpkg')
+
+                field_name = field_prefix + "_mean"
+                stats_to_vector_task = task_graph.add_task(
+                    func=stats_to_vector,
+                    args=(
+                        gadm_vector_path, pickle_path, output_vector_path,
+                        field_name),
+                    target_path_list=[output_vector_path],
+                    dependent_task_list=[stats_task],
+                    task_name=f'stat_to_{gadm_type}_task_{field_prefix}')
+
+                percentile_field_name = field_prefix + "_pct"
+                if 'gadm36_1' in input_vector_path:
+                    output_perc_vector_path = os.path.join(
+                        output_stat_gadm_dir,
+                        f'{gadm_type}_{field_prefix}_perc.gpkg')
+                    percentile_to_vector_task = task_graph.add_task(
+                        func=calculate_percentiles_to_vector,
+                        args=(
+                            gadm_vector_path, output_perc_vector_path, field_name,
+                            percentile_field_name),
+                        target_path_list=[output_perc_vector_path],
+                        dependent_task_list=[stats_task, stats_to_vector_task],
+                        task_name=f'perc_to_gadm_task_{field_prefix}')
 
     task_graph.close()
     task_graph.join()
