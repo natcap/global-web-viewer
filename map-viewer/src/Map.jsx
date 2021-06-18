@@ -29,18 +29,22 @@ const Map = () => {
     {
       layerID: 'light-v10',
       name: 'light',
+      imageIcon: 'light.png',
     },
     {
       layerID: 'dark-v10',
       name: 'dark',
+      imageIcon: 'dark.png',
     },
     {
       layerID: 'streets-v11',
       name: 'streets',
+      imageIcon: 'streets.png',
     },
     {
       layerID: 'satellite-v9',
       name: 'satellite',
+      imageIcon: 'satellite.png',
     },
   ]
 
@@ -175,9 +179,24 @@ const Map = () => {
 
     map.on('load', () => {
       console.log("LOAD EVENT");
+      let originLayers = map.getStyle().layers;
+      let firstSymbolId = '';
+      for (let i = 0; i < originLayers.length; i++) {
+        if (originLayers[i].type === 'symbol') {
+          firstSymbolId = originLayers[i].id;
+          break;
+        }
+      }
       addSources(map);
       mapLayers.forEach((layer) => {
-        map.addLayer(layer.mapLayer);
+        map.addLayer(layer.mapLayer, firstSymbolId);
+      });
+
+      // Turns all road layers in basemap non-visible
+      map.getStyle().layers.map(function (layer) {
+        if (layer.id.indexOf('road') >= 0) {
+          map.setLayoutProperty(layer.id, 'visibility', 'none');
+        }
       });
 
       setMap(map);
@@ -187,13 +206,13 @@ const Map = () => {
       setLng(e.lngLat.lng.toFixed(2));
       setLat(e.lngLat.lat.toFixed(2));
     });
-    /*
+    
     map.on('move', () => {
       setLng(map.getCenter().lng.toFixed(2));
       setLat(map.getCenter().lat.toFixed(2));
       setZoom(map.getZoom().toFixed(2));
     });
-    */
+   
 
     // When a click event occurs on a feature in the states layer, open a popup at the
     // location of the click, with description HTML from its properties.
@@ -210,6 +229,7 @@ const Map = () => {
   }, []);
   //}, [lng, lat, zoom]); // eslint-disable-line-react-hooks/exhaustive-deps
 
+  /*
   useEffect(() => {
     if (map == null || !map.current) return; // wait for map to initialize
     map.current.on('move', () => {
@@ -218,6 +238,7 @@ const Map = () => {
       setZoom(map.current.getZoom().toFixed(2));
     });
   });
+  */
 
 
   useEffect(() => {
@@ -289,9 +310,17 @@ const Map = () => {
     console.log("checked ", checked);
     await map.setStyle('mapbox://styles/mapbox/' + basemapId);
     setTimeout(() => {
+      let originLayers = map.getStyle().layers;
+      let firstSymbolId = '';
+      for (let i = 0; i < originLayers.length; i++) {
+        if (originLayers[i].type === 'symbol') {
+          firstSymbolId = originLayers[i].id;
+          break;
+        }
+      }
       addSources(map);
       mapLayers.forEach((layer) => {
-        map.addLayer(layer.mapLayer);
+        map.addLayer(layer.mapLayer, firstSymbolId);
       });
       for (const serviceType in visibleLayers) {
         map.setLayoutProperty(visibleLayers[serviceType].layerID, 'visibility', 'visible');
