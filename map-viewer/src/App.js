@@ -27,8 +27,9 @@ function App() {
         show={modalShow}
         onHide={() => setModalShow(false)}
       />
-      <Row>
-        <Col className="banner">Natural Capital Project Global Viewer
+      <Row className="row-banner">
+        <Col className="banner">
+          [ Project Sleepy Otter ]
         </Col>
       </Row>
       <Row className="h-100">

@@ -15,15 +15,14 @@ const WelcomeModal = (props) => {
     >
       <Modal.Header closeButton>
         <Modal.Title id="contained-modal-title-vcenter">
-          Natural Capital Web Viewer: Welcome!
+          Welcome to [ Project Sleepy Otter ]!
         </Modal.Title>
       </Modal.Header>
       <Modal.Body>
         <h4>Getting Started</h4>
         <p>
-          Welcome to the global data web viewer by the Natural Capital Project!
-          We have curated some of our global data products for your pleasure.
-          Enjoy.
+          Welcome to [ Project Sleepy Otter ], a web map viewer for global data.
+          We have curated some global data products for your pleasure. Enjoy.
         </p>
       </Modal.Body>
       <Modal.Footer>

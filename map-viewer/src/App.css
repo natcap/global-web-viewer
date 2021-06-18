@@ -10,6 +10,11 @@
   margin-top: 0rem;
   min-height: 5rem;
 }
+.row-banner {
+  border-bottom-style: solid;
+  border-bottom-width: thin;
+  border-bottom-color: #ffffff;
+}
 
 .footer {
   background-color: #2f2f30;
