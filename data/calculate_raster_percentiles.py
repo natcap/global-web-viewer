@@ -276,9 +276,9 @@ if __name__ == "__main__":
         'realized_pollination_nathab_md5_feab479b3d6bf25a928c355547c9d9ab.tif')
 
     input_raster_path_list = [
-        sed_retention_path, nit_retention_path, grazing_path, nature_access_path,
+        sed_retention_path, nit_retention_path, nature_access_path,
         crop_pollination_path]
-    raster_service_id_list = ['sed', 'nit', 'graz', 'acc', 'crop']
+    raster_service_id_list = ['sed', 'nit', 'acc', 'crop']
 
     ### TaskGraph Set Up
     taskgraph_pct_dir = os.path.join(output_root_dir, 'taskgraph_pct')
@@ -287,25 +287,26 @@ if __name__ == "__main__":
     taskgraph_working_dir = os.path.join(
         taskgraph_pct_dir, '_taskgraph_working_dir')
 
-    n_workers = 6
+    n_workers = 3
     task_graph = taskgraph.TaskGraph(
-        taskgraph_working_dir, n_workers, reporting_interval=60.0*30.0)
+        taskgraph_working_dir, n_workers, reporting_interval=60.0*5.0)
     ###
 
-    run_gadm = False
-    run_hydro_basins = True
+    run_gadm = True
+    run_hydro_basins = False
     run_global = False
 
     if run_gadm:
-        # For each boundary feature
-        for boundary_vector_path, boundary_identifier, boundary_field_attr in gadm_vector_info_list:
-            # Get unique attribute for each boundary feature
-            unique_boundary_names = get_unique_vector_attributes(
-                boundary_vector_path, boundary_field_attr)
-            LOGGER.debug(
-                f"Number of {boundary_identifier} features is {len(unique_boundary_names)}")
-            for input_raster_path, service_id in zip(
-                    input_raster_path_list, raster_service_id_list):
+        for input_raster_path, service_id in zip(input_raster_path_list, raster_service_id_list):
+            if service_id != 'crop':
+                continue
+            # For each boundary feature
+            for boundary_vector_path, boundary_identifier, boundary_field_attr in gadm_vector_info_list:
+                # Get unique attribute for each boundary feature
+                unique_boundary_names = get_unique_vector_attributes(
+                    boundary_vector_path, input_raster_path, boundary_field_attr)
+                LOGGER.debug(
+                    f"Number of {boundary_identifier} features is {len(unique_boundary_names)}")
                 percentile_service_out_dir = os.path.join(
                     output_root_dir, 'gadm_pct_rasters', f'{service_id}',
                     f'{service_id}_{boundary_identifier}_pct_rasters')

@@ -1,5 +1,6 @@
 import os
 import sys
+import time
 import logging
 import numpy
 import pickle
@@ -53,18 +54,11 @@ def stats_to_vector(
     target_driver = ogr.GetDriverByName('GPKG')
     target_vector = target_driver.CreateDataSource(vector_out_path)
     target_vector.CopyLayer(layer, layer_dfn.GetName())
-
-    number_features = layer.GetFeatureCount()
-    LOGGER.debug(f"Base vector feature count: {number_features}")
-    five_perc_counter = int(number_features * 0.05)
-
     target_layer = target_vector.GetLayer(0)
     number_features_target = target_layer.GetFeatureCount()
-    LOGGER.debug(f"Target vector feature count: {number_features_target}")
 
-    # Get the number of fields in original_layer
-    original_field_count = layer_dfn.GetFieldCount()
-    LOGGER.debug(f"Original field count: {original_field_count}")
+    layer = None
+    base_vector = None
 
     LOGGER.info("Loading stats")
     with open(stats_pickle_path, 'rb') as pickle_file:
@@ -90,16 +84,12 @@ def stats_to_vector(
     target_field_count = target_layer_dfn.GetFieldCount()
     LOGGER.debug(f"Target field count: {target_field_count}")
     # Copy all of the features in layer to the new shapefile
+    last_time = time.time()
     target_layer.StartTransaction()
-    error_count = 0
-    perc_total = 0
     for feature_index, target_feature in enumerate(target_layer):
-        if feature_index % five_perc_counter == 0:
-            if feature_index == 0:
-                LOGGER.debug(f"Starting stats calc for target features")
-            else:
-                perc_total += 5
-                LOGGER.debug(f"Completed {perc_total}% of features")
+        last_time = pygeoprocessing._invoke_timed_callback(
+            last_time, lambda: LOGGER.info(
+                f'{(feature_index / number_features_target):.2f} processed'), 30.0)
 
         fid = target_feature.GetFID()
 
@@ -112,14 +102,8 @@ def stats_to_vector(
         target_layer.SetFeature(target_feature)
         target_feature = None
     target_layer.CommitTransaction()
-    if error_count > 0:
-        LOGGER.debug(
-            '%d features out of %d were unable to be transformed and are'
-            ' not in the output vector at %s', error_count,
-            layer.GetFeatureCount(), vector_out_path)
-    layer = None
+
     target_layer = None
-    base_vector = None
     target_vector = None
 
 def pickle_zonal_stats(
@@ -188,8 +172,6 @@ def calculate_percentiles_to_vector(
 
     target_layer = target_vector.GetLayer(0)
     number_features_target = target_layer.GetFeatureCount()
-    LOGGER.debug(f"Target vector feature count: {number_features_target}")
-    five_perc_counter = int(number_features_target * 0.05)
 
     # Create new percentile field
     target_field = ogr.FieldDefn(percentile_field_name, ogr.OFTReal)
@@ -216,20 +198,17 @@ def calculate_percentiles_to_vector(
 
     country_pctile_dict = {}
     for key, value in country_means_dict.items():
-        percentile_groups = numpy.percentile(value, range(0, 100, 5))
+        percentile_groups = numpy.percentile(value, range(0, 105, 5))
         country_pctile_dict[key] = percentile_groups
 
     country_means_dict = None
 
+    last_time = time.time()
     target_layer.StartTransaction()
-    perc_total = 0
     for feat_index, feat in enumerate(target_layer):
-        if feat_index % five_perc_counter == 0:
-            if feat_index == 0:
-                LOGGER.debug(f"Starting percentile calc for target features")
-            else:
-                perc_total += 5
-                LOGGER.debug(f"Completed {perc_total}% of features")
+        last_time = pygeoprocessing._invoke_timed_callback(
+            last_time, lambda: LOGGER.info(
+                f'{(feat_index / number_features_target):.2f} processed'), 30.0)
 
         country_name = feat.GetFieldAsString('NAME_0')
         mean_value = feat.GetFieldAsDouble(field_to_percentile)
@@ -335,15 +314,11 @@ def spatial_join_vector_attribute(
     join_layer.ResetReading()
 
     target_layer.StartTransaction()
-    error_count = 0
-    perc_total = 0
+    last_time = time.time()
     for target_index, target_feat in enumerate(target_layer):
-        if target_index % five_perc_counter == 0:
-            if target_index == 0:
-                LOGGER.debug(f"Starting join calc for target features")
-            else:
-                perc_total += 5
-                LOGGER.debug(f"Completed {perc_total}% of target features")
+        last_time = pygeoprocessing._invoke_timed_callback(
+            last_time, lambda: LOGGER.info(
+                f'{(feat_index / number_features_target):.2f} processed'), 30.0)
 
         target_fid = target_feat.GetFID()
         target_geom = target_feat.GetGeometryRef()
@@ -389,11 +364,6 @@ def spatial_join_vector_attribute(
         target_feat = None
 
     target_layer.CommitTransaction()
-    if error_count > 0:
-        LOGGER.debug(
-            '%d features out of %d were unable to be transformed and are'
-            ' not in the output vector at %s', error_count,
-            layer.GetFeatureCount(), vector_out_path)
 
     target_layer = None
     join_layer = None
@@ -419,15 +389,19 @@ if __name__ == "__main__":
 
     if not os.path.exists(output_root_dir):
         os.makedirs(output_root_dir)
-    if not os.path.exists(pickled_dir):
-        os.makedirs(pickled_dir)
 
+    #sed_retention_path = os.path.join(
+    #    data_common_root_dir, 'pixel-data', 'Sediment-Retention',
+    #    'realized_sedimentdeposition_nathab_md5_96c3424924c752e9b1f7ccfffe9b102a.tif')
+    #nit_retention_path = os.path.join(
+    #    data_common_root_dir, 'pixel-data', 'Nitrogen-Retention',
+    #    'realized_nitrogenretention_nathab_md5_7656b23f9ad0eb1d55b18367bad00635.tif')
     sed_retention_path = os.path.join(
-        data_common_root_dir, 'pixel-data', 'Sediment-Retention',
-        'realized_sedimentdeposition_nathab_md5_96c3424924c752e9b1f7ccfffe9b102a.tif')
+        data_common_root_dir, 'pixel-data', 'land_ocean_mask_workspace',
+        'sed', 'sed_gadm36_0_clipped_nodata_mask.tif')
     nit_retention_path = os.path.join(
-        data_common_root_dir, 'pixel-data', 'Nitrogen-Retention',
-        'realized_nitrogenretention_nathab_md5_7656b23f9ad0eb1d55b18367bad00635.tif')
+        data_common_root_dir, 'pixel-data', 'land_ocean_mask_workspace',
+        'nit', 'nit_gadm36_0_clipped_nodata_mask.tif')
     nature_access_path = os.path.join(
         data_common_root_dir, 'pixel-data', 'Nature-Access',
         'realized_natureaccess10_nathab_md5_af07e76ecea7fb5be0fa307dc7ff4eed.tif')
@@ -446,18 +420,22 @@ if __name__ == "__main__":
     hydro_basin_country_directory = os.path.join(
         output_root_dir, 'hybas_country_lev08')
 
-    gadm_0_path = os.path.join(gadm_0_1_directory, 'gadm36_0.shp')
-    gadm_1_path = os.path.join(gadm_0_1_directory, 'gadm36_1.shp')
+    gadm_0_path = os.path.join(
+        gadm_0_1_directory, 'clipped_gadm36_0_antarctica',
+        'gadm36_0_clipped.gpkg')
+    gadm_1_path = os.path.join(
+        gadm_0_1_directory, 'clipped_gadm36_1_antarctica',
+        'gadm36_1_clipped.gpkg')
 
     ### TaskGraph Set Up
     taskgraph_working_dir = os.path.join(
         output_root_dir, '_stats_taskgraph_working_dir')
 
-    n_workers = 5
+    n_workers = -1
     task_graph = taskgraph.TaskGraph(taskgraph_working_dir, n_workers)
     ###
 
-    gadm_vector_paths = build_vector_path_list(gadm_0_1_directory)
+    gadm_vector_paths = [gadm_0_path, gadm_1_path]
     #hydro_basin_paths_full = build_vector_path_list(hydro_basin_directory)
     hydro_basin_paths_full = build_vector_path_list(hydro_basin_country_directory)
     LOGGER.debug(f'gadm vector paths {gadm_vector_paths}')
@@ -472,12 +450,6 @@ if __name__ == "__main__":
         crop_pollination_path]
     raster_field_prefix_list = ['sed', 'nit', 'acc', 'crop']
 
-    output_vector_path_list = []
-    output_pickled_path_list = []
-    stats_task_list = []
-    stats_to_vector_task_list = []
-    perc_to_vector_task_list = []
-
     compute_country_join = False
     run_gadm = False
     run_hydro_basins = True
@@ -490,7 +462,6 @@ if __name__ == "__main__":
                 output_hydro_country_path = os.path.join(
                     output_root_dir,
                     os.path.splitext(hydro_basin_basename)[0] + '_country.gpkg')
-                output_vector_path_list.append(output_hydro_country_path)
 
                 country_attr = "NAME_0"
                 map_country_to_hydro_task = task_graph.add_task(
@@ -506,15 +477,16 @@ if __name__ == "__main__":
                 stats_dep_tasks = []
 
             for input_raster_path, field_prefix in zip(input_raster_path_list, raster_field_prefix_list):
-                if not field_prefix == 'nit':
+                if not field_prefix == 'sed':
                     continue
                 output_stat_dir = os.path.join(
-                    output_root_dir, 'hybas_stats_vectors', f'hybas_{field_prefix}_processed_vectors')
+                    output_root_dir, 'hybas_stats_vectors',
+                    f'hybas_{field_prefix}_processed_vectors')
                 if not os.path.exists(output_stat_dir):
                     os.makedirs(output_stat_dir)
 
                 pickle_path = os.path.join(
-                    output_stats_dir,
+                    output_stat_dir,
                     os.path.splitext(hydro_basin_basename)[0] + f'_{field_prefix}_pickled.pickle')
 
                 stats_task = task_graph.add_task(
@@ -556,22 +528,22 @@ if __name__ == "__main__":
     if run_gadm:
         output_stat_dir = os.path.join(output_root_dir, f'gadm_stats_vectors')
         if not os.path.exists(output_stat_dir):
-            os.makedirs(output_stat_dir)
+            os.mkdir(output_stat_dir)
 
         for gadm_vector_path in gadm_vector_paths:
             # gadm36_[0|1].shp
             gadm_basename = os.path.basename(gadm_vector_path)
             # gadm36_[0|1]
-            gadm_type = os.path.splitext(gadm_vector_path)[0]
+            gadm_type = os.path.splitext(gadm_basename)[0]
             output_stat_gadm_dir = os.path.join(
                 output_stat_dir, f'{gadm_type}_stats')
             if not os.path.exists(output_stat_gadm_dir):
-                os.makedirs(output_stat_gadm_dir)
+                os.mkdir(output_stat_gadm_dir)
+
             for input_raster_path, field_prefix in zip(input_raster_path_list, raster_field_prefix_list):
                 pickle_path = os.path.join(
                     output_stat_gadm_dir,
                     f'{gadm_type}_{field_prefix}_pickled.pickle')
-                output_pickled_path_list.append(pickle_path)
 
                 stats_task = task_graph.add_task(
                     func=pickle_zonal_stats,
@@ -594,14 +566,14 @@ if __name__ == "__main__":
                     task_name=f'stat_to_{gadm_type}_task_{field_prefix}')
 
                 percentile_field_name = field_prefix + "_pct"
-                if 'gadm36_1' in input_vector_path:
+                if 'gadm36_1' in gadm_vector_path:
                     output_perc_vector_path = os.path.join(
                         output_stat_gadm_dir,
                         f'{gadm_type}_{field_prefix}_perc.gpkg')
                     percentile_to_vector_task = task_graph.add_task(
                         func=calculate_percentiles_to_vector,
                         args=(
-                            gadm_vector_path, output_perc_vector_path, field_name,
+                            output_vector_path, output_perc_vector_path, field_name,
                             percentile_field_name),
                         target_path_list=[output_perc_vector_path],
                         dependent_task_list=[stats_task, stats_to_vector_task],

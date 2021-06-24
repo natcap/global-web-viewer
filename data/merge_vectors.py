@@ -35,40 +35,80 @@ if __name__ == "__main__":
         'C:', os.sep, 'Users', 'ddenu', 'Workspace', 'NatCap', 'Repositories',
         'global-web-viewer', 'processed-data', 'hybas_stats_vectors')
 
-    hybas_process_dir = os.path.join(
-        hybas_root_dir, 'hybas_sed_processed_vectors')
+    gadm0_root_dir = os.path.join(
+        'C:', os.sep, 'Users', 'ddenu', 'Workspace', 'NatCap', 'Repositories',
+        'global-web-viewer', 'processed-data', 'gadm_stats_vectors')
 
-    hybas_path_list = build_vector_path_list(hybas_process_dir)
+    gadm0_process_dir = os.path.join(
+        gadm0_root_dir, 'gadm36_0_clipped_stats')
 
-    # Refine hydro files by level
-    file_matcher = 'sed_perc'
-    hybas_selected_path_list = [x for x in hybas_path_list if file_matcher in x]
-    LOGGER.debug(f'hydro basin paths {hybas_selected_path_list}')
+    gadm0_path_list = build_vector_path_list(gadm0_process_dir)
 
-    hybas_id = 'sed'
+    merge_hybas = True
+    merge_gadm0 = False
 
-    merged_out_dir = os.path.join(hybas_root_dir, f'merged_{hybas_id}_vectors')
-    if not os.path.isdir(merged_out_dir):
-        os.makedirs(merged_out_dir)
+    if merge_hybas:
+        hybas_id = 'acc'
+        hybas_process_dir = os.path.join(
+            hybas_root_dir, f'hybas_{hybas_id}_processed_vectors')
+        hybas_path_list = build_vector_path_list(hybas_process_dir)
+        
+        # Refine hydro files by level
+        file_matcher = f'{hybas_id}_perc'
+        hybas_selected_path_list = [x for x in hybas_path_list if file_matcher in x]
+        LOGGER.debug(f'hydro basin paths {hybas_selected_path_list}')
 
-    merged_out_path = os.path.join(
-        merged_out_dir, f"hybas_all_{hybas_id}.shp")
-    # if this file already exists, then remove it
-    if os.path.isfile(merged_out_path):
-        os.remove(merged_out_path)
 
-    number_of_vectors = len(hybas_selected_path_list)
+        merged_out_dir = os.path.join(hybas_root_dir, f'merged_{hybas_id}_vectors')
+        if not os.path.isdir(merged_out_dir):
+            os.makedirs(merged_out_dir)
 
-    for idx, hybas_path in enumerate(hybas_selected_path_list):
-        if idx == 0:
-            # ogr2ogr -f "ESRI Shapefile" merged a.ship
-            # ogr2ogr -f "GeoJSONSeq" merged a.ship
-            subprocess.run(
-                ["ogr2ogr", "-f", "ESRI Shapefile", merged_out_path, hybas_path])
-        else:
-            # ogr2ogr -f "ESRI Shapefile" -append -update merged b.ship
-            subprocess.run(
-                ["ogr2ogr", "-f", "ESRI Shapefile", "-append", "-update",
-                 merged_out_path, hybas_path])
+        merged_out_path = os.path.join(
+            merged_out_dir, f"hybas_all_{hybas_id}.shp")
+        # if this file already exists, then remove it
+        if os.path.isfile(merged_out_path):
+            os.remove(merged_out_path)
 
-        LOGGER.debug(f"{idx + 1} out of {number_of_vectors} merged")
+        number_of_vectors = len(hybas_selected_path_list)
+
+        for idx, hybas_path in enumerate(hybas_selected_path_list):
+            if idx == 0:
+                # ogr2ogr -f "ESRI Shapefile" merged a.ship
+                # ogr2ogr -f "GeoJSONSeq" merged a.ship
+                subprocess.run(
+                    ["ogr2ogr", "-f", "ESRI Shapefile", merged_out_path, hybas_path])
+            else:
+                # ogr2ogr -f "ESRI Shapefile" -append -update merged b.ship
+                subprocess.run(
+                    ["ogr2ogr", "-f", "ESRI Shapefile", "-append", "-update",
+                     merged_out_path, hybas_path])
+
+            LOGGER.debug(f"{idx + 1} out of {number_of_vectors} merged")
+
+    if merge_gadm0:
+        merged_out_dir = os.path.join(
+            gadm0_process_dir, f'merged_vectors')
+        if not os.path.isdir(merged_out_dir):
+            os.makedirs(merged_out_dir)
+
+        merged_out_path = os.path.join(
+            merged_out_dir, f"gadm_0_all_services.shp")
+        # if this file already exists, then remove it
+        if os.path.isfile(merged_out_path):
+            os.remove(merged_out_path)
+
+        number_of_vectors = len(gadm0_path_list)
+
+        for idx, gadm_path in enumerate(gadm0_path_list):
+            if idx == 0:
+                # ogr2ogr -f "ESRI Shapefile" merged a.ship
+                # ogr2ogr -f "GeoJSONSeq" merged a.ship
+                subprocess.run(
+                    ["ogr2ogr", "-f", "ESRI Shapefile", merged_out_path, gadm_path])
+            else:
+                # ogr2ogr -f "ESRI Shapefile" -append -update merged b.ship
+                subprocess.run(
+                    ["ogr2ogr", "-f", "ESRI Shapefile", "-append", "-update",
+                     merged_out_path, gadm_path])
+
+            LOGGER.debug(f"{idx + 1} out of {number_of_vectors} merged")
