@@ -25,14 +25,6 @@ export const scales = [
       defaultChecked: false,
     },
     {
-      id: "watershed",
-      name: "Watershed",
-      label: `Watershed scale.`,
-      helpText: "Help text here.",
-      iconKey: "fcglobe",
-      defaultChecked: false,
-    },
-    {
       id: "local",
       name: "Local",
       label: `Provide an AOI (area of interest) and examine ecosystem service
@@ -49,35 +41,41 @@ export const serviceMenuDetails = [
       label: "Clean water: sediment retention",
       helpText: "Help text here.",
       iconKey: "fcglobe",
+      disable: false,
     },
     {
       id: "nitrogen",
       label: "Clean water: nitrogen retention",
       helpText: "Help text here.",
       iconKey: "fcglobe",
-    },
-    {
-      id: "pollination",
-      label: "Crop pollination",
-      helpText: "Help text here.",
-      iconKey: "fcglobe",
-    },
-    {
-      id: "coastal-protection",
-      label: "Coastal storm risk reduction",
-      helpText: "Help text here.",
-      iconKey: "fcglobe",
+      disable: false,
     },
     {
       id: "nature-access",
       label: "Local nature access",
       helpText: "Help text here.",
       iconKey: "fcglobe",
+      disable: false,
+    },
+    {
+      id: "pollination",
+      label: "Crop pollination",
+      helpText: "Help text here.",
+      iconKey: "fcglobe",
+      disable: true,
+    },
+    {
+      id: "coastal-protection",
+      label: "Coastal storm risk reduction",
+      helpText: "Help text here.",
+      iconKey: "fcglobe",
+      disable: true,
     },
     {
       id: "grazing",
       label: "Livestock grazing",
       helpText: "Help text here.",
       iconKey: "fcglobe",
+      disable: true,
     },
 ]

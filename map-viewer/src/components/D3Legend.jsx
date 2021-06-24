@@ -7,14 +7,20 @@ const legendStyle = {
   'sediment': {
     id: 'sediment',
     name: 'Sediment Deposition Pct',
-    colorStops: ['0-26', '26-51', '51-76', '76-100', '101+'],
-    colors: ['#ffffb2', '#fecc5c', '#fd8d3c', '#f03b20', '#bd0026'],
+    colorStops: ['0', '100'],
+    colors: ['#f2f2e6', '#664830'],
     },
   'nitrogen': {
     id: 'nitrogen',
     name: 'Nitrogen Pct',
     colorStops: ['0-26', '26-51', '51-76', '76-100', '101+'],
-    colors: ['#f7fcf5', '#caeac3', '#7bc87c', '#2a924a', '#00441b'],
+    colors: ['#dae1f2', '#114cab'],
+  },
+  'access': {
+    id: 'access',
+    name: 'Access to Nature Pct',
+    colorStops: ['0-26', '26-51', '51-76', '76-100', '101+'],
+    colors: ['#e5f2da', '#0e5720'],
   },
 }
 
@@ -33,10 +39,7 @@ const D3Legend = (props) => {
       linearGradient.selectAll("stop")
         .data([
           {offset: "0%", color: legendStyle[props.serviceType].colors[0]},
-          {offset: "25%", color: legendStyle[props.serviceType].colors[1]},
-          {offset: "50%", color: legendStyle[props.serviceType].colors[2]},
-          {offset: "75%", color: legendStyle[props.serviceType].colors[3]},
-          {offset: "100%", color: legendStyle[props.serviceType].colors[4]}
+          {offset: "100%", color: legendStyle[props.serviceType].colors[1]}
         ])
         .enter().append("stop")
         .attr("offset", function(d) { return d.offset; })

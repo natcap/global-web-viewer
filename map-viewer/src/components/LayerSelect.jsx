@@ -31,6 +31,7 @@ const LayerSelect = (props) => {
       <Form.Row key={i} className="align-items-center layer-container">
         <Col key={`form-col-layer-check-${i}`}>
           <Form.Check
+            disabled={service.disable}
             onChange={handleChange}
             defaultChecked={false}
             type="switch"

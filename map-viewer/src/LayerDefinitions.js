@@ -10,122 +10,281 @@ const mapLayers = [
       layout: {
         visibility: 'none',
       },
-      source: 'sed-pct-global',
+      source: {
+        type: 'raster',
+        url: 'mapbox://ddenu.33r0lkjs'
+      },
     },
   },
   {
-    layerID: 'global-nit-pct',
+    layerID: 'nit-pct-global',
     name: 'Nitrogen Pct',
     serviceType: 'nitrogen',
     scaleID: 'global',
     mapLayer: {
-      id: 'global-nit-pct',
+      id: 'nit-pct-global',
       type: 'raster',
       layout: {
         visibility: 'none',
       },
-      source: 'global-nit-pct',
+      source: {
+        type: 'raster',
+        url: 'mapbox://ddenu.9q9phcqp'
+      },
     },
   },
   {
-    layerID: 'gadm0-sed-pct',
+    layerID: 'acc-pct-global',
+    name: 'Access to Nature Pct',
+    serviceType: 'access',
+    scaleID: 'global',
+    mapLayer: {
+      id: 'acc-pct-global',
+      type: 'raster',
+      layout: {
+        visibility: 'none',
+      },
+      source: {
+        type: 'raster',
+        url: 'mapbox://ddenu.arhkdcnr'
+      },
+    },
+  },
+  {
+    layerID: 'sed-pct-gadm0',
     name: 'GADM0 Sed Dep Pct',
     serviceType: 'sediment',
     scaleID: 'national',
     mapLayer: {
-      id: 'gadm0-sed-pct',
+      id: 'sed-pct-gadm0',
       type: 'raster',
       layout: {
         visibility: 'none',
       },
-      source: 'gadm0-sed-pct',
+      source: {
+        type: 'raster',
+        url: 'mapbox://ddenu.7bd8mt7n'
+      },
     },
   },
   {
-    layerID: 'gadm0-nit-pct',
+    layerID: 'nit-pct-gadm0',
     name: 'GADM0 Nit Dep Pct',
     serviceType: 'nitrogen',
     scaleID: 'national',
     mapLayer: {
-      id: 'gadm0-nit-pct',
+      id: 'nit-pct-gadm0',
       type: 'raster',
       layout: {
         visibility: 'none',
       },
-      source: 'gadm0-nit-pct',
+      source: {
+        type: 'raster',
+        url: 'mapbox://ddenu.ah2yvpwa'
+      },
     },
   },
+  /*
   {
-    layerID: 'gadm1-sed-pct',
+    layerID: 'acc-pct-gadm0',
+    name: 'Access to Nature Gadm0',
+    serviceType: 'access',
+    scaleID: 'national',
+    mapLayer: {
+      id: 'acc-pct-gadm0',
+      type: 'raster',
+      layout: {
+        visibility: 'none',
+      },
+      source: {
+//      type: 'raster',
+//      url: 'mapbox://'
+      },
+    },
+  },
+  */
+  {
+    layerID: 'sed-pct-gadm1',
     name: 'GADM1 Sed Dep Pct',
     serviceType: 'sediment',
     scaleID: 'admin',
     mapLayer: {
-      id: 'gadm1-sed-pct',
+      id: 'sed-pct-gadm1',
       type: 'raster',
       layout: {
         visibility: 'none',
       },
-      source: 'gadm1-sed-pct',
+      source: {
+        type: 'raster',
+        url: 'mapbox://ddenu.5gp8uedb'
+      },
     },
   },
   {
-    layerID: 'gadm1-nit-pct',
+    layerID: 'nit-pct-gadm1',
     name: 'GADM1 Nit Dep Pct',
     serviceType: 'nitrogen',
     scaleID: 'admin',
     mapLayer: {
-      id: 'gadm1-nit-pct',
+      id: 'nit-pct-gadm1',
       type: 'raster',
       layout: {
         visibility: 'none',
       },
-      source: 'gadm1-nit-pct',
+      source: {
+        type: 'raster',
+        url: 'mapbox://ddenu.80hd6f8c'
+      },
+    },
+  },
+  /*
+  {
+    layerID: 'acc-pct-gadm1',
+    name: 'Access to Nature Gadm1',
+    serviceType: 'access',
+    scaleID: 'admin',
+    mapLayer: {
+      id: 'acc-pct-gadm1',
+      type: 'raster',
+      layout: {
+        visibility: 'none',
+      },
+      source: {
+//      type: 'raster',
+//      url: 'mapbox://'
+      },
     },
   },
   {
-    layerID: 'hybas-sed-pct',
+    layerID: 'sed-pct-hybas',
     name: 'HYBAS Sed Dep Pct',
     serviceType: 'sediment',
     scaleID: 'watershed',
     mapLayer: {
-      id: 'hybas-sed-pct',
+      id: 'sed-pct-hybas',
       type: 'raster',
       layout: {
         visibility: 'none',
       },
-      source: 'hybas-sed-pct',
+      source: {
+
+      },
     },
   },
   {
-    layerID: 'hybas-nit-pct',
+    layerID: 'nit-pct-hybas',
     name: 'HYBAS Nit Dep Pct',
     serviceType: 'nitrogen',
     scaleID: 'watershed',
     mapLayer: {
-      id: 'hybas-nit-pct',
+      id: 'nit-pct-hybas',
       type: 'raster',
       layout: {
         visibility: 'none',
       },
-      source: 'hybas-nit-pct',
+      source: {
+
+      },
     }
   },
   {
-    layerID: 'hybas-sed-stats',
-    name: 'Hybas Lev08 Sed',
-    serviceType: 'sediment',
+    layerID: 'acc-pct-hybas',
+    name: 'Access to Nature Hybas',
+    serviceType: 'access',
+    scaleID: 'watershed',
     mapLayer: {
-      id: 'hybas-sed-stats',
-      type: 'fill',
-      source: 'hybas-sed-stats',
-      'source-layer': 'hybas_sed_stats',
-      paint: {
-        'fill-color': 'rgba(99, 99, 99, 0.0)',
-        'fill-outline-color': 'rgba(43, 140, 190, 1.0)',
-      },
+      id: 'acc-pct-hybas',
+      type: 'raster',
       layout: {
         visibility: 'none',
+      },
+      source: {
+
+      },
+    }
+  },
+  */
+  {
+    layerID: 'stats-gadm0',
+    name: 'Service Stats Gadm0',
+    serviceType: 'all',
+    mapLayer: {
+      id: 'stats-gadm0',
+      type: 'fill',
+      'source-layer': 'gadm0_all_stats',
+      paint: {
+        'fill-color': 'rgb(9, 9, 9)',
+        'fill-outline-color': 'rgba(9, 9, 9, 0.51)',
+        'fill-opacity': [
+          'case',
+          ['boolean', ['feature-state', 'hover'], false],
+          0.00,
+          0.00
+        ]
+      },
+      layout: {
+        visibility: 'visible',
+      },
+      source: {
+        type: 'vector',
+        url: 'mapbox://ddenu.c1c79s1n',
+        generatedId: true
+      },
+    }
+  },
+  {
+    layerID: 'stats-gadm1',
+    name: 'Service Stats Gadm1',
+    serviceType: 'all',
+    mapLayer: {
+      id: 'stats-gadm1',
+      type: 'fill',
+      'source-layer': 'gadm1_all_stats',
+      paint: {
+        'fill-color': 'rgb(9, 9, 9)',
+        'fill-outline-color': 'rgba(9, 9, 9, 0.51)',
+        'fill-opacity': [
+          'case',
+          ['boolean', ['feature-state', 'hover'], false],
+          0.00,
+          0.00
+        ]
+      },
+      layout: {
+        visibility: 'visible',
+      },
+      source: {
+        type: 'vector',
+        url: 'mapbox://ddenu.8s375kz0',
+        generatedId: true
+      },
+    }
+  },
+  {
+    layerID: 'stats-hybas',
+    name: 'Hybas Lev08 Sed',
+    serviceType: 'all',
+    mapLayer: {
+      id: 'stats-hybas',
+      type: 'fill',
+      'source-layer': 'hybas_all_stats',
+      paint: {
+        'fill-color': 'rgb(9, 9, 9)',
+        'fill-outline-color': 'rgba(9, 9, 9, 0.01)',
+        'fill-opacity': [
+          'case',
+          ['boolean', ['feature-state', 'hover'], false],
+          0.00,
+          0.00
+        ]
+      },
+      layout: {
+        visibility: 'visible',
+      },
+      source: {
+        type: 'vector',
+        url: 'mapbox://ddenu.cme0lyel',
+        generatedId: true
       },
     }
   },

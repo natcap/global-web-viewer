@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 import React from 'react';
 import PropTypes from 'prop-types'; // ES6
 
@@ -37,7 +38,7 @@ const BasemapControl = (props) => {
                 label={
                   <span>
                     <img
-                      src="./icons/street-map-small.jpg"
+                      src={`./icons/${basemap.imageIcon}`}
                       className="img-fluid labelMaps"
                       alt={`${basemap.name}`}
                     />
@@ -57,9 +58,9 @@ const BasemapControl = (props) => {
 };
 
 BasemapControl.propTypes = {
-  lng: PropTypes.number.isRequired,
-  lat: PropTypes.number.isRequired,
-  zoom: PropTypes.number.isRequired,
+  //lng: PropTypes.number.isRequired,
+  //lat: PropTypes.number.isRequired,
+  //zoom: PropTypes.number.isRequired,
   basemaps: PropTypes.array.isRequired,
   changeBasemapState: PropTypes.func.isRequired,
 }
