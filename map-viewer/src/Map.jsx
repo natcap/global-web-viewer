@@ -48,6 +48,12 @@ const Map = () => {
     },
   ]
 
+  const clickPopupKey = {
+    sediment: {name: 'Sediment retention', key: 'sed_'},
+    nitrogen: {name: 'Nitrogen retention', key: 'nit_'},
+    natureAccess: {name: 'Access to Nature', key: 'acc_'},
+  }
+
   //const meanStatsList = ['sed_mean', 'nit_mean', 'acc_mean'];
   //const pctStatsList = ['sed_pct', 'nit_pct', 'acc_pct'];
 
@@ -63,11 +69,32 @@ const Map = () => {
   //const [mapLayers, setLayers] = useState(layers);
   //const [scale, _setScale] = useState('global');
   //const [scale, setScale] = useState('global');
-  const [selectedServices, setServices] = useState([]);
+  //const [selectedServices, setServices] = useState([]);
   const [visibleLayers, setLayers] = useState({});
+
+  const [selectedServices, _setServices] = useState([]);
+  const servicesRef = useRef(selectedServices);
+  const setServices = (data) => {
+    servicesRef.current = data;
+    _setServices(data);
+  };
+
 
   //const scaleRef = React.useRef(scale);
   const scale = React.useRef(null);
+
+  const geocoderNational = new MapboxGeocoder({
+    accessToken: mapboxgl.accessToken,
+    types: 'country',
+    mapboxgl: mapboxgl,
+    //collapsed: true,
+  });
+  const geocoderAdmin = new MapboxGeocoder({
+    accessToken: mapboxgl.accessToken,
+    types: 'region',
+    mapboxgl: mapboxgl
+  });
+
 
   /*
   const setScale = x => {
@@ -101,14 +128,6 @@ const Map = () => {
       maxZoom: 9.1,
     });
 
-    // Add the control to the map.
-    map.addControl(
-      new MapboxGeocoder({
-        accessToken: mapboxgl.accessToken,
-        mapboxgl: mapboxgl
-      })
-    );
-
     // Add zoom and rotation controls to the map.
     map.addControl(new mapboxgl.NavigationControl());
 
@@ -121,11 +140,55 @@ const Map = () => {
     });
     map.addControl(draw);
 
-    map.on('draw.create', updateArea);
-    //map.on('draw.delete', updateArea);
+    map.on('draw.create', highlightSelected);
+    map.on('draw.delete', removeHighlight);
     //map.on('draw.update', updateArea);
 
-    function updateArea(e) {
+    function highlightSelected(e) {
+      console.log("draw.create")
+      console.log(e);
+      const data = draw.getAll();
+      if (data.features.length > 0) {
+        const geoms = data.features[0].geometry.coordinates[0];
+        let arrayX = [];
+        let arrayY = [];
+        geoms.forEach((point) => {
+          const pointLike = map.project(point);
+          arrayX.push(pointLike.x);
+          arrayY.push(pointLike.y);
+        });
+
+        const bbox = [[Math.min(...arrayX), Math.max(...arrayY)], [Math.max(...arrayX), Math.min(...arrayY)]];
+        // The geometry of the query region in pixels: either a single point
+        // or bottom left and top right points describing a bounding box,
+        // where the origin is at the top left.
+        var features = map.queryRenderedFeatures(bbox, {
+          layers: ['stats-hybas']
+        });
+        let featList = [];
+        features.forEach((feat) => {
+          const featID = feat.properties.HYBAS_ID;
+          featList.push(featID);
+        });
+
+        map.setPaintProperty(
+          'stats-hybas', 'fill-opacity', [
+            'match', ['get', 'HYBAS_ID'], [...featList], 0.0, 0.8]);
+
+        //map.setFeatureState(
+        //  { source: 'stats-hybas', sourceLayer: 'hybas_all_stats', id: featId },
+        //  { hover: true }
+        //);
+      }
+
+    }
+
+    function removeHighlight(e) {
+      console.log("draw.delete")
+      console.log(e)
+      map.setPaintProperty(
+        'stats-hybas', 'fill-opacity', 0.8);
+      /*
       const data = draw.getAll();
       if (data.features.length > 0) {
         console.log(e);
@@ -142,14 +205,68 @@ const Map = () => {
         const bbox = [Math.min(...arrayX), Math.min(...arrayY), Math.max(...arrayX), Math.max(...arrayY)];
         console.log(bbox);
       }
+      */
 
     }
-
     //var hoveredStateId = null;
 
     map.on('load', () => {
       scale.current = 'global';
       console.log("LOAD EVENT");
+
+      // Add geocoder result to container.
+      geocoderNational.on('result', function (e) {
+        if(scale.current !== 'national') {
+          return;
+        }
+        //results.innerText = JSON.stringify(e.result, null, 2);
+        console.log(e);
+        const countryName = e.result.place_name;
+        console.log(countryName);
+        const lngLatBbox = e.result.bbox;
+        map.fitBounds(lngLatBbox, {padding:40});
+        const resultCenter = e.result.center;
+        const centerPointLike = map.project(resultCenter);
+
+        // The geometry of the query region in pixels: either a single point
+        // or bottom left and top right points describing a bounding box,
+        // where the origin is at the top left.
+        var features = map.queryRenderedFeatures(centerPointLike, {
+          layers: ['stats-gadm0']
+        });
+        const featID = features[0].properties.NAME_0;
+
+        map.setPaintProperty(
+          'stats-gadm0', 'fill-opacity', [
+            'match', ['get', 'NAME_0'], featID, 0.0, 0.8]);
+      });
+      geocoderAdmin.on('result', function (e) {
+        if(scale.current !== 'admin') {
+          return;
+        }
+        //results.innerText = JSON.stringify(e.result, null, 2);
+        console.log(e);
+        const countryName = e.result.place_name;
+        console.log(countryName);
+        const lngLatBbox = e.result.bbox;
+        map.fitBounds(lngLatBbox, {padding:40});
+        const resultCenter = e.result.center;
+        const centerPointLike = map.project(resultCenter);
+
+        // The geometry of the query region in pixels: either a single point
+        // or bottom left and top right points describing a bounding box,
+        // where the origin is at the top left.
+        var features = map.queryRenderedFeatures(centerPointLike, {
+          layers: ['stats-gadm1']
+        });
+        const featID = features[0].properties.NAME_1;
+
+        map.setPaintProperty(
+          'stats-gadm1', 'fill-opacity', [
+            'match', ['get', 'NAME_1'], featID, 0.0, 0.8]);
+      });
+
+
       let originLayers = map.getStyle().layers;
       let firstSymbolId = '';
       for (let i = 0; i < originLayers.length; i++) {
@@ -192,87 +309,101 @@ const Map = () => {
       //scale.current = 'global;
       if (scale.current === 'national') {
         console.log("click stats-gadm0");
-        new mapboxgl.Popup({closeButton:false})
-        .setLngLat(e.lngLat)
-        .setHTML(
-          `
-           <h3>${e.features[0].properties.NAME_0}</h3>
-           <h4><u>Sediment retention</u></h4>
-           <h5>Mean:  ${e.features[0].properties.sed_mean.toFixed(2)}</h5>
-           <h4><u>Nitrogen retention</u></h4>
-           <h5>Mean:  ${e.features[0].properties.nit_mean.toFixed(2)}</h5>
-           <h4><u>Access to Nature</u></h4>
-           <h5>Mean:  ${e.features[0].properties.acc_mean.toFixed(2)}</h5>
-        `)
-        .addTo(map);
+        console.log(selectedServices);
+        let htmlString = `<h3>${e.features[0].properties.NAME_0}</h3>`;
+        let currentServices = [...servicesRef.current];
+        if (currentServices.length > 0) {
+          currentServices.forEach((service) => {
+            console.log(service);
+            const attrKey = clickPopupKey[service].key;
+            htmlString = htmlString + `
+             <h4><u>${clickPopupKey[service].name}</u></h4>
+             <h5>Mean:  ${e.features[0].properties[attrKey+'mean'].toFixed(2)}</h5>
+            `
+          });
+          new mapboxgl.Popup({closeButton:true})
+          .setLngLat(e.lngLat)
+          .setHTML(htmlString)
+          .addTo(map);
+        }
+        else {
+          htmlString = htmlString + `<h5>Select a service layer to see 
+          aggregated statistics.</h5>`
+          new mapboxgl.Popup({closeButton:true})
+          .setLngLat(e.lngLat)
+          .setHTML(htmlString)
+          .addTo(map);
+        }
       }
     });
     map.on('click', 'stats-gadm1', function (e) {
       // Only pop up info if gadm1 scale is selected
       if (scale.current === 'admin') {
         console.log("click stats-gadm1");
-        new mapboxgl.Popup({closeButton:false})
-        .setLngLat(e.lngLat)
-        .setHTML(
-          `Sed mean Value: ${e.features[0].properties.sed_mean.toFixed(2)} <br/>
-           Sed Pct Value: ${e.features[0].properties.sed_pct} <br/>
-           Nit mean Value: ${e.features[0].properties.nit_mean.toFixed(2)} <br/>
-           Nit Pct Value: ${e.features[0].properties.nit_pct} <br/>
-           Acc mean Value: ${e.features[0].properties.acc_mean.toFixed(2)} <br/>
-           Acc Pct Value: ${e.features[0].properties.acc_pct} <br/>
-        `)
-        .addTo(map);
+        let htmlString = `<h3>${e.features[0].properties.NAME_1}</h3>`;
+        let currentServices = [...servicesRef.current];
+        if (currentServices.length > 0) {
+          currentServices.forEach((service) => {
+            const attrKey = clickPopupKey[service].key;
+            htmlString = htmlString + `
+             <h4><u>${clickPopupKey[service].name}</u></h4>
+             <h5>Mean:  ${e.features[0].properties[attrKey+'mean'].toFixed(2)}</h5>
+             <h5>Percentile*:  ${e.features[0].properties[attrKey+'pct'].toFixed(2)}</h5>
+            `
+          });
+          new mapboxgl.Popup({closeButton:true})
+          .setLngLat(e.lngLat)
+          .setHTML(
+            htmlString + `<br/><h5>* percentile is in comparison with the mean value
+            of other regions within the same country.</h5>`)
+          .addTo(map);
+        }
+        else {
+          htmlString = htmlString + `<h5>Select a service layer to see 
+          aggregated statistics.</h5>`
+          new mapboxgl.Popup({closeButton:true})
+          .setLngLat(e.lngLat)
+          .setHTML(htmlString)
+          .addTo(map);
+        }
       }
     });
     map.on('click', 'stats-hybas', function (e) {
-      if (scale.current === 'local') {
+      if (scale.current === 'local' && draw.getMode() === 'simple_select') {
         console.log("click stats-hybas");
-        // set bbox as 5px reactangle area around clicked point
-        var bbox = [
-          [e.point.x - 5, e.point.y - 5],
-          [e.point.x + 5, e.point.y + 5]
-        ];
-        var features = map.queryRenderedFeatures(bbox, {
-          layers: ['stats-hybas']
-        });
-        console.log(features);
-        var featId = e.features[0].id;
-
-        map.setFeatureState(
-          { source: 'stats-hybas', sourceLayer: 'hybas_all_stats', id: featId },
-          { hover: true }
-        );
-      }
-    });
-/*
-    map.on('mouseover', 'hybas-sed-stats', function (e) {
-      console.log("mouseover");
-      if (e.features.length > 0) {
-        if (hoveredStateId !== null) {
-          map.setFeatureState(
-            { source: 'hybas-sed-stats', sourceLayer: 'hybas_sed_stats', id: hoveredStateId },
-            { hover: false }
-          );
+        console.log(e);
+        let htmlString = `
+          <h3>${e.features[0].properties.NAME_0}<br/>
+            <span>Hybas ID: ${e.features[0].properties.HYBAS_ID}</span>
+          </h3>`;
+        let currentServices = [...servicesRef.current];
+        if (currentServices.length > 0) {
+          currentServices.forEach((service) => {
+            const attrKey = clickPopupKey[service].key;
+            htmlString = htmlString + `
+             <h4><u>${clickPopupKey[service].name}</u></h4>
+             <h5>Mean:  ${e.features[0].properties[attrKey+'mean'].toFixed(2)}</h5>
+             <h5>Percentile*:  ${e.features[0].properties[attrKey+'pct'].toFixed(2)}</h5>
+            `
+          });
+          new mapboxgl.Popup({closeButton:true})
+          .setLngLat(e.lngLat)
+          .setHTML(
+            htmlString + `<br/><h5>* percentile is in comparison with the mean value
+            of other regions within the same country.</h5>`)
+          .addTo(map);
         }
-        hoveredStateId = e.features[0].id;
-        map.setFeatureState(
-          { source: 'hybas-sed-stats', sourceLayer: 'hybas_sed_stats', id: hoveredStateId },
-          { hover: true }
-        );
+        else {
+          htmlString = htmlString + `<h5>Select a service layer to see 
+          aggregated statistics.</h5>`
+          new mapboxgl.Popup({closeButton:true})
+          .setLngLat(e.lngLat)
+          .setHTML(htmlString)
+          .addTo(map);
+        }
       }
     });
-    // When the mouse leaves the state-fill layer, update the feature state of the
-    // previously hovered feature.
-    map.on('mouseleave', 'state-fills', function () {
-      if (hoveredStateId !== null) {
-        map.setFeatureState(
-          { source: 'hybas-sed-stats', sourceLayer: 'hybas_sed_stats', id: hoveredStateId },
-          { hover: false }
-        );
-      }
-      hoveredStateId = null;
-    });
-    */
+
     console.log("main useeffect");
     // Clean up on unmount
     return () => map.remove();
@@ -304,8 +435,9 @@ const Map = () => {
     //scaleState = scaleResult;
     let visibleLayersUpdate = {};
     let visibleVar = 'none';
+    const currentServices = [...selectedServices];
     mapLayers.forEach((layer) => {
-      if(layer.scaleID === scaleResult && selectedServices.includes(layer.serviceType)) {
+      if(layer.scaleID === scaleResult && currentServices.includes(layer.serviceType)) {
         visibleLayersUpdate[layer.serviceType] = layer;
         visibleVar = 'visible';
       }
@@ -315,9 +447,26 @@ const Map = () => {
       map.setLayoutProperty(layer.layerID, 'visibility', visibleVar);
       visibleVar = 'none';
     });
-    //map.setLayoutProperty('stats-hybas', 'visibility', 'visible');
-    //console.log("scale state: ", scale);
-    //console.log("layers state: ", visibleLayersUpdate);
+    if(scaleResult === 'local') {
+      map.setPaintProperty('stats-hybas', 'fill-opacity', 0.60);
+      map.setPaintProperty('stats-gadm0', 'fill-opacity', 0.00);
+      map.setPaintProperty('stats-gadm1', 'fill-opacity', 0.00);
+    }
+    else if(scaleResult === 'national') {
+      map.setPaintProperty('stats-hybas', 'fill-opacity', 0.00);
+      map.setPaintProperty('stats-gadm0', 'fill-opacity', 0.60);
+      map.setPaintProperty('stats-gadm1', 'fill-opacity', 0.00);
+    }
+    else if(scaleResult === 'admin') {
+      map.setPaintProperty('stats-hybas', 'fill-opacity', 0.00);
+      map.setPaintProperty('stats-gadm0', 'fill-opacity', 0.00);
+      map.setPaintProperty('stats-gadm1', 'fill-opacity', 0.60);
+    }
+    else {
+      map.setPaintProperty('stats-hybas', 'fill-opacity', 0.00);
+      map.setPaintProperty('stats-gadm0', 'fill-opacity', 0.00);
+      map.setPaintProperty('stats-gadm1', 'fill-opacity', 0.00);
+    }
     setLayers({...visibleLayersUpdate});
     setMap(map);
   };
@@ -326,7 +475,8 @@ const Map = () => {
     console.log("service ", serviceResult);
     console.log("checked ", checked);
     let visibleLayersUpdate = visibleLayers;
-    let selectedServicesUpdate = selectedServices;
+    let selectedServicesUpdate = [...selectedServices];
+    console.log("servicesRef current: ", selectedServicesUpdate);
     if(!checked) {
       const removeIndex = selectedServicesUpdate.indexOf(serviceResult);
       if (removeIndex > -1) {
@@ -351,14 +501,12 @@ const Map = () => {
       mapLayers.forEach((layer) => {
         if(layer.scaleID === scale.current && layer.serviceType === serviceResult) {
           map.setLayoutProperty(layer.layerID, 'visibility', 'visible');
-          visibleLayersUpdate[serviceResult] = layer;
+          visibleLayersUpdate[serviceResult] = {...layer};
           setLayers({...visibleLayersUpdate});
-          console.log("add visible layer: ");
-          console.log(visibleLayersUpdate);
         }
       });
     }
-    console.log("selectedServices: after visibility change ", selectedServices);
+    console.log("selectedServices: after visibility change ", [...selectedServices]);
     setMap(map);
   };
 
@@ -393,16 +541,14 @@ const Map = () => {
   return (
       <Col className="map-container" ref={mapContainer} >
         <VerticalMenu
-          //scale={scale}
-          //layers={visibleLayers}
           changeVisibilityState={changeVisibilityState}
           changeScaleState={changeScaleState}
+          geocoderNational={geocoderNational}
+          geocoderAdmin={geocoderAdmin}
         />
         <Legend
           layers={visibleLayers}
           services={selectedServices}
-          //svgLegends={legends}
-          //changeVisibilityState={changeVisibilityState}
         />
         <BasemapControl className="basemap-control"
           basemaps={basemaps}

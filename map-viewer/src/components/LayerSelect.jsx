@@ -1,20 +1,24 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import { FcGlobe } from 'react-icons/fc';
-import { GrMapLocation } from 'react-icons/gr';
-import { GiAfrica } from 'react-icons/gi';
+import { IoWaterOutline, IoWater } from 'react-icons/io5';
+import { GiBee, GiCow } from 'react-icons/gi';
+import { BiWater } from 'react-icons/bi';
+import { TiTree } from 'react-icons/ti';
 
 import Form from 'react-bootstrap/Form';
 import Col from 'react-bootstrap/Col';
 
 import { serviceMenuDetails } from '../ScaleDefinitions';
-import InfoPopover from './InfoPopover';
+import ServicePopover from './ServicePopover';
 
 const IconMap = {
-  fcglobe: <FcGlobe className="labelIcons"/>,
-  grmaplocation: <GrMapLocation className="labelIcons"/>,
-  giafrica: <GiAfrica className="labelIcons"/>,
+  iowateroutline: <IoWaterOutline className="labelIcons"/>,
+  iowater: <IoWater className="labelIcons"/>,
+  gibee: <GiBee className="labelIcons"/>,
+  biwater: <BiWater className="labelIcons"/>,
+  titree: <TiTree className="labelIcons"/>,
+  gicow: <GiCow className="labelIcons"/>,
 }
 
 const LayerSelect = (props) => {
@@ -47,9 +51,9 @@ const LayerSelect = (props) => {
           />
         </Col>
         <Col xs="auto">
-          <InfoPopover
-            title={`Cool Title`}
-            content={`Cool Content`}
+          <ServicePopover
+            title={service.label}
+            content={service.helpText}
           />
         </Col>
       </Form.Row>

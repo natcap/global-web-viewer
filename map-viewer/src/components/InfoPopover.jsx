@@ -8,14 +8,28 @@ import OverlayTrigger from 'react-bootstrap/OverlayTrigger';
 import { BsInfoCircle} from 'react-icons/bs';
 
 const InfoPopover = (props) => {
-  const popover = (
+  let popover = null;
+  if(props.title) {
+    popover = (
+      <Popover id="popover-service">
+        <Popover.Title>
+          {props.title}
+        </Popover.Title>
+        <Popover.Content>
+          {props.content}
+        </Popover.Content>
+      </Popover>
+    );
+  }
+  else {
+   popover = (
     <Popover id="popover-service">
-      <Popover.Title as="h3">{props.title}</Popover.Title>
       <Popover.Content>
         {props.content}
       </Popover.Content>
     </Popover>
-  );
+   );
+  }
 
   return (
     <OverlayTrigger trigger="click" rootClose placement="right" overlay={popover}>
@@ -27,7 +41,7 @@ const InfoPopover = (props) => {
 };
 
 InfoPopover.propTypes = {
-  title: PropTypes.string.isRequired,
+  title: PropTypes.string,
   content: PropTypes.string.isRequired,
 }
 

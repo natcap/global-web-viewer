@@ -11,9 +11,15 @@
   min-height: 5rem;
 }
 .row-banner {
+  background-color: #2f2f30;
   border-bottom-style: solid;
   border-bottom-width: thin;
   border-bottom-color: #ffffff;
+}
+.banner-logo {
+  width: 95px;
+  height: auto;
+  margin-left: 0.5rem;
 }
 
 .footer {
@@ -33,6 +39,9 @@
   padding-right: 0.3rem;
   background-color: rgba(237, 244, 245, 1.0);
   border-style: none;
+}
+.welcome-title {
+  background-color: #9BA17B;
 }
 
 .appContainer {

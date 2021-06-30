@@ -28,8 +28,15 @@ function App() {
         onHide={() => setModalShow(false)}
       />
       <Row className="row-banner">
-        <Col className="banner">
-          [ Project Sleepy Otter ]
+        <Col id="banner" className="banner">
+          Prototype Global Data Viewer
+        </Col>
+        <Col xs="auto">
+          <img 
+            src="./icons/NatCap-Logo-2016.jpg" 
+            alt="NatCap"
+            className="img-fluid banner-logo"
+          />
         </Col>
       </Row>
       <Row className="h-100">

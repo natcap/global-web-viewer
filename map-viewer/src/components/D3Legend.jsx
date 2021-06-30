@@ -3,27 +3,6 @@ import PropTypes from 'prop-types';
 
 import * as d3 from "d3";
 
-const legendStyle = {
-  'sediment': {
-    id: 'sediment',
-    name: 'Sediment Deposition Pct',
-    colorStops: ['0', '100'],
-    colors: ['#f2f2e6', '#664830'],
-    },
-  'nitrogen': {
-    id: 'nitrogen',
-    name: 'Nitrogen Pct',
-    colorStops: ['0-26', '26-51', '51-76', '76-100', '101+'],
-    colors: ['#dae1f2', '#114cab'],
-  },
-  'access': {
-    id: 'access',
-    name: 'Access to Nature Pct',
-    colorStops: ['0-26', '26-51', '51-76', '76-100', '101+'],
-    colors: ['#e5f2da', '#0e5720'],
-  },
-}
-
 const D3Legend = (props) => {
 
   const d3Container = useRef(null);
@@ -38,15 +17,15 @@ const D3Legend = (props) => {
         .attr("id", `linear-gradient-${props.serviceType}`);
       linearGradient.selectAll("stop")
         .data([
-          {offset: "0%", color: legendStyle[props.serviceType].colors[0]},
-          {offset: "100%", color: legendStyle[props.serviceType].colors[1]}
+          {offset: "0%", color: props.legendStyle[props.serviceType].colors[0]},
+          {offset: "100%", color: props.legendStyle[props.serviceType].colors[1]}
         ])
         .enter().append("stop")
         .attr("offset", function(d) { return d.offset; })
         .attr("stop-color", function(d) { return d.color; });
 
       svg.append("rect")
-        .attr("width", 200)
+        .attr("width", 220)
         .attr("height", 15)
         .style("fill", `url(#linear-gradient-${props.serviceType})`);
 
@@ -76,6 +55,7 @@ const D3Legend = (props) => {
 
 D3Legend.propTypes = {
   serviceType: PropTypes.string.isRequired,
+  legendStyle: PropTypes.object.isRequired,
 }
 
 export default D3Legend;
