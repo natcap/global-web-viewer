@@ -154,7 +154,7 @@ const mapLayers = [
   },
   {
     layerID: 'sed-pct-hybas',
-    name: 'HYBAS Sed Dep Pct',
+    name: 'HydroBASIN Sed Dep Pct',
     serviceType: 'sediment',
     scaleID: 'local',
     mapLayer: {
@@ -171,7 +171,7 @@ const mapLayers = [
   },
   {
     layerID: 'nit-pct-hybas',
-    name: 'HYBAS Nit Dep Pct',
+    name: 'HydroBASIN Nit Dep Pct',
     serviceType: 'nitrogen',
     scaleID: 'local',
     mapLayer: {
@@ -188,7 +188,7 @@ const mapLayers = [
   },
   {
     layerID: 'acc-pct-hybas',
-    name: 'Access to Nature Hybas',
+    name: 'Access to Nature HydroBASIN',
     serviceType: 'natureAccess',
     scaleID: 'local',
     mapLayer: {
@@ -253,7 +253,7 @@ const mapLayers = [
   },
   {
     layerID: 'stats-hybas',
-    name: 'Hybas Lev08 Sed',
+    name: 'HydroBASIN Lev08 Sed',
     serviceType: 'all',
     scaleID: 'none',
     mapLayer: {
