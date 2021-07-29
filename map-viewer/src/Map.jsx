@@ -318,7 +318,7 @@ const Map = () => {
             const attrKey = clickPopupKey[service].key;
             htmlString = htmlString + `
              <h4><u>${clickPopupKey[service].name}</u></h4>
-             <h5>Mean:  ${e.features[0].properties[attrKey+'mean'].toExponential(2)}</h5>
+             <h5>Mean:  ${e.features[0].properties[attrKey+'mean'].toExponential(3)}</h5>
             `
           });
           new mapboxgl.Popup({closeButton:true})
@@ -347,7 +347,7 @@ const Map = () => {
             const attrKey = clickPopupKey[service].key;
             htmlString = htmlString + `
              <h4><u>${clickPopupKey[service].name}</u></h4>
-             <h5>Mean:  ${e.features[0].properties[attrKey+'mean'].toExponential(2)}</h5>
+             <h5>Mean:  ${e.features[0].properties[attrKey+'mean'].toExponential(3)}</h5>
              <h5>Percentile*:  ${e.features[0].properties[attrKey+'pct'].toFixed(2)}</h5>
             `
           });
@@ -382,7 +382,7 @@ const Map = () => {
             const attrKey = clickPopupKey[service].key;
             htmlString = htmlString + `
              <h4><u>${clickPopupKey[service].name}</u></h4>
-             <h5>Mean:  ${e.features[0].properties[attrKey+'mean'].toExponential(2)}</h5>
+             <h5>Mean:  ${e.features[0].properties[attrKey+'mean'].toExponential(3)}</h5>
              <h5>Percentile*:  ${e.features[0].properties[attrKey+'pct'].toFixed(2)}</h5>
             `
           });
