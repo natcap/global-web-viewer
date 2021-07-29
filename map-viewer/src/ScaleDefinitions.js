@@ -131,7 +131,7 @@ export const serviceMenuDetails = [
        people, such as recreation, hunting and gathering, aesthetics
        (visual beauty), mental and physical health, cultural and traditional
        value, and sense of place. Many of these contributions depend on the
-       ability of people to access nature, so accessibility to natural lands
+       ability of people to access nature, so proximity to natural lands
        is used as a proxy for nature’s contributions to people, and population
        is derived from LandScan data.`,
         metric: `Values represent the number of people within 10 km of 
