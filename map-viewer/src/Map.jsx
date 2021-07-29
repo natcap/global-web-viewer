@@ -374,7 +374,7 @@ const Map = () => {
         console.log(e);
         let htmlString = `
           <h3>${e.features[0].properties.NAME_0}<br/>
-            <span>Hybas ID: ${e.features[0].properties.HYBAS_ID}</span>
+            <span>HydroBASIN ID ${e.features[0].properties.HYBAS_ID}</span>
           </h3>`;
         let currentServices = [...servicesRef.current];
         if (currentServices.length > 0) {
