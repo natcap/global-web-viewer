@@ -15,7 +15,8 @@
   background-color: #2f2f30;
   color: #ffffff;
   padding: 6px 12px;
-  font: 15px/24px monospace;
+  font-family: 'Source Sans Pro', sans-serif;
+  font-size: 16px;
   z-index: 1;
   position: absolute;
   left: 0;
@@ -38,7 +39,8 @@
 }
 .layer-group {
   color: #ffffff;
-  font: 15px/24px monospace;
+  font-family: 'Source Sans Pro', sans-serif;
+  font-size: 16px;
   z-index: 1;
 }
 
@@ -64,15 +66,20 @@
   border-color: #009b76 !important;
 }
 
+.popover-body {
+  font-family: 'Source Sans Pro', sans-serif;
+}
 .popover-service {
+  font-family: 'Source Sans Pro', sans-serif;
   max-width: 30rem;
   overflow-y: auto;
   max-height: 35rem;
 }
 .popover-service-title {
+  font-family: 'Source Sans Pro', sans-serif;
   background-color: #007c92;
   color: #ffffff;
-  font-size: 18px;
+  font-size: 20px;
 }
 
 .btn {
@@ -132,14 +139,15 @@
 }
 
 .menu-main-text {
-  font: 16px/24px monospace;
-  font-weight: bold;
+  font-family: 'Source Sans Pro', sans-serif;
+  font-size: 16px;
   padding-right: .3rem;
   display: inline;
 }
 .menu-desc-text {
   display: inline;
-  font: 14px/16px monospace;
+  font-family: 'Source Sans Pro', sans-serif;
+  font-size: 14px;
 }
 .suggestions-wrapper {
   overflow: visible !important;
@@ -156,6 +164,7 @@
 }
 
 .legend-group {
+  font-family: 'Source Sans Pro', sans-serif;
   z-index: 1;
   position: absolute;
   right: 0;
@@ -211,7 +220,7 @@
 /*display: none;*/
 }
 .mapboxgl-popup-content {
-  font: 400 15px/22px 'Source Sans Pro', 'Helvetica Neue', Sans-serif;
+  font: 400 15px/22px 'Source Sans Pro', Sans-serif;
   padding: 0;
   padding-bottom: 5px;
   width: 280px;
