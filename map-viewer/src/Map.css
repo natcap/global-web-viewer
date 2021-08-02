@@ -232,7 +232,7 @@
 }
 .mapboxgl-popup-content h3 {
   font-size: 20px;
-  background: #9BA17B;
+  background: #007c92;
   color: #fff;
   margin: 0;
   padding: 10px;
@@ -243,7 +243,7 @@
 }
 .mapboxgl-popup-content h3 span{
   font-size: 16px;
-  background: #9BA17B;
+  background: #007c92;
   color: #fff;
 }
 .mapboxgl-popup-content .popup-div {
