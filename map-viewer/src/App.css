@@ -33,15 +33,16 @@
 }
 .welcomeButton {
   font: 8px;
-  color: #000000;
+  background-color: #007c92;
+  color: #fff;
   padding: 0.2rem;
   padding-left: 0.3rem;
   padding-right: 0.3rem;
-  background-color: rgba(237, 244, 245, 1.0);
   border-style: none;
 }
 .welcome-title {
-  background-color: #9BA17B;
+  background-color: #007c92;
+  color: #fff;
 }
 
 .appContainer {
