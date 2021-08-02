@@ -43,7 +43,7 @@ const VerticalMenu = (props) => {
         <Card>
           <Accordion.Toggle as={Card.Header} eventKey="0" className="accordion-header">
             <Row>
-              <Col>Select Area of Focus</Col>
+              <Col>1) Select Area of Focus</Col>
               <Col xs="auto"><IoIosArrowDropdown className="dropdown-icon"/></Col>
             </Row>
           </Accordion.Toggle>
@@ -92,7 +92,7 @@ const VerticalMenu = (props) => {
         <Card>
           <Accordion.Toggle as={Card.Header} eventKey="1" className="accordion-header">
             <Row>
-              <Col>Explore Ecosystem Services</Col>
+              <Col>2) Explore Ecosystem Services</Col>
               <Col xs="auto"><IoIosArrowDropdown className="dropdown-icon"/></Col>
             </Row>
           </Accordion.Toggle>
@@ -110,7 +110,7 @@ const VerticalMenu = (props) => {
         <Card>
           <Accordion.Toggle as={Card.Header} eventKey="2" className="accordion-header">
             <Row>
-              <Col>Explore Other Layers -- Coming Soon</Col>
+              <Col>3) Explore Other Layers -- Coming Soon</Col>
               <Col xs="auto"><IoIosArrowDropdown className="dropdown-icon"/></Col>
             </Row>
           </Accordion.Toggle>
