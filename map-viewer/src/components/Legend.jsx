@@ -2,8 +2,11 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 import ListGroup from 'react-bootstrap/ListGroup';
+import Col from 'react-bootstrap/Col';
+import Row from 'react-bootstrap/Row';
 
 import D3Legend from './D3Legend';
+import InfoPopover from './InfoPopover';
 
 const legendStyle = {
   'sediment': {
@@ -36,7 +39,19 @@ const Legend = (props) => {
       return (
         <ListGroup.Item key={`legendStyle-${i}`} className="legend-container">
           <div className="legend-desc">{legendStyle[serviceType].desc}</div>
-          <D3Legend serviceType={serviceType} legendStyle={legendStyle}/>
+          <Row>
+            <Col>
+              <D3Legend serviceType={serviceType} legendStyle={legendStyle}/>
+            </Col>
+            <Col xs="auto">
+              <InfoPopover
+                key={`legend-popover-${serviceType}`}
+                content={
+                  `Low = 1st percentile, Medium = 50th percentile, High = 99th
+                  percentile, scaled based on the chosen area of focus.`}
+              />
+            </Col>
+          </Row>
         </ListGroup.Item>
       );
   };

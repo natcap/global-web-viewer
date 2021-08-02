@@ -32,7 +32,7 @@ const InfoPopover = (props) => {
   }
 
   return (
-    <OverlayTrigger trigger="click" rootClose placement="right" overlay={popover}>
+    <OverlayTrigger trigger="click" rootClose placement="auto" overlay={popover}>
       <Button variant="info" className="button-info" bsPrefix="info-btn">
         <BsInfoCircle />
       </Button>

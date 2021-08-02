@@ -83,7 +83,7 @@
   background-color:transparent;
   font-size: 18px;
   padding: 0;
-  padding-left: 0.5rem;
+  padding-left: 0.0rem;
   margin: 0;
   border: 0;
   outline-style: none;
@@ -185,7 +185,7 @@
 }
 .d3-legend {
   z-index: 1;
-  width: 300px;
+  width: 220px;
   height: 20px;
 }
 .d3-x-axis:not(:last-child) {
