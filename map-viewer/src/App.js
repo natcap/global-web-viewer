@@ -29,7 +29,7 @@ function App() {
       />
       <Row className="row-banner">
         <Col id="banner" className="banner">
-          Prototype Global Data Viewer
+          Prototype Natural Capital World Viewer
         </Col>
         <Col xs="auto">
           <img 
