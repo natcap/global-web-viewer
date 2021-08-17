@@ -15,7 +15,8 @@
   background-color: #2f2f30;
   color: #ffffff;
   padding: 6px 12px;
-  font: 15px/24px monospace;
+  font-family: 'Source Sans Pro', sans-serif;
+  font-size: 16px;
   z-index: 1;
   position: absolute;
   left: 0;
@@ -38,41 +39,47 @@
 }
 .layer-group {
   color: #ffffff;
-  font: 15px/24px monospace;
+  font-family: 'Source Sans Pro', sans-serif;
+  font-size: 16px;
   z-index: 1;
 }
 
 .custom-control-input:focus ~ .custom-control-label::before {
 /* when the button is toggled off it is still in focus and a green border will appear */
-  border-color: #98FF98 !important;
+  border-color: #009b76 !important;
 /* box shadow is blue by default but we do not want any shadow hence we have set all the values as 0 */
   box-shadow:
     0 0 0 0rem rgba(0, 0, 0, 0) !important;
   }
-/*sets the background color of switch to #98FF98 when it is checked*/
+/*sets the background color of switch to #009b76 when it is checked*/
 .custom-control-input:checked ~ .custom-control-label::before {
-  border-color: #98FF98 !important;
-  background-color: #98FF98 !important;
+  border-color: #009b76 !important;
+  background-color: #009b76 !important;
 }
 /*sets the background color of switch to green when it is active*/
 .custom-control-input:active ~ .custom-control-label::before {
-  background-color: #98FF98 !important;
-  border-color: #98FF98 !important;
+  background-color: #009b76 !important;
+  border-color: #009b76 !important;
 }
 /*sets the border color of switch to green when it is not checked*/
 .custom-control-input:focus:not(:checked) ~ .custom-control-label::before {
-  border-color: #98FF98 !important;
+  border-color: #009b76 !important;
 }
 
+.popover-body {
+  font-family: 'Source Sans Pro', sans-serif;
+}
 .popover-service {
+  font-family: 'Source Sans Pro', sans-serif;
   max-width: 30rem;
   overflow-y: auto;
   max-height: 35rem;
 }
 .popover-service-title {
-  background-color: #9BA17B;
+  font-family: 'Source Sans Pro', sans-serif;
+  background-color: #007c92;
   color: #ffffff;
-  font-size: 18px;
+  font-size: 20px;
 }
 
 .btn {
@@ -132,14 +139,15 @@
 }
 
 .menu-main-text {
-  font: 16px/24px monospace;
-  font-weight: bold;
+  font-family: 'Source Sans Pro', sans-serif;
+  font-size: 16px;
   padding-right: .3rem;
   display: inline;
 }
 .menu-desc-text {
   display: inline;
-  font: 14px/16px monospace;
+  font-family: 'Source Sans Pro', sans-serif;
+  font-size: 14px;
 }
 .suggestions-wrapper {
   overflow: visible !important;
@@ -156,6 +164,7 @@
 }
 
 .legend-group {
+  font-family: 'Source Sans Pro', sans-serif;
   z-index: 1;
   position: absolute;
   right: 0;
@@ -211,7 +220,7 @@
 /*display: none;*/
 }
 .mapboxgl-popup-content {
-  font: 400 15px/22px 'Source Sans Pro', 'Helvetica Neue', Sans-serif;
+  font: 400 15px/22px 'Source Sans Pro', Sans-serif;
   padding: 0;
   padding-bottom: 5px;
   width: 280px;
@@ -223,7 +232,7 @@
 }
 .mapboxgl-popup-content h3 {
   font-size: 20px;
-  background: #9BA17B;
+  background: #007c92;
   color: #fff;
   margin: 0;
   padding: 10px;
@@ -234,7 +243,7 @@
 }
 .mapboxgl-popup-content h3 span{
   font-size: 16px;
-  background: #9BA17B;
+  background: #007c92;
   color: #fff;
 }
 .mapboxgl-popup-content .popup-div {

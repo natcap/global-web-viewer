@@ -1,6 +1,7 @@
 .banner {
   background-color: #2f2f30;
-  font: 32px Arial, sans-serif;
+  font-family: 'Source Sans Pro', sans-serif;
+  font-size: 32px;
   color: #ffffff;
   padding-left: 2rem;
   padding-top: 1rem;
@@ -32,16 +33,17 @@
   height: 2.5rem;
 }
 .welcomeButton {
-  font: 8px;
-  color: #000000;
+  font-size: 16px;
+  background-color: #007c92;
+  color: #fff;
   padding: 0.2rem;
   padding-left: 0.3rem;
   padding-right: 0.3rem;
-  background-color: rgba(237, 244, 245, 1.0);
   border-style: none;
 }
 .welcome-title {
-  background-color: #9BA17B;
+  background-color: #007c92;
+  color: #fff;
 }
 
 .appContainer {

@@ -17,17 +17,17 @@ const WelcomeModal = (props) => {
     >
       <Modal.Header closeButton className="welcome-title">
         <Modal.Title id="contained-modal-title-vcenter">
-          Prototype Global Data Viewer
+          Prototype Natural Capital World Viewer
         </Modal.Title>
       </Modal.Header>
       <Modal.Body>
         <h4>Getting Started</h4>
         <p>
-          Welcome to the NatCap Data Viewer, a web map app to investigate 
-          global data. We have uploaded a sample of our data and implemented 
-          a subset of features for this demo. Currently a prototype, we hope 
-          to gather user feedback and interest for a production version in the 
-          future. Enjoy! 
+          Welcome to the prototype of the NatCap World Viewer, a web map app 
+          to investigate global data. We have uploaded a sample of our data
+          and implemented a subset of features for this demo. Currently a
+          prototype, we hope to gather user feedback and interest for a
+          production version in the future. Enjoy! 
         </p>
       </Modal.Body>
       <Modal.Footer>
@@ -35,7 +35,7 @@ const WelcomeModal = (props) => {
           <Col>
             <span> P.S. Because this is a prototype we have not had a 
               chance to run this through the testing gauntlet. If something breaks,
-              simply hit the refresh button. Thanks for understanding.
+              simply hit the browser refresh button. Thanks for understanding.
             </span>
           </Col>
           <Col xs="auto">
