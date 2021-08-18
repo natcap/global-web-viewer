@@ -18,6 +18,8 @@ from osgeo import gdal, ogr
 import pygeoprocessing
 import taskgraph
 
+import test_cp_agg_core
+
 logging.basicConfig(
     level=logging.DEBUG,
     format=(
@@ -35,8 +37,14 @@ def global_degree_grid():
     global_y_bottom = -90
     global_y_top = 90
 
+    # Test U.S.
+    #global_x_left = -130
+    #global_x_right = -50
+    #global_y_bottom = 10
+    #global_y_top = 55
+
     raster_deg_grid_size = 10
-    poly_deg_grid_buffer = 5
+    poly_deg_grid_buffer = 1
 
     raster_grid_bboxes = []
     poly_grid_bboxes = []
@@ -75,7 +83,10 @@ def global_degree_grid():
 
 def process_coastal_protection(
         input_raster_path, input_vector_path, raster_bbox, vector_bbox,
-        vector_id_attr, tmp_workspace):
+        vector_id_attr, tmp_workspace, target_pickle_path):
+
+    if not os.path.exists(tmp_workspace):
+        os.makedirs(tmp_workspace)
 
     #clip vector to bbox
     vector = gdal.OpenEx(input_vector_path, gdal.OF_VECTOR)
@@ -113,7 +124,9 @@ def process_coastal_protection(
 
     if len(feature_geom_list) == 0:
         LOGGER.info(f"No boundaries intersected for {vector_bbox}")
-        return None
+        with open(target_pickle_path, 'wb') as pickle_file:
+            pickle.dump({"no-nearest": "no boundaries intersect"}, pickle_file)
+        return
 
     file_idx = STRtree(feature_geom_list)
 
@@ -121,6 +134,7 @@ def process_coastal_protection(
 
     #clip raster to bbox
     clipped_raster_path = os.path.join(tmp_workspace, f'clipped_raster.tif')
+    LOGGER.info(f"clipped path: {clipped_raster_path}")
     if os.path.exists(clipped_raster_path):
         os.remove(clipped_raster_path)
 
@@ -139,10 +153,13 @@ def process_coastal_protection(
 
     stats_dict = {"no-nearest": []}
     #might be able to just to readAsArray from the raster_bbox
+    LOGGER.info("Run through iterblocks")
     for offset, array_block in pygeoprocessing.iterblocks((clipped_raster_path, 1)):
         valid_array = ~numpy.isclose(array_block, nodata)
         valid_idx = numpy.argwhere(valid_array == 1)
 
+        if len(valid_idx) > 5000:
+            LOGGER.info(f"number of valid pixels: {len(valid_idx)}")
         for idx in valid_idx:
             idx_centroid = (
                 top_left[0] + (offset['xoff'] + idx[1] + 0.5) * pixel_size[0],
@@ -158,36 +175,218 @@ def process_coastal_protection(
                     stats_dict[id_val]["count"] += 1
                     stats_dict[id_val]["sum"] += array_block[idx[0], idx[1]]
             else:
-                stats_dict["no-nearest"] = stats_dict["no-nearest"].append(idx_centroid)
+                stats_dict["no-nearest"].append(idx_centroid)
 
     LOGGER.info(f"Done processing raster_bbox: {raster_bbox}")
     #return a dict like {vector_id_1: {count: x, sum: x}, vector_id_1: {count: x, sum: x}}
     #shutil.rmtree(tmp_workspace)
-    return stats_dict
+    LOGGER.info(f"rbbox: {raster_bbox} ; vbbox: {vector_bbox}")
+    LOGGER.info(f"Stats dict: {stats_dict}")
+    #return stats_dict
+    with open(target_pickle_path, 'wb') as pickle_file:
+        pickle.dump(stats_dict, pickle_file)
 
-def stats_to_vector(
-        base_vector_path, stats_pickle_path, vector_out_path, mean_attr):
-    """Add zonal statistics to vector.
 
-    Args:
-        base_vector_path (string): path to a GDAL vector file. Used as the
-            base for the output vector.
-        stats_pickle_path (string): path to a pickled file containing 
-            zonal statistics using ``pygeoprocessing.zonal_statistics``.
-        vector_out_path (string): path to a GDAL vector file for the 
-            output vector containin zonal stats.
-        mean_attr (string): name of the feature field for saving the mean.
+def process_coastal_protection_rasterize(
+        input_raster_path, input_vector_path, raster_bbox, vector_bbox,
+        vector_id_attr, tmp_workspace, target_pickle_path):
 
-    Returns:
-        None
-    """
-    LOGGER.debug("Add statistics to vector")
-    base_vector_info = pygeoprocessing.get_vector_info(base_vector_path)
+    if not os.path.exists(tmp_workspace):
+        os.makedirs(tmp_workspace)
 
-    base_vector = gdal.OpenEx(base_vector_path, gdal.OF_VECTOR)
-
-    layer = base_vector.GetLayer(0)
+    #clip vector to bbox
+    vector = gdal.OpenEx(input_vector_path, gdal.OF_VECTOR)
+    layer = vector.GetLayer()
     layer_dfn = layer.GetLayerDefn()
+    layer.SetSpatialFilterRect(*vector_bbox)
+
+    vector_info = pygeoprocessing.get_vector_info(input_vector_path)
+
+    ### Check that there are valid vector boundaries and raster pixels ###
+
+    # check intersection of vector input and vector bbox. If not intersection
+    # then nothing to do here
+    feature_geom_list = []
+    for feat in layer:
+        fid = feat.GetFID()
+        geom = feat.GetGeometryRef()
+        shapely_geom = shapely.wkb.loads(geom.ExportToWkb())
+        clipped_geom = shapely_geom.intersection(box(*vector_bbox))
+        feature_geom_list.append(clipped_geom)
+
+        feat = None
+
+    if len(feature_geom_list) == 0:
+        LOGGER.info(f"No boundaries intersected for {vector_bbox}")
+        with open(target_pickle_path, 'wb') as pickle_file:
+            pickle.dump({"no-nearest": "no boundaries intersect"}, pickle_file)
+        return
+
+    # tmp mask vector path from raster bbox
+    temp_raster_mask_path = os.path.join(
+        tmp_workspace, 'tmp_vector_mask_raster_bb.gpkg')
+    if os.path.isfile(temp_raster_mask_path):
+        os.remove(temp_raster_mask_path)
+
+    raster_bb_geom = [shapely.geometry.box(*raster_bbox)]
+    LOGGER.info(f"raster_bb_geom: {raster_bb_geom}")
+    pygeoprocessing.shapely_geometry_to_vector(
+        raster_bb_geom, temp_raster_mask_path, vector_info['projection_wkt'],
+        'GPKG')
+
+    stats_dict = pygeoprocessing.zonal_statistics(
+        (input_raster_path, 1), temp_raster_mask_path, 
+        polygons_might_overlap=False)
+
+    LOGGER.info(f"zonal stats dict: {stats_dict}")
+    if stats_dict[1]['count'] == 0:
+        LOGGER.info(f"No valid raster pixels for {raster_bbox}")
+        with open(target_pickle_path, 'wb') as pickle_file:
+            pickle.dump({"no-pixels": "no non nodata pixels"}, pickle_file)
+        return
+
+    ### We have valid raster pixels and we have boundaries so continue ###
+
+    # clipped out vector path
+    clipped_vector_path = os.path.join(tmp_workspace, 'clipped_result.gpkg')
+    if os.path.isfile(clipped_vector_path):
+        os.remove(clipped_vector_path)
+
+    # create a new shapefile from the orginal_datasource
+    clip_driver = ogr.GetDriverByName('GPKG')
+    clip_vector = clip_driver.CreateDataSource(clipped_vector_path)
+    projection = osr.SpatialReference()
+    projection.ImportFromWkt(vector_info['projection_wkt'])
+    clip_vector.CreateLayer(
+        layer_dfn.GetName(), srs=projection, geom_type=layer_dfn.GetGeomType())
+    clip_result_layer = clip_vector.GetLayer()
+
+    # tmp mask method vector path
+    temp_mask_path = os.path.join(tmp_workspace, 'tmp_vector_mask.gpkg')
+    if os.path.isfile(temp_mask_path):
+        os.remove(temp_mask_path)
+
+    bounding_box_geom = [shapely.geometry.box(*vector_bbox)]
+    pygeoprocessing.shapely_geometry_to_vector(
+        bounding_box_geom, temp_mask_path, vector_info['projection_wkt'],
+        'GPKG')
+    temp_mask_vector = gdal.OpenEx(temp_mask_path, gdal.OF_VECTOR)
+    temp_mask_layer = temp_mask_vector.GetLayer()
+
+    layer.Clip(temp_mask_layer, clip_result_layer)
+
+    layer = None
+    temp_mask_layer = None
+    vector = None
+    temp_mask_vector = None
+
+    raster_info = pygeoprocessing.get_raster_info(input_raster_path)
+    pixel_size = raster_info['pixel_size']
+    # origin should be top left, so min_x, max_y
+    origin = (vector_bbox[0], vector_bbox[3])
+    target_x_size = int(abs(
+        float(vector_bbox[2] - vector_bbox[0]) / pixel_size[0]))
+    target_y_size = int(abs(
+        float(vector_bbox[3] - vector_bbox[1]) / pixel_size[1]))
+    new_raster_array = numpy.zeros((target_y_size, target_x_size))
+    rasterize_nodata = -999.9
+
+    distance_transform_raster_list = []
+    dist_trans_id_list = []
+    dist_trans_name_list = []
+    for feat in clip_result_layer:
+        id_val = feat.GetFieldAsInteger('idMap')
+        name_val = feat.GetFieldAsString('GID_1')
+        rasterize_path = os.path.join(tmp_workspace, f"rasterize_{id_val}.tif")
+
+        pygeoprocessing.numpy_array_to_raster(
+            new_raster_array, rasterize_nodata, pixel_size, origin,
+            raster_info['projection_wkt'], rasterize_path)
+
+        pygeoprocessing.rasterize(
+            clipped_vector_path, rasterize_path,
+            option_list=["ATTRIBUTE=idMap"], where_clause=f"idMap={id_val}")
+
+        distance_transform_path = os.path.join(
+            tmp_workspace, f"dist_trans_{id_val}.tif")
+        pygeoprocessing.distance_transform_edt(
+            (rasterize_path, 1), distance_transform_path)
+
+        distance_transform_raster_list.append(distance_transform_path)
+        dist_trans_id_list.append(id_val)
+        dist_trans_name_list.append(name_val)
+
+    clip_result_layer = None
+    clip_vector = None
+
+    # clip raster to bbox
+    clipped_raster_path = os.path.join(tmp_workspace, f'clipped_raster.tif')
+    LOGGER.info(f"clipped path: {clipped_raster_path}")
+    if os.path.exists(clipped_raster_path):
+        os.remove(clipped_raster_path)
+
+    raster_info = pygeoprocessing.get_raster_info(input_raster_path)
+
+    pygeoprocessing.align_and_resize_raster_stack(
+        [input_raster_path], [clipped_raster_path], ['near'],
+        raster_info['pixel_size'], raster_bbox)
+
+    # Align distance transform rasters with clipped cv raster
+    aligned_dist_trans_list = [
+        f"{os.path.splitext(x)[0]}_aligned.tif" for x in distance_transform_raster_list]
+    aligned_clipped_raster_path = os.path.join(
+        tmp_workspace, f'clipped_raster_aligned.tif')
+
+    clipped_and_dist_trans_list = [
+        clipped_raster_path, *distance_transform_raster_list]
+    aligned_clipped_dist_trans_list = [
+        aligned_clipped_raster_path, *aligned_dist_trans_list]
+    pygeoprocessing.align_and_resize_raster_stack(
+        clipped_and_dist_trans_list, aligned_clipped_dist_trans_list,
+        ['near'] * len(clipped_and_dist_trans_list),
+        raster_info['pixel_size'], 'union')
+
+    #for each raster pixel with value find nearest vector geom
+    raster_info = pygeoprocessing.get_raster_info(clipped_raster_path)
+    nodata = raster_info['nodata'][0]
+    pixel_size = raster_info['pixel_size']
+    bounding_box = raster_info['bounding_box']
+    top_left = (bounding_box[0], bounding_box[3])
+
+    stats_dict = {"no-nearest": []}
+    #id_to_name = {value: key for key, value in attr_id_map.items()}
+
+    #might be able to just to readAsArray from the raster_bbox
+    stats_dict = test_cp_agg_core.find_close(
+        aligned_clipped_raster_path, aligned_dist_trans_list,
+        dist_trans_name_list, dist_trans_id_list)
+
+    LOGGER.info(f"Done processing raster_bbox: {raster_bbox}")
+    #return a dict like {vector_id_1: {count: x, sum: x}, vector_id_1: {count: x, sum: x}}
+    #shutil.rmtree(tmp_workspace)
+    LOGGER.info(f"rbbox: {raster_bbox} ; vbbox: {vector_bbox}")
+    LOGGER.info(f"Stats dict: {stats_dict}")
+    #return stats_dict
+    with open(target_pickle_path, 'wb') as pickle_file:
+        pickle.dump(stats_dict, pickle_file)
+
+
+def admin_unique_identifiers(vector_path, vector_id_attr, vector_out_path):
+    """ """
+    vector = gdal.OpenEx(vector_path, gdal.OF_VECTOR)
+    layer = vector.GetLayer()
+    layer_dfn = layer.GetLayerDefn()
+
+    hash_id_map = {}
+    count = 1
+    for feat in layer:
+        fid = feat.GetFID()
+        id_attr_value = feat.GetFieldAsString(vector_id_attr)
+        if id_attr_value not in hash_id_map:
+            hash_id_map[id_attr_value] = count
+            count += 1
+
+        feat = None
 
     # if this file already exists, then remove it
     if os.path.isfile(vector_out_path):
@@ -197,187 +396,28 @@ def stats_to_vector(
     target_driver = ogr.GetDriverByName('GPKG')
     target_vector = target_driver.CreateDataSource(vector_out_path)
     target_vector.CopyLayer(layer, layer_dfn.GetName())
-
-    number_features = layer.GetFeatureCount()
-    LOGGER.debug(f"Base vector feature count: {number_features}")
-    five_perc_counter = int(number_features * 0.05)
-
     target_layer = target_vector.GetLayer(0)
-    number_features_target = target_layer.GetFeatureCount()
-    LOGGER.debug(f"Target vector feature count: {number_features_target}")
 
-    # Get the number of fields in original_layer
-    original_field_count = layer_dfn.GetFieldCount()
-    LOGGER.debug(f"Original field count: {original_field_count}")
+    target_field = ogr.FieldDefn('idMap', ogr.OFTInteger)
+    target_layer.CreateField(target_field)
 
-    LOGGER.info("Loading stats")
-    with open(stats_pickle_path, 'rb') as pickle_file:
-        vector_stats = pickle.load(pickle_file)
-
-    # Calculate mean
-    for key, value in vector_stats.items():
-        if value['count'] != 0.0:
-            vector_stats[key][mean_attr] = value['sum'] / value['count']
-        else:
-            vector_stats[key][mean_attr] = 0.0
-
-    vector_stats_keys = list(vector_stats.keys())
-    target_field_idx_name_list = []
-    for key in vector_stats[vector_stats_keys[0]].keys():
-        target_field = ogr.FieldDefn(key, ogr.OFTReal)
-        target_layer.CreateField(target_field)
-        target_field_idx_name_list.append(
-            (target_layer.FindFieldIndex(key, 1), key) )
-    LOGGER.debug(f"target fields to be added: {target_field_idx_name_list}")
-
-    target_layer_dfn = target_layer.GetLayerDefn()
-    target_field_count = target_layer_dfn.GetFieldCount()
-    LOGGER.debug(f"Target field count: {target_field_count}")
+    fld_idx = target_layer.FindFieldIndex('idMap', 1)
     # Copy all of the features in layer to the new shapefile
-    last_time = time.time()
     target_layer.StartTransaction()
-    error_count = 0
-    perc_total = 0
     for feature_index, target_feature in enumerate(target_layer):
-        last_time = pygeoprocessing._invoke_timed_callback(
-            last_time, lambda: LOGGER.info(
-                f'{(feature_index / number_features_target):.2f} processed'), 5.0)
-
         fid = target_feature.GetFID()
+        id_attr_value = target_feature.GetFieldAsString(vector_id_attr)
 
-        for field_idx, field_name in target_field_idx_name_list:
-            field_value = vector_stats[fid][field_name]
-            if field_value is None:
-                field_value = 0.0
-
-            target_feature.SetField(field_idx, float(field_value))
+        target_feature.SetField(fld_idx, hash_id_map[id_attr_value])
         target_layer.SetFeature(target_feature)
         target_feature = None
     target_layer.CommitTransaction()
-    if error_count > 0:
-        LOGGER.debug(
-            '%d features out of %d were unable to be transformed and are'
-            ' not in the output vector at %s', error_count,
-            layer.GetFeatureCount(), vector_out_path)
+
     layer = None
-    target_layer = None
-    base_vector = None
-    target_vector = None
-
-def pickle_zonal_stats(
-        base_vector_path, base_raster_path, target_pickle_path):
-    """Calculate Zonal Stats for a vector/raster pair and pickle result.
-
-    Args:
-        base_vector_path (str): path to vector file
-        base_raster_path (str): path to raster file to aggregate over.
-        target_pickle_path (str): path to desired target pickle file that will
-            be a pickle of the pygeoprocessing.zonal_stats function.
-
-    Returns:
-        None.
-    """
-    LOGGER.info(
-        f'Taking zonal statistics of {base_vector_path} over {base_raster_path}')
-    zonal_stats = pygeoprocessing.zonal_statistics(
-        (base_raster_path, 1), base_vector_path, polygons_might_overlap=False)
-    with open(target_pickle_path, 'wb') as pickle_file:
-        pickle.dump(zonal_stats, pickle_file)
-
-def calculate_percentiles_to_vector(
-    input_vector_path, target_vector_path, field_to_percentile,
-    percentile_field_name):
-    """Calculate percentiles.
-
-    Args:
-        input_vector_path (string):
-        target_vector_path (string):
-        field_to_percentile (string):
-        percentile_field_name (string): name for the output percentile field
-
-    Returns:
-        None
-    """
-    LOGGER.debug("Add percentiles to vector")
-    input_vector_info = pygeoprocessing.get_vector_info(input_vector_path)
-
-    input_vector = gdal.OpenEx(input_vector_path, gdal.OF_VECTOR)
-    input_layer = input_vector.GetLayer(0)
-    input_layer_dfn = input_layer.GetLayerDefn()
-
-    # if this file already exists, then remove it
-    if os.path.isfile(target_vector_path):
-        os.remove(target_vector_path)
-
-    # create a new shapefile from the orginal_datasource
-    target_driver = ogr.GetDriverByName('GPKG')
-    target_vector = target_driver.CreateDataSource(target_vector_path)
-    target_vector.CopyLayer(input_layer, input_layer_dfn.GetName())
-
-    input_layer = None
-    input_vector = None
-
-    target_layer = target_vector.GetLayer(0)
-    number_features_target = target_layer.GetFeatureCount()
-    LOGGER.debug(f"Target vector feature count: {number_features_target}")
-    five_perc_counter = int(number_features_target * 0.05)
-
-    # Create new percentile field
-    target_field = ogr.FieldDefn(percentile_field_name, ogr.OFTReal)
-    target_layer.CreateField(target_field)
-
-    target_layer_dfn = target_layer.GetLayerDefn()
-    target_field_count = target_layer_dfn.GetFieldCount()
-    LOGGER.debug(f"Target field count: {target_field_count}")
-
-    country_means_dict = {}
-
-    for feat in target_layer:
-        country_name = feat.GetFieldAsString('ISO_SOV1')
-        mean_value = feat.GetFieldAsDouble(field_to_percentile)
-
-        if country_name in country_means_dict:
-            country_means_dict[country_name].append(mean_value)
-        else:
-            country_means_dict[country_name] = [mean_value]
-
-        feat = None
-
-    target_layer.ResetReading()
-
-    country_pctile_dict = {}
-    for key, value in country_means_dict.items():
-        percentile_groups = numpy.percentile(value, range(0, 100, 5))
-        country_pctile_dict[key] = percentile_groups
-
-    country_means_dict = None
-
-    last_time = time.time()
-    target_layer.StartTransaction()
-    perc_total = 0
-    for feat_index, feat in enumerate(target_layer):
-        last_time = pygeoprocessing._invoke_timed_callback(
-            last_time, lambda: LOGGER.info(
-                f'{(feat_index / number_features_target):.2f} processed'), 5.0)
-
-        country_name = feat.GetFieldAsString('ISO_SOV1')
-        mean_value = feat.GetFieldAsDouble(field_to_percentile)
-
-        pct_group = country_pctile_dict[country_name]
-        LOGGER.debug(f"country name: {country_name}")
-        LOGGER.debug(f"mean value: {mean_value}")
-        LOGGER.debug(f"pct group: {pct_group}")
-
-        pct_idx = numpy.where(mean_value <= pct_group)[0][0] * 5
-        feat.SetField(percentile_field_name, float(pct_idx))
-
-        target_layer.SetFeature(feat)
-        feat = None
-
-    target_layer.CommitTransaction()
-
+    vector = None
     target_layer = None
     target_vector = None
+
 
 if __name__ == "__main__":
 
@@ -398,7 +438,7 @@ if __name__ == "__main__":
         os.makedirs(output_root_dir)
     if not os.path.exists(pickled_dir):
         os.makedirs(pickled_dir)
-    
+
     gadm_0_1_directory = os.path.join(
         data_common_root_dir, 'boundaries', 'GADM36_levels_0_1',
         'GADM36_levels_0_1')
@@ -418,7 +458,7 @@ if __name__ == "__main__":
     taskgraph_working_dir = os.path.join(
         output_root_dir, '_taskgraph_working_dir')
 
-    n_workers = 5
+    n_workers = -1
     task_graph = taskgraph.TaskGraph(
         taskgraph_working_dir, n_workers, reporting_interval=60.0)
     ###
@@ -432,74 +472,48 @@ if __name__ == "__main__":
 
     global_raster_pairs, global_poly_pairs = global_grid_task.get()
 
+    copied_gadm_path = os.path.join(output_root_dir, 'gadm_id_hash.gpkg')
+    if os.path.isfile(copied_gadm_path):
+        os.remove(copied_gadm_path)
+
+    hash_country_task = task_graph.add_task(
+        func=admin_unique_identifiers,
+        args=(gadm_1_path, 'GID_1', copied_gadm_path),
+        target_path_list=[copied_gadm_path],
+        task_name=f'admin_unique_id_task')
+
+    output_pickled_path_list = []
     coastal_task_match_list = []
     tmp_workspace_count = 0
     for raster_bbox, vector_bbox in zip(global_raster_pairs, global_poly_pairs):
         tmp_workspace = os.path.join(
             output_root_dir, f"test-algorithm-tmp-{tmp_workspace_count}")
-        tmp_workspace_count += 1
-        if not os.path.exists(tmp_workspace):
-            os.makedirs(tmp_workspace)
+        pickle_path = os.path.join(
+            tmp_workspace, f'stats_pickled_{tmp_workspace_count}.pickle')
+        output_pickled_path_list.append(pickle_path)
+
+#        coastal_stats_task = task_graph.add_task(
+#            func=process_coastal_protection,
+#            args=(
+#                coastal_prot_path, gadm_1_path, raster_bbox, vector_bbox, 'GID_1',
+#                tmp_workspace, pickle_path),
+#            target_path_list=[pickle_path],
+#            task_name=f'coastal_stats_task_{tmp_workspace_count}')
+#        coastal_task_match_list.append(coastal_stats_task)
 
         coastal_stats_task = task_graph.add_task(
-            func=process_coastal_protection,
+            func=process_coastal_protection_rasterize,
             args=(
-                coastal_prot_path, gadm_1_path, raster_bbox, vector_bbox, 'GID_1',
-                tmp_workspace),
-            target_path_list=[],
-            store_result=True,
+                coastal_prot_path, copied_gadm_path, raster_bbox, vector_bbox,
+                'GID_1', tmp_workspace, pickle_path),
+            target_path_list=[pickle_path],
             task_name=f'coastal_stats_task_{tmp_workspace_count}')
         coastal_task_match_list.append(coastal_stats_task)
 
-    coastal_stats = coastal_stats_task.get()
-    LOGGER.info(f"coastal stats: {coastal_stats}")
+        tmp_workspace_count += 1
 
     task_graph.close()
     task_graph.join()
+    #coastal_stats = coastal_stats_task.get()
+    #LOGGER.info(f"coastal stats: {coastal_stats}")
 
-#    output_stat_dir = os.path.join(output_root_dir, f'eez_processed')
-#    if not os.path.exists(output_stat_dir):
-#        os.makedirs(output_stat_dir)
-#
-#    output_pickled_path_list = []
-#    eez_basename = os.path.basename(eez_vector_path)
-#    pickle_path = os.path.join(
-#        pickled_dir,
-#        os.path.splitext(eez_basename)[0] + f'_pickled.pickle')
-#    output_pickled_path_list.append(pickle_path)
-#
-#    stats_task = task_graph.add_task(
-#        func=pickle_zonal_stats,
-#        args=(eez_vector_path, coastal_prot_path, pickle_path),
-#        target_path_list=[pickle_path],
-#        task_name=f'stat_eez_task')
-#
-#    output_vector_path = os.path.join(
-#        output_stat_dir,
-#        os.path.splitext(eez_basename)[0] + f'_stats.gpkg')
-#
-#    field_name = "cst_mean"
-#    stats_to_vector_task = task_graph.add_task(
-#        func=stats_to_vector,
-#        args=(
-#            eez_vector_path, pickle_path, output_vector_path,
-#            field_name),
-#        target_path_list=[output_vector_path],
-#        dependent_task_list=[stats_task],
-#        task_name=f'stat_to_eez_task')
-#
-#    percentile_field_name = "cst_pct"
-#    output_perc_vector_path = os.path.join(
-#        output_stat_dir,
-#        os.path.splitext(eez_basename)[0] + f'_perc.gpkg')
-#    percentile_to_vector_task = task_graph.add_task(
-#        func=calculate_percentiles_to_vector,
-#        args=(
-#            output_vector_path, output_perc_vector_path, field_name,
-#            percentile_field_name),
-#        target_path_list=[output_perc_vector_path],
-#        dependent_task_list=[stats_task, stats_to_vector_task],
-#        task_name=f'perc_to_eez_task')
-#
-#    task_graph.close()
-#    task_graph.join()
