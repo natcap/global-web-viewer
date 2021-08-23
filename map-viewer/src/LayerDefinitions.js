@@ -276,6 +276,54 @@ const mapLayers = [
       },
     }
   },
+  {
+    layerID: 'rcp-points',
+    name: 'Realized Coastal Protection',
+    serviceType: 'coastalProtection',
+    scaleID: 'all',
+    mapLayer: {
+      id: 'rcp-points',
+      minzoom: 1,
+      type: 'circle',
+      'source-layer': 'realized_coastal_protection_points',
+      paint: {
+        'circle-color': [
+          'interpolate',
+          ['linear'],
+          ['get', 'grid_code'],
+          0,
+          '#f3deff',
+          4.6,
+          '#e2c7ec',
+          29.3,
+          '#d1afdc',
+          101.1,
+          '#c098cd',
+          284.4,
+          '#ae81bd',
+          732.2,
+          '#9d69ad',
+          1790.7,
+          '#8c529d',
+          4555.7,
+          '#7b3a8d',
+          14861.5,
+          '#500066'
+        ],
+        'circle-stroke-color': '#fff',
+        'circle-stroke-width': 0.25,
+      },
+      layout: {
+        visibility: 'none',
+      },
+      source: {
+        type: 'vector',
+        url: 'mapbox://ddenu.38tijv0y',
+        //style: 'mapbox://styles/ddenu/ckshdib4d1p6l18nztzq5xhaf',
+        generatedId: true
+      },
+    }
+  },
 ]
 
 export default mapLayers;

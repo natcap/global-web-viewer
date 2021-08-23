@@ -52,6 +52,7 @@ const Map = () => {
     sediment: {name: 'Sediment retention', key: 'sed_'},
     nitrogen: {name: 'Nitrogen retention', key: 'nit_'},
     natureAccess: {name: 'Access to Nature', key: 'acc_'},
+    coastalProtection: {name: 'Realized Coastal Protection', key: 'rcp_'},
   }
 
   //const meanStatsList = ['sed_mean', 'nit_mean', 'acc_mean'];
@@ -119,13 +120,14 @@ const Map = () => {
   //By using this Hook, you tell React that your component needs to do
   //something after render.
   useEffect(() => {
+    //if (map.current) return; // initialize map only once
     const map = new mapboxgl.Map({
       container: mapContainer.current,
       style: 'mapbox://styles/mapbox/streets-v11',
       center: [lng, lat],
       zoom: zoom,
       minZoom: 1.6,
-      maxZoom: 9.1,
+      maxZoom: 11.1,
     });
 
     // Add zoom and rotation controls to the map.
@@ -265,7 +267,17 @@ const Map = () => {
           'stats-gadm1', 'fill-opacity', [
             'match', ['get', 'NAME_1'], featID, 0.0, 0.8]);
       });
-
+      if (map.getLayer('rcp-points')) {
+        map.setPaintProperty('rcp-points', 'circle-radius', [
+          'interpolate',
+          ['linear'],
+          ['zoom'],
+          2,
+          2,
+          9,
+          4
+        ]);
+      }
 
       let originLayers = map.getStyle().layers;
       let firstSymbolId = '';
@@ -420,6 +432,21 @@ const Map = () => {
     });
   });
   */
+  useEffect(() => {
+    if (map == null) return; // wait for map to initialize
+    console.log('rcp-points radius useffect');
+    //if (map.getLayer('rcp-points')) {
+      map.setPaintProperty('rcp-points', 'circle-radius', [
+        'interpolate',
+        ['linear'],
+        ['zoom'],
+        2,
+        2,
+        9,
+        4
+      ]);
+  //  }
+  }, [visibleLayers]);
 
 
   useEffect(() => {
@@ -438,6 +465,12 @@ const Map = () => {
     const currentServices = [...selectedServices];
     mapLayers.forEach((layer) => {
       if(layer.scaleID === scaleResult && currentServices.includes(layer.serviceType)) {
+        visibleLayersUpdate[layer.serviceType] = layer;
+        visibleVar = 'visible';
+      }
+      // This is the case for coastal protection. Show the same output across
+      // scales
+      if(layer.scaleID === 'all' && currentServices.includes(layer.serviceType)) {
         visibleLayersUpdate[layer.serviceType] = layer;
         visibleVar = 'visible';
       }
@@ -499,7 +532,9 @@ const Map = () => {
       setServices([...selectedServicesUpdate]);
       console.log("change Vis State: ", scale.current);
       mapLayers.forEach((layer) => {
-        if(layer.scaleID === scale.current && layer.serviceType === serviceResult) {
+        // Check 'all' for coastal protection case where we want this one 
+        // layer visible across all scales
+        if((layer.scaleID === scale.current || layer.scaleID === 'all') && layer.serviceType === serviceResult) {
           map.setLayoutProperty(layer.layerID, 'visibility', 'visible');
           visibleLayersUpdate[serviceResult] = {...layer};
           setLayers({...visibleLayersUpdate});
