@@ -13,7 +13,7 @@ from shapely.strtree import STRtree
 from shapely.geometry import Polygon, Point, box
 
 import numpy
-from osgeo import gdal, ogr
+from osgeo import gdal, ogr, osr
 
 import pygeoprocessing
 import taskgraph
@@ -291,6 +291,7 @@ def process_coastal_protection_rasterize(
     new_raster_array = numpy.zeros((target_y_size, target_x_size))
     rasterize_nodata = -999.9
 
+    rasterize_path_list = []
     distance_transform_raster_list = []
     dist_trans_id_list = []
     dist_trans_name_list = []
@@ -298,6 +299,7 @@ def process_coastal_protection_rasterize(
         id_val = feat.GetFieldAsInteger('idMap')
         name_val = feat.GetFieldAsString('GID_1')
         rasterize_path = os.path.join(tmp_workspace, f"rasterize_{id_val}.tif")
+        rasterize_path_list.append(rasterize_path)
 
         pygeoprocessing.numpy_array_to_raster(
             new_raster_array, rasterize_nodata, pixel_size, origin,
@@ -346,29 +348,32 @@ def process_coastal_protection_rasterize(
         ['near'] * len(clipped_and_dist_trans_list),
         raster_info['pixel_size'], 'union')
 
-    #for each raster pixel with value find nearest vector geom
-    raster_info = pygeoprocessing.get_raster_info(clipped_raster_path)
-    nodata = raster_info['nodata'][0]
-    pixel_size = raster_info['pixel_size']
-    bounding_box = raster_info['bounding_box']
-    top_left = (bounding_box[0], bounding_box[3])
-
-    stats_dict = {"no-nearest": []}
-    #id_to_name = {value: key for key, value in attr_id_map.items()}
-
     #might be able to just to readAsArray from the raster_bbox
     stats_dict = test_cp_agg_core.find_close(
         aligned_clipped_raster_path, aligned_dist_trans_list,
         dist_trans_name_list, dist_trans_id_list)
 
     LOGGER.info(f"Done processing raster_bbox: {raster_bbox}")
-    #return a dict like {vector_id_1: {count: x, sum: x}, vector_id_1: {count: x, sum: x}}
-    #shutil.rmtree(tmp_workspace)
+    # Save a pickled dict like:
+    # Stats dict: {
+    #  'NOR.17_1': {'count': 77360, 'sum': 86745510.0},
+    #  'NOR.10_1': {'count': 149649, 'sum': 31046264.0},
+    #  'SWE.18_1': {'count': 3021, 'sum': 13581030.0},
+    #  'SWE.3_1': {'count': 9546, 'sum': 33047218.0},
+    #  'ALA.5_1': {'count': 1084, 'sum': 1081706.1} }
     LOGGER.info(f"rbbox: {raster_bbox} ; vbbox: {vector_bbox}")
     LOGGER.info(f"Stats dict: {stats_dict}")
-    #return stats_dict
     with open(target_pickle_path, 'wb') as pickle_file:
         pickle.dump(stats_dict, pickle_file)
+
+    # Clean up temp files to free up disk space
+    for rasterize_path in rasterize_path_list:
+        os.remove(rasterize_path)
+    for dist_trans_path in distance_transform_raster_list:
+        os.remove(dist_trans_path)
+    for aligned_dist_path in aligned_dist_trans_list:
+        os.remove(aligned_dist_path)
+    os.remove(temp_mask_path)
 
 
 def admin_unique_identifiers(vector_path, vector_id_attr, vector_out_path):
@@ -458,7 +463,7 @@ if __name__ == "__main__":
     taskgraph_working_dir = os.path.join(
         output_root_dir, '_taskgraph_working_dir')
 
-    n_workers = -1
+    n_workers = 5
     task_graph = taskgraph.TaskGraph(
         taskgraph_working_dir, n_workers, reporting_interval=60.0)
     ###
@@ -507,6 +512,7 @@ if __name__ == "__main__":
                 coastal_prot_path, copied_gadm_path, raster_bbox, vector_bbox,
                 'GID_1', tmp_workspace, pickle_path),
             target_path_list=[pickle_path],
+            dependent_task_list=[hash_country_task],
             task_name=f'coastal_stats_task_{tmp_workspace_count}')
         coastal_task_match_list.append(coastal_stats_task)
 
