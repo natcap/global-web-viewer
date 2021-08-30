@@ -297,7 +297,7 @@ def process_coastal_protection_rasterize(
     dist_trans_name_list = []
     for feat in clip_result_layer:
         id_val = feat.GetFieldAsInteger('idMap')
-        name_val = feat.GetFieldAsString('GID_1')
+        name_val = feat.GetFieldAsString(vector_id_attr)
         rasterize_path = os.path.join(tmp_workspace, f"rasterize_{id_val}.tif")
         rasterize_path_list.append(rasterize_path)
 
@@ -378,6 +378,9 @@ def process_coastal_protection_rasterize(
 
 def admin_unique_identifiers(vector_path, vector_id_attr, vector_out_path):
     """ """
+    if os.path.isfile(vector_out_path):
+        os.remove(vector_out_path)
+
     vector = gdal.OpenEx(vector_path, gdal.OF_VECTOR)
     layer = vector.GetLayer()
     layer_dfn = layer.GetLayerDefn()
@@ -423,6 +426,94 @@ def admin_unique_identifiers(vector_path, vector_id_attr, vector_out_path):
     target_layer = None
     target_vector = None
 
+def aggregate_pickled_results(output_pickled_path_list):
+    # Stats dict: {
+    #  'NOR.17_1': {'count': 77360, 'sum': 86745510.0},
+    #  'NOR.10_1': {'count': 149649, 'sum': 31046264.0},
+    #  'SWE.18_1': {'count': 3021, 'sum': 13581030.0},
+    #  'SWE.3_1': {'count': 9546, 'sum': 33047218.0},
+    #  'ALA.5_1': {'count': 1084, 'sum': 1081706.1} }
+
+    full_stats = {}
+    for pickled_path in output_pickled_path_list:
+        with open(pickled_path, 'rb') as pickle_file:
+            stats = pickle.load(pickle_file)
+            for key, val in stats.items():
+                if key == 'no-nearest' or key == 'no-pixels':
+                    continue
+                if key not in full_stats:
+                    full_stats[key] = val
+                    full_stats[key]["mean"] = full_stats[key]["sum"] / full_stats[key]["count"]
+                else:
+                    full_stats[key]["count"] += val["count"]
+                    full_stats[key]["sum"] += val["sum"]
+                    full_stats[key]["mean"] = full_stats[key]["sum"] / full_stats[key]["count"]
+    return full_stats
+
+def stats_to_vector(vector_path, target_path, stats_dict, vector_key):
+    """Add zonal statistics to vector.
+
+    Args:
+        vector_path (string): path to a GDAL vector file. Used as the
+            base for the output vector.
+        stats_dict (dict):
+        vector_key (string): name of the feature field for saving the mean.
+
+    Returns:
+        None
+    """
+    LOGGER.debug("Add statistics to vector")
+    vector_info = pygeoprocessing.get_vector_info(vector_path)
+
+    vector = gdal.OpenEx(vector_path, gdal.OF_VECTOR)
+
+    layer = vector.GetLayer(0)
+    layer_dfn = layer.GetLayerDefn()
+
+    # if this file already exists, then remove it
+    if os.path.isfile(target_path):
+        os.remove(target_path)
+
+    # create a new shapefile from the orginal_datasource
+    target_driver = ogr.GetDriverByName('GPKG')
+    target_vector = target_driver.CreateDataSource(target_path)
+    target_vector.CopyLayer(layer, layer_dfn.GetName())
+    target_layer = target_vector.GetLayer(0)
+
+    layer = None
+    vector = None
+
+    vector_stats_keys = list(stats_dict.keys())
+    target_field_idx_name_list = []
+    for key in stats_dict[vector_stats_keys[0]].keys():
+        target_field = ogr.FieldDefn(f'rcp-{key}', ogr.OFTReal)
+        target_layer.CreateField(target_field)
+        target_field_idx_name_list.append(
+            (target_layer.FindFieldIndex(f'rcp-{key}', 1), f'rcp-{key}') )
+    LOGGER.debug(f"target fields to be added: {target_field_idx_name_list}")
+
+    target_layer_dfn = target_layer.GetLayerDefn()
+    field_count = target_layer_dfn.GetFieldCount()
+    LOGGER.debug(f"Target field count: {field_count}")
+
+    target_layer.StartTransaction()
+    for feature_index, target_feature in enumerate(target_layer):
+        id_attr_value = target_feature.GetFieldAsString(vector_key)
+
+        for field_idx, field_name in target_field_idx_name_list:
+            if id_attr_value in stats_dict:
+                field_value = stats_dict[id_attr_value][field_name[4:]]
+            else:
+                field_value = 0.0
+
+            target_feature.SetField(field_idx, float(field_value))
+        target_layer.SetFeature(target_feature)
+        target_feature = None
+    target_layer.CommitTransaction()
+
+    target_layer = None
+    target_vector = None
+
 
 if __name__ == "__main__":
 
@@ -451,13 +542,13 @@ if __name__ == "__main__":
     gadm_0_path = os.path.join(gadm_0_1_directory, 'gadm36_0.shp')
     gadm_1_path = os.path.join(gadm_0_1_directory, 'gadm36_1.shp')
 
-
     coastal_prot_path = os.path.join(
         data_common_root_dir, 'pixel-data', 'Storm-Risk-Reduction',
         'realized_coastalprotection_md5_b8e0ec0c13892c2bf702c4d2d3e50536.tif')
-    eez_vector_path = os.path.join(
-        data_common_root_dir, 'boundaries', 'EEZ', 'World_EEZ_v11_20191118_gpkg',
-        'eez_v11.gpkg')
+
+    gadm_path_list = [gadm_0_path, gadm_1_path]
+    boundary_id_list = ['GID_0', 'GID_1']
+    gadm_id_list = ['gadm36_0', 'gadm36_1']
 
     ### TaskGraph Set Up
     taskgraph_working_dir = os.path.join(
@@ -477,49 +568,64 @@ if __name__ == "__main__":
 
     global_raster_pairs, global_poly_pairs = global_grid_task.get()
 
-    copied_gadm_path = os.path.join(output_root_dir, 'gadm_id_hash.gpkg')
-    if os.path.isfile(copied_gadm_path):
-        os.remove(copied_gadm_path)
+    for gadm_path, gadm_id, boundary_id in zip(gadm_path_list, gadm_id_list, boundary_id_list):
+        if gadm_id == 'gadm36_1':
+            continue
+        gadm_out_dir = os.path.join(output_root_dir, f'results_{gadm_id}')
+        if not os.path.exists(gadm_out_dir):
+            os.makedirs(gadm_out_dir)
 
-    hash_country_task = task_graph.add_task(
-        func=admin_unique_identifiers,
-        args=(gadm_1_path, 'GID_1', copied_gadm_path),
-        target_path_list=[copied_gadm_path],
-        task_name=f'admin_unique_id_task')
+        copied_gadm_path = os.path.join(
+            gadm_out_dir, f'{gadm_id}_id_hash.gpkg')
 
-    output_pickled_path_list = []
-    coastal_task_match_list = []
-    tmp_workspace_count = 0
-    for raster_bbox, vector_bbox in zip(global_raster_pairs, global_poly_pairs):
-        tmp_workspace = os.path.join(
-            output_root_dir, f"test-algorithm-tmp-{tmp_workspace_count}")
-        pickle_path = os.path.join(
-            tmp_workspace, f'stats_pickled_{tmp_workspace_count}.pickle')
-        output_pickled_path_list.append(pickle_path)
+        hash_country_task = task_graph.add_task(
+            func=admin_unique_identifiers,
+            args=(gadm_path, boundary_id, copied_gadm_path),
+            target_path_list=[copied_gadm_path],
+            task_name=f'{gadm_id}_admin_unique_id_task')
 
-#        coastal_stats_task = task_graph.add_task(
-#            func=process_coastal_protection,
-#            args=(
-#                coastal_prot_path, gadm_1_path, raster_bbox, vector_bbox, 'GID_1',
-#                tmp_workspace, pickle_path),
-#            target_path_list=[pickle_path],
-#            task_name=f'coastal_stats_task_{tmp_workspace_count}')
-#        coastal_task_match_list.append(coastal_stats_task)
+        output_pickled_path_list = []
+        coastal_task_match_list = []
+        tmp_workspace_count = 0
+        for raster_bbox, vector_bbox in zip(global_raster_pairs, global_poly_pairs):
+            tmp_workspace = os.path.join(
+                gadm_out_dir, f"test-algorithm-tmp-{tmp_workspace_count}")
+            pickle_path = os.path.join(
+                tmp_workspace, f'stats_pickled_{tmp_workspace_count}.pickle')
+            output_pickled_path_list.append(pickle_path)
 
-        coastal_stats_task = task_graph.add_task(
-            func=process_coastal_protection_rasterize,
-            args=(
-                coastal_prot_path, copied_gadm_path, raster_bbox, vector_bbox,
-                'GID_1', tmp_workspace, pickle_path),
-            target_path_list=[pickle_path],
-            dependent_task_list=[hash_country_task],
-            task_name=f'coastal_stats_task_{tmp_workspace_count}')
-        coastal_task_match_list.append(coastal_stats_task)
+            coastal_stats_task = task_graph.add_task(
+                func=process_coastal_protection_rasterize,
+                args=(
+                    coastal_prot_path, copied_gadm_path, raster_bbox, vector_bbox,
+                    boundary_id, tmp_workspace, pickle_path),
+                target_path_list=[pickle_path],
+                dependent_task_list=[hash_country_task],
+                task_name=f'{gadm_id}_coastal_stats_task_{tmp_workspace_count}')
+            coastal_task_match_list.append(coastal_stats_task)
 
-        tmp_workspace_count += 1
+            tmp_workspace_count += 1
+
+        stats_total_task = task_graph.add_task(
+            func=aggregate_pickled_results,
+            args=(output_pickled_path_list,),
+            store_result=True,
+            dependent_task_list=coastal_task_match_list,
+            task_name=f'{gadm_id}_stats_total_task')
+
+        stats_total = stats_total_task.get()
+
+        aggregated_path = os.path.join(
+            gadm_out_dir, f'{gadm_id}_rcp_stats.gpkg')
+        aggregate_task = task_graph.add_task(
+            func=stats_to_vector,
+            args=(copied_gadm_path, aggregated_path, stats_total, boundary_id),
+            target_path_list=[aggregated_path],
+            dependent_task_list=[stats_total_task],
+            task_name=f'{gadm_id}_stats_agg_task')
+
+        task_graph.join()
+
 
     task_graph.close()
     task_graph.join()
-    #coastal_stats = coastal_stats_task.get()
-    #LOGGER.info(f"coastal stats: {coastal_stats}")
-
