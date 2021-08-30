@@ -51,7 +51,11 @@ def combine_vector_attributes(
     combine_layer = combine_vector.GetLayer(0)
     combine_layer_dfn = combine_layer.GetLayerDefn()
 
+    LOGGER.info(f'Attrs to add: {attr_list}')
+    field_names = [field.name for field in layer.schema]
     for field_key in attr_list:
+        if field_key in field_names:
+            continue
         target_field = ogr.FieldDefn(field_key, ogr.OFTReal)
         layer.CreateField(target_field)
 
@@ -64,8 +68,19 @@ def combine_vector_attributes(
                 f'{(feature_index / number_features):.2f} processed'), 30.0)
 
         fid = feature.GetFID()
+        feat_name = feature.GetFieldAsString('GID_1')
 
-        combine_feature = combine_layer.GetFeature(fid)
+        # for RCP, not guaranteed we have the same FIDs / feature count
+        # because I didn't use the masked antartica shape file when gathering
+        # stats
+        feature_match = False
+        for combine_feature in combine_layer:
+            comb_name = combine_feature.GetFieldAsString('GID_1')
+            if comb_name == feat_name:
+                feature_match = True
+                break
+        if not feature_match:
+            continue
 
         for field_name in attr_list:
             combine_value = combine_feature.GetFieldAsDouble(field_name)
@@ -76,6 +91,7 @@ def combine_vector_attributes(
             feature.SetField(fld_idx, float(combine_value))
 
         layer.SetFeature(feature)
+        combine_layer.ResetReading()
         feature = None
         combine_feature = None
 
@@ -138,32 +154,44 @@ if __name__ == "__main__":
 
     #base_vector_path = os.path.join(
     #    gadm0_root_dir, 'gadm36_0_clipped_sed_stats.gpkg')
-    #combined_out_path = os.path.join(
-    #    combine_vector_dir, 'gadm0_all_stats.gpkg')
-    base_vector_path = os.path.join(
-        gadm1_root_dir, 'gadm36_1_clipped_sed_perc.gpkg')
     combined_out_path = os.path.join(
         combine_vector_dir, 'gadm1_all_stats.gpkg')
+    #base_vector_path = os.path.join(
+    #    gadm1_root_dir, 'gadm36_1_clipped_sed_perc.gpkg')
+    #combined_out_path = os.path.join(
+    #    combine_vector_dir, 'gadm1_all_stats.gpkg')
     #base_vector_path = os.path.join(
     #    hybas_root_dir, 'merged_sed_vectors', 'hybas_all_sed.shp')
     #combined_out_path = os.path.join(
     #    combine_vector_dir, 'hybas_all_service_stats.gpkg')
 
-    copy_vector(base_vector_path, combined_out_path)
+    #copy_vector(base_vector_path, combined_out_path)
 
     # created the base with sed, so not needed again
     #service_id_list = ['nit', 'acc', 'crop']
-    service_id_list = ['nit', 'acc']
+    #service_id_list = ['nit', 'acc']
+    service_id_list = ['rcp']
 
     for service_id in service_id_list:
         #service_vector_path = os.path.join(
         #    gadm0_root_dir, f'gadm36_0_clipped_{service_id}_stats.gpkg')
-        service_vector_path = os.path.join(
-            gadm1_root_dir, f'gadm36_1_clipped_{service_id}_perc.gpkg')
+        #service_vector_path = os.path.join(
+        #    gadm1_root_dir, f'gadm36_1_clipped_{service_id}_perc.gpkg')
         #service_vector_path = os.path.join(
         #    hybas_root_dir, f'merged_{service_id}_vectors', 
         #    f'hybas_all_{service_id}.shp')
-        attr_list = [f'{service_id}_mean', f'{service_id}_pct']
+        #attr_list = [f'{service_id}_mean', f'{service_id}_pct']
+
+        # Add RCP attributes
+        #service_vector_path = os.path.join(
+        #    output_root_dir, 'coastal_protection_stats_vectors',
+        #    'results_gadm36_1', 'gadm36_1_rcp_stats.gpkg')
+        service_vector_path = os.path.join(
+            output_root_dir, 'coastal_protection_stats_vectors',
+            'gadm36_1_rcp_stats.gpkg')
+        attr_list = [
+            f'{service_id}-mean', f'{service_id}-count', f'{service_id}-sum']
+
         combine_vector_attributes(
             combined_out_path, service_vector_path, attr_list)
 
