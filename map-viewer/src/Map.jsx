@@ -51,8 +51,8 @@ const Map = () => {
   const clickPopupKey = {
     sediment: {name: 'Sediment retention', key: 'sed_'},
     nitrogen: {name: 'Nitrogen retention', key: 'nit_'},
-    natureAccess: {name: 'Access to Nature', key: 'acc_'},
-    coastalProtection: {name: 'Realized Coastal Protection', key: 'rcp_'},
+    natureAccess: {name: 'Access to nature', key: 'acc_'},
+    coastalProtection: {name: 'Realized coastal protection', key: 'rcp-'},
   }
 
   //const meanStatsList = ['sed_mean', 'nit_mean', 'acc_mean'];
@@ -267,17 +267,17 @@ const Map = () => {
           'stats-gadm1', 'fill-opacity', [
             'match', ['get', 'NAME_1'], featID, 0.0, 0.8]);
       });
-      if (map.getLayer('rcp-points')) {
-        map.setPaintProperty('rcp-points', 'circle-radius', [
-          'interpolate',
-          ['linear'],
-          ['zoom'],
-          2,
-          2,
-          9,
-          4
-        ]);
-      }
+//      if (map.getLayer('rcp-points')) {
+//        map.setPaintProperty('rcp-points', 'circle-radius', [
+//          'interpolate',
+//          ['linear'],
+//          ['zoom'],
+//          2,
+//          2,
+//          9,
+//          4
+//        ]);
+//      }
 
       let originLayers = map.getStyle().layers;
       let firstSymbolId = '';
@@ -354,20 +354,31 @@ const Map = () => {
         console.log("click stats-gadm1");
         let htmlString = `<h3>${e.features[0].properties.NAME_1}</h3>`;
         let currentServices = [...servicesRef.current];
+        let pctNotice = false;
         if (currentServices.length > 0) {
           currentServices.forEach((service) => {
             const attrKey = clickPopupKey[service].key;
             htmlString = htmlString + `
              <h4><u>${clickPopupKey[service].name}</u></h4>
              <h5>Mean:  ${e.features[0].properties[attrKey+'mean'].toExponential(3)}</h5>
-             <h5>Percentile*:  ${e.features[0].properties[attrKey+'pct'].toFixed(2)}</h5>
             `
+            if(service !== 'coastalProtection') {
+              htmlString = htmlString + `
+                <h5>Percentile*:  ${e.features[0].properties[attrKey+'pct'].toFixed(2)}</h5>
+              `
+              pctNotice = true;
+            }
           });
+          if(pctNotice) {
+            htmlString = htmlString + `
+              <br/><h5>* percentile is in comparison with the mean value
+              of other regions within the same country.</h5>
+            `
+          }
+
           new mapboxgl.Popup({closeButton:true})
           .setLngLat(e.lngLat)
-          .setHTML(
-            htmlString + `<br/><h5>* percentile is in comparison with the mean value
-            of other regions within the same country.</h5>`)
+          .setHTML(htmlString)
           .addTo(map);
         }
         else {
@@ -436,15 +447,15 @@ const Map = () => {
     if (map == null) return; // wait for map to initialize
     console.log('rcp-points radius useffect');
     //if (map.getLayer('rcp-points')) {
-      map.setPaintProperty('rcp-points', 'circle-radius', [
-        'interpolate',
-        ['linear'],
-        ['zoom'],
-        2,
-        2,
-        9,
-        4
-      ]);
+//      map.setPaintProperty('rcp-points', 'circle-radius', [
+//        'interpolate',
+//        ['linear'],
+//        ['zoom'],
+//        2,
+//        2,
+//        9,
+//        4
+//      ]);
   //  }
   }, [visibleLayers]);
 
