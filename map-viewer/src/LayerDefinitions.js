@@ -211,7 +211,7 @@ const mapLayers = [
     mapLayer: {
       id: 'stats-gadm0',
       type: 'fill',
-      'source-layer': 'gadm0_all_stats',
+      'source-layer': 'gadm0_all_stats_rcp',
       paint: {
         'fill-color': 'rgb(9, 9, 9)',
         'fill-outline-color': 'rgb(245, 245, 245)',
@@ -222,7 +222,7 @@ const mapLayers = [
       },
       source: {
         type: 'vector',
-        url: 'mapbox://ddenu.c1c79s1n',
+        url: 'mapbox://ddenu.4c107okb',
         generatedId: true
       },
     }
@@ -235,7 +235,7 @@ const mapLayers = [
     mapLayer: {
       id: 'stats-gadm1',
       type: 'fill',
-      'source-layer': 'gadm1_all_stats',
+      'source-layer': 'gadm1_all_stats_rcp',
       paint: {
         'fill-color': 'rgb(9, 9, 9)',
         'fill-outline-color': 'rgb(245, 245, 245)',
@@ -246,7 +246,7 @@ const mapLayers = [
       },
       source: {
         type: 'vector',
-        url: 'mapbox://ddenu.8s375kz0',
+        url: 'mapbox://ddenu.bn0gvfer',
         generatedId: true
       },
     }
