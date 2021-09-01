@@ -6,8 +6,18 @@ import * as d3 from "d3";
 const D3Legend = (props) => {
 
   const d3Container = useRef(null);
+  const numberStops = props.legendStyle[props.serviceType].colors.length - 1;
+  const colors = props.legendStyle[props.serviceType].colors;
+  let colorOffsets = [];
+  colors.forEach((colorHex, index) => {
+    const colorPct = ((index / numberStops) * 100.0).toFixed(2);
+    colorOffsets.push(
+      {offset: `${colorPct}%`, color: colorHex}
+    );
+  });
 
   useEffect(() => {
+    console.log(colorOffsets);
 
     if(props.serviceType && d3Container.current){
       const svg = d3.select(d3Container.current);
@@ -16,10 +26,11 @@ const D3Legend = (props) => {
       let linearGradient = defs.append("linearGradient")
         .attr("id", `linear-gradient-${props.serviceType}`);
       linearGradient.selectAll("stop")
-        .data([
-          {offset: "0%", color: props.legendStyle[props.serviceType].colors[0]},
-          {offset: "100%", color: props.legendStyle[props.serviceType].colors[1]}
-        ])
+        .data(colorOffsets)
+        //.data([
+          //{offset: "0%", color: props.legendStyle[props.serviceType].colors[0]},
+          //{offset: "100%", color: props.legendStyle[props.serviceType].colors[1]}
+        //])
         .enter().append("stop")
         .attr("offset", function(d) { return d.offset; })
         .attr("stop-color", function(d) { return d.color; });

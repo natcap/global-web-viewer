@@ -200,7 +200,7 @@ export const serviceMenuDetails = [
       disable: true,
     },
     {
-      id: "coastal-protection",
+      id: "coastalProtection",
       label: "Coastal storm risk reduction",
       helpText: {
         text: `Coastal habitats—such as coral reefs, mangroves, salt marsh,
@@ -239,7 +239,7 @@ export const serviceMenuDetails = [
         },
       },
       iconKey: "biwater",
-      disable: true,
+      disable: false,
     },
     {
       id: "grazing",

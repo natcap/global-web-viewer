@@ -66,6 +66,8 @@ def create_percentile_rasters(
         os.path.join(temp_dir, 'percentile'),
         percentile_list)
 
+    LOGGER.info(f'Percentile values: {percentile_values}')
+
     shutil.rmtree(temp_dir, ignore_errors=True)
 
     def raster_percentile(band):
@@ -274,11 +276,14 @@ if __name__ == "__main__":
     crop_pollination_path = os.path.join(
         data_common_root_dir, 'pixel-data', 'Realized-Crop-Pollination',
         'realized_pollination_nathab_md5_feab479b3d6bf25a928c355547c9d9ab.tif')
+    realized_protection_path = os.path.join(
+        data_common_root_dir, 'pixel-data', 'Storm-Risk-Reduction',
+        'realized_coastalprotection_md5_b8e0ec0c13892c2bf702c4d2d3e50536.tif')
 
     input_raster_path_list = [
         sed_retention_path, nit_retention_path, nature_access_path,
-        crop_pollination_path]
-    raster_service_id_list = ['sed', 'nit', 'acc', 'crop']
+        crop_pollination_path, realized_protection_path]
+    raster_service_id_list = ['sed', 'nit', 'acc', 'crop', 'rcp']
 
     ### TaskGraph Set Up
     taskgraph_pct_dir = os.path.join(output_root_dir, 'taskgraph_pct')
@@ -287,14 +292,14 @@ if __name__ == "__main__":
     taskgraph_working_dir = os.path.join(
         taskgraph_pct_dir, '_taskgraph_working_dir')
 
-    n_workers = 3
+    n_workers = -1
     task_graph = taskgraph.TaskGraph(
         taskgraph_working_dir, n_workers, reporting_interval=60.0*5.0)
     ###
 
-    run_gadm = True
+    run_gadm = False
     run_hydro_basins = False
-    run_global = False
+    run_global = True
 
     if run_gadm:
         for input_raster_path, service_id in zip(input_raster_path_list, raster_service_id_list):
@@ -442,6 +447,8 @@ if __name__ == "__main__":
     if run_global:
         for input_raster_path, service_id in zip(
                 input_raster_path_list, raster_service_id_list):
+            if service_id != 'rcp':
+                continue
 
             percentile_service_out_dir = os.path.join(
                 output_root_dir, 'global_pct_rasters', f'{service_id}')
@@ -456,7 +463,8 @@ if __name__ == "__main__":
             raster_percentile_path = os.path.join(
                 percentile_service_out_dir,
                 f'global_{service_id}_percentile.tif')
-            pct_buckets = list(range(0,100,1))
+            #pct_buckets = list(range(0,100,1))
+            pct_buckets = list(range(0,100,5))
             global_pct_task = task_graph.add_task(
                 func=create_percentile_rasters,
                 args=(

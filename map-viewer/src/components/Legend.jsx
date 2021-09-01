@@ -15,6 +15,8 @@ const legendStyle = {
     desc: 'Sediment retention for downstream users',
     colorStops: ['0', '100'],
     colors: ['#f2f2e6', '#664830'],
+    info: `Low = 1st percentile, Medium = 50th percentile, High = 99th
+      percentile, scaled based on the chosen area of focus.`
     },
   'nitrogen': {
     id: 'nitrogen',
@@ -22,6 +24,8 @@ const legendStyle = {
     desc: 'Nitrogen retention for downstream users',
     colorStops: ['0-26', '26-51', '51-76', '76-100', '101+'],
     colors: ['#dae1f2', '#114cab'],
+    info: `Low = 1st percentile, Medium = 50th percentile, High = 99th
+      percentile, scaled based on the chosen area of focus.`
   },
   'natureAccess': {
     id: 'natureAccess',
@@ -29,6 +33,20 @@ const legendStyle = {
     desc: 'Number of people near natural lands',
     colorStops: ['0-26', '26-51', '51-76', '76-100', '101+'],
     colors: ['#e5f2da', '#0e5720'],
+    info: `Low = 1st percentile, Medium = 50th percentile, High = 99th
+      percentile, scaled based on the chosen area of focus.`
+  },
+  'coastalProtection': {
+    id: 'coastalProtection',
+    name: 'Coastal Protection',
+    desc: 'Risk reduction for coastal communities',
+    colorStops: [
+      '0-4.6', '4.6-29.3', '29.3-101.1', '101.1-284.4', '284.4-732.2',
+      '732.2-1790.7', '1790.7-4555.7', '4555.7-14861.5'],
+    colors: [
+      '#f3deff', '#e2c7ec', '#d1afdc', '#c098cd', '#ae81bd', '#9d69ad',
+      '#8c529d', '#7b3a8d', '#500066'],
+    info: 'Low = 0-4.6, Medium = 284.4-732.2, High = 14861.5+',
   },
 }
 
@@ -46,9 +64,7 @@ const Legend = (props) => {
             <Col xs="auto">
               <InfoPopover
                 key={`legend-popover-${serviceType}`}
-                content={
-                  `Low = 1st percentile, Medium = 50th percentile, High = 99th
-                  percentile, scaled based on the chosen area of focus.`}
+                content={legendStyle[serviceType].info}
               />
             </Col>
           </Row>
