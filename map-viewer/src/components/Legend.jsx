@@ -54,8 +54,8 @@ const legendStyle = {
   },
   'lulc': {
     id: 'lulc',
-    name: 'LULC',
-    desc: 'Land Use Land Cover',
+    name: 'Land use/land cover type',
+    desc: 'Land use/land cover type',
     type: 'ordinal',
     colorKeys: [
       'Bare areas', 'Cropland', 'Grassland/herbaceous', 'Shrubland',
@@ -67,8 +67,8 @@ const legendStyle = {
   },
   'population': {
     id: 'population',
-    name: 'LandScan Population 2017',
-    desc: 'Population counts representing an average, or ambient, population distribution.',
+    name: 'Population',
+    desc: 'Population counts',
     type: 'sequential',
     colorStops: [
       '0-1', '1-5', '5-25', '25-250', '250-1000', '1000-5000',
@@ -76,7 +76,8 @@ const legendStyle = {
     colors: [
       '#ffffff', '#ffffd4', '#fee9ac', '#fed080', '#feab46', '#f38821',
       '#de6712', '#be4d0a'],
-    info: 'Low = 0-5, Medium = 250-1000, High = 25000+',
+    info: `Population counts representing an average, or ambient, population
+    distribution. Low = 0-5, Medium = 250-1000, High = 25000+`,
   },
 }
 

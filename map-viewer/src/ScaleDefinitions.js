@@ -265,46 +265,134 @@ export const serviceMenuDetails = [
 export const supportMenuDetails = [
     {
       id: "lulc",
-      label: "Land Use Land Cover",
+      label: "Land use/land cover",
       helpText: {
-        text: `text goes here`,
-        metric: `LULC codes`,
+        text: `A land use/land cover (LULC) map displays how people are using
+        the land (e.g. agriculture, urban) and the different types of
+        vegetation cover (e.g. forest, wetland). An LULC map is an important
+        dataset used in modeling nature's different benefits to people
+        presented here. For the Sediment and Nitrogen models, each type of
+        land use/land cover receives a value related to erosion potential or
+        nitrogen application. Pollination uses the LULC map to identify
+        agriculture and pollinator habitat. Nature access defines natural
+        lands via the LULC, as are coastal terrestrial habitats used by the
+        Coastal Risk model. The original European Space Agency (ESA) map
+        defines 37 different types of land use/land cover, which have been
+        combined into 9 groups for more simplified viewing.`,
+        metric: "N/A",
         source: "ESA",
         resolution: "~300m",
         date: "2015",
         coverage: "Global",
         license: {
-          link: "https://creativecommons.org/licenses/by/4.0/",
-          text: "CC-By Attribution 4.0 International",
+          link: "http://maps.elie.ucl.ac.be/CCI/viewer/download.php",
+          text: "Land Cover CCI Terms of Use.",
         },
         citation: {
-          text: `citation here`,
-          link: "citation-link",
+          text: "Land Cover CCI Product User Guide Version 2. Tech. Rep. (2017).",
+          link: "http://maps.elie.ucl.ac.be/CCI/viewer/download/ESACCI-LC-Ph2-PUGv2_2.0.pdf",
         },
       },
-      iconKey: "iowateroutline",
+      iconKey: "mdlandscape",
       disable: false,
     },
     {
       id: "population",
-      label: "LandScan 2017 Population",
+      label: "Population",
       helpText: {
-        text: `text goes here`,
-        metric: `number of persons`,
-        source: "landscan",
-        resolution: "~300m",
-        date: "2015",
+        text: `To determine the location and number of people who receive
+        various benefits from nature, LandScan population data from 2017 is
+        used.`,
+        metric: "N/A",
+        source: "Oak Ridge National Laboratory.",
+        resolution: "~1km",
+        date: "2017",
         coverage: "Global",
         license: {
-          link: "https://creativecommons.org/licenses/by/4.0/",
-          text: "CC-By Attribution 4.0 International",
+          link: "https://landscan.ornl.gov/license",
+          text: "LandScan license",
         },
         citation: {
-          text: `citation here`,
-          link: "citation-link",
+          text: `A. N. Rose, J. J. McKee, M. L. Urban, E. A. Bright, LandScan
+          2017 (2018).`,
+          link: "https://landscan.ornl.gov/).",
         },
       },
-      iconKey: "iowateroutline",
+      iconKey: "ioiospeople",
       disable: false,
+    },
+    {
+      id: "rivers",
+      label: "Rivers",
+      helpText: {
+        text: `The InVEST Sediment and Nutrient models trace the path of
+        erosion and nutrient from their origins until they reach a stream.
+        While in-stream processes are not modelled, the assumption is that
+        once these reach a river, they can cause water quality issues for
+        people and infrastructure downstream. So, it is often useful to
+        visualize rivers along with hydrologic service maps, to understand
+        which rivers and downstream communities are likely to benefit when
+        natural lands hold back sediment and nutrient from entering the
+        water supply.  `,
+        metric: "N/A",
+        source: "",
+        resolution: "",
+        date: "",
+        coverage: "Global",
+        license: {
+          link: "",
+          text: "",
+        },
+        citation: {
+          text: ``,
+          link: "",
+        },
+      },
+      iconKey: "ioiosconstruct",
+      disable: true,
+    },
+    {
+      id: "cvhabs",
+      label: "Coastal Habitats",
+      helpText: {
+        text: ``,
+        metric: "N/A",
+        source: "",
+        resolution: "",
+        date: "",
+        coverage: "Global",
+        license: {
+          link: "",
+          text: "",
+        },
+        citation: {
+          text: ``,
+          link: "",
+        },
+      },
+      iconKey: "ioiosconstruct",
+      disable: true,
+    },
+    {
+      id: "protected",
+      label: "Protected Areas",
+      helpText: {
+        text: ``,
+        metric: "N/A",
+        source: "",
+        resolution: "",
+        date: "",
+        coverage: "Global",
+        license: {
+          link: "",
+          text: "",
+        },
+        citation: {
+          text: ``,
+          link: "",
+        },
+      },
+      iconKey: "ioiosconstruct",
+      disable: true,
     },
 ]
