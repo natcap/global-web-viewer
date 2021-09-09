@@ -9,7 +9,7 @@ import { TiTree } from 'react-icons/ti';
 import Form from 'react-bootstrap/Form';
 import Col from 'react-bootstrap/Col';
 
-import { serviceMenuDetails } from '../ScaleDefinitions';
+//import { serviceMenuDetails } from '../ScaleDefinitions';
 import ServicePopover from './ServicePopover';
 
 const IconMap = {
@@ -62,13 +62,14 @@ const LayerSelect = (props) => {
 
   return (
     <div className="layer-group">
-      {serviceMenuDetails.map(renderLayers)}
+      {props.layerDetails.map(renderLayers)}
     </div>
   );
 };
 
 LayerSelect.propTypes = {
   changeVisibilityState: PropTypes.func.isRequired,
+  layerDetails: PropTypes.array.isRequired,
 }
 
 export default LayerSelect;

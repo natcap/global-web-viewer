@@ -261,3 +261,50 @@ export const serviceMenuDetails = [
       disable: true,
     },
 ]
+
+export const supportMenuDetails = [
+    {
+      id: "lulc",
+      label: "Land Use Land Cover",
+      helpText: {
+        text: `text goes here`,
+        metric: `LULC codes`,
+        source: "ESA",
+        resolution: "~300m",
+        date: "2015",
+        coverage: "Global",
+        license: {
+          link: "https://creativecommons.org/licenses/by/4.0/",
+          text: "CC-By Attribution 4.0 International",
+        },
+        citation: {
+          text: `citation here`,
+          link: "citation-link",
+        },
+      },
+      iconKey: "iowateroutline",
+      disable: false,
+    },
+    {
+      id: "population",
+      label: "LandScan 2017 Population",
+      helpText: {
+        text: `text goes here`,
+        metric: `number of persons`,
+        source: "landscan",
+        resolution: "~300m",
+        date: "2015",
+        coverage: "Global",
+        license: {
+          link: "https://creativecommons.org/licenses/by/4.0/",
+          text: "CC-By Attribution 4.0 International",
+        },
+        citation: {
+          text: `citation here`,
+          link: "citation-link",
+        },
+      },
+      iconKey: "iowateroutline",
+      disable: false,
+    },
+]

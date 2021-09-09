@@ -319,8 +319,41 @@ const mapLayers = [
       source: {
         type: 'vector',
         url: 'mapbox://ddenu.38tijv0y',
-        //style: 'mapbox://styles/ddenu/ckshdib4d1p6l18nztzq5xhaf',
         generatedId: true
+      },
+    }
+  },
+  {
+    layerID: 'lulc',
+    name: 'ESA Land Use Land Cover',
+    serviceType: 'lulc',
+    scaleID: 'all',
+    mapLayer: {
+      id: 'lulc',
+      type: 'raster',
+      layout: {
+        visibility: 'none',
+      },
+      source: {
+        type: 'raster',
+        url: 'mapbox://ddenu.9x3nkjh1',
+      },
+    }
+  },
+  {
+    layerID: 'population',
+    name: 'LandScan Population 2017',
+    serviceType: 'population',
+    scaleID: 'all',
+    mapLayer: {
+      id: 'population',
+      type: 'raster',
+      layout: {
+        visibility: 'none',
+      },
+      source: {
+        type: 'raster',
+        url: 'mapbox://ddenu.1x4xnqfg',
       },
     }
   },

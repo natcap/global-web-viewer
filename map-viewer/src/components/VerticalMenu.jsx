@@ -15,6 +15,7 @@ import Accordion from 'react-bootstrap/Accordion';
 import LayerSelect from './LayerSelect';
 import { scales } from '../ScaleDefinitions';
 import InfoPopover from './InfoPopover';
+import { serviceMenuDetails, supportMenuDetails } from '../ScaleDefinitions';
 
 const IconMap = {
   faglobe: <FaGlobe className="labelIcons"/>,
@@ -100,6 +101,7 @@ const VerticalMenu = (props) => {
             <Card.Body>
               <LayerSelect
                 changeVisibilityState={props.changeVisibilityState}
+                layerDetails={serviceMenuDetails}
               />
             </Card.Body>
           </Accordion.Collapse>
@@ -116,7 +118,10 @@ const VerticalMenu = (props) => {
           </Accordion.Toggle>
           <Accordion.Collapse eventKey="2" className="accordion-header">
             <Card.Body>
-              <div> More soon. </div>
+              <LayerSelect
+                changeVisibilityState={props.changeVisibilityState}
+                layerDetails={supportMenuDetails}
+              />
             </Card.Body>
           </Accordion.Collapse>
         </Card>
