@@ -5,11 +5,12 @@ import { IoWaterOutline, IoWater } from 'react-icons/io5';
 import { GiBee, GiCow } from 'react-icons/gi';
 import { BiWater } from 'react-icons/bi';
 import { TiTree } from 'react-icons/ti';
+import { MdLandscape } from 'react-icons/md';
+import { IoIosPeople, IoIosConstruct } from 'react-icons/io';
 
 import Form from 'react-bootstrap/Form';
 import Col from 'react-bootstrap/Col';
 
-import { serviceMenuDetails } from '../ScaleDefinitions';
 import ServicePopover from './ServicePopover';
 
 const IconMap = {
@@ -19,14 +20,15 @@ const IconMap = {
   biwater: <BiWater className="labelIcons"/>,
   titree: <TiTree className="labelIcons"/>,
   gicow: <GiCow className="labelIcons"/>,
+  ioiospeople: <IoIosPeople className="labelIcons"/>,
+  ioiosconstruct: <IoIosConstruct className="labelIcons"/>,
+  mdlandscape: <MdLandscape className="labelIcons"/>,
 }
 
 const LayerSelect = (props) => {
 
   function handleChange(event) {
     const { id, checked } = event.target;
-    console.log("event: ", event.target);
-    //props.changeVisibilityState(parseInt(id.slice(id.length - 1)), checked);
     props.changeVisibilityState(id, checked);
   }
 
@@ -62,13 +64,14 @@ const LayerSelect = (props) => {
 
   return (
     <div className="layer-group">
-      {serviceMenuDetails.map(renderLayers)}
+      {props.layerDetails.map(renderLayers)}
     </div>
   );
 };
 
 LayerSelect.propTypes = {
   changeVisibilityState: PropTypes.func.isRequired,
+  layerDetails: PropTypes.array.isRequired,
 }
 
 export default LayerSelect;

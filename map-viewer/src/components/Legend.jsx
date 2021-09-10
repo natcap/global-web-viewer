@@ -13,6 +13,7 @@ const legendStyle = {
     id: 'sediment',
     name: 'Sediment Deposition Pct',
     desc: 'Sediment retention for downstream users',
+    type: 'sequential',
     colorStops: ['0', '100'],
     colors: ['#f2f2e6', '#664830'],
     info: `Low = 1st percentile, Medium = 50th percentile, High = 99th
@@ -22,6 +23,7 @@ const legendStyle = {
     id: 'nitrogen',
     name: 'Nitrogen Pct',
     desc: 'Nitrogen retention for downstream users',
+    type: 'sequential',
     colorStops: ['0-26', '26-51', '51-76', '76-100', '101+'],
     colors: ['#dae1f2', '#114cab'],
     info: `Low = 1st percentile, Medium = 50th percentile, High = 99th
@@ -31,6 +33,7 @@ const legendStyle = {
     id: 'natureAccess',
     name: 'Access to Nature Pct',
     desc: 'Number of people near natural lands',
+    type: 'sequential',
     colorStops: ['0-26', '26-51', '51-76', '76-100', '101+'],
     colors: ['#e5f2da', '#0e5720'],
     info: `Low = 1st percentile, Medium = 50th percentile, High = 99th
@@ -40,6 +43,7 @@ const legendStyle = {
     id: 'coastalProtection',
     name: 'Coastal Protection',
     desc: 'Risk reduction for coastal communities',
+    type: 'sequential',
     colorStops: [
       '0-4.6', '4.6-29.3', '29.3-101.1', '101.1-284.4', '284.4-732.2',
       '732.2-1790.7', '1790.7-4555.7', '4555.7-14861.5'],
@@ -47,6 +51,33 @@ const legendStyle = {
       '#f3deff', '#e2c7ec', '#d1afdc', '#c098cd', '#ae81bd', '#9d69ad',
       '#8c529d', '#7b3a8d', '#500066'],
     info: 'Low = 0-4.6, Medium = 284.4-732.2, High = 14861.5+',
+  },
+  'lulc': {
+    id: 'lulc',
+    name: 'Land use/land cover type',
+    desc: 'Land use/land cover type',
+    type: 'ordinal',
+    colorKeys: [
+      'Bare areas', 'Cropland', 'Grassland/herbaceous', 'Shrubland',
+      'Snow/ice', 'Tree cover', 'Urban areas', 'Water bodies', 'Wetland'],
+    colors: [
+      '#f7f0e4', '#bf96d6', '#c7d79e', '#ccb078', '#f5f5f5', '#637838',
+      '#000000', '#7a8ef5', '#444f89'],
+    info: 'Land use/land cover type',
+  },
+  'population': {
+    id: 'population',
+    name: 'Population',
+    desc: 'Population counts',
+    type: 'sequential',
+    colorStops: [
+      '0-1', '1-5', '5-25', '25-250', '250-1000', '1000-5000',
+      '5000-25000', '25000+'],
+    colors: [
+      '#ffffff', '#ffffd4', '#fee9ac', '#fed080', '#feab46', '#f38821',
+      '#de6712', '#be4d0a'],
+    info: `Population counts representing an average, or ambient, population
+    distribution. Low = 0-5, Medium = 250-1000, High = 25000+`,
   },
 }
 

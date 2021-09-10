@@ -195,7 +195,18 @@
 .d3-legend {
   z-index: 1;
   width: 220px;
-  height: 20px;
+  height: auto;
+}
+.d3-legend.sequential{
+  z-index: 1;
+  width: 220px;
+  height: 15px;
+}
+.d3-legend.ordinal{
+  z-index: 1;
+  width: 220px;
+  height: 200px;
+  overflow-y: auto;
 }
 .d3-x-axis:not(:last-child) {
   padding-right: 4.75rem;
