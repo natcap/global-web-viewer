@@ -63,7 +63,7 @@ const legendStyle = {
     colors: [
       '#f7f0e4', '#bf96d6', '#c7d79e', '#ccb078', '#f5f5f5', '#637838',
       '#000000', '#7a8ef5', '#444f89'],
-    info: 'LULC info',
+    info: 'Land use/land cover type',
   },
   'population': {
     id: 'population',
