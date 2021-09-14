@@ -79,6 +79,18 @@ const legendStyle = {
     info: `Population counts representing an average, or ambient, population
     distribution. Low = 0-5, Medium = 250-1000, High = 25000+`,
   },
+  'coastal-habitat': {
+    id: 'coastal-habitat',
+    name: 'Coastal habitat types',
+    desc: 'Coastal habitat types',
+    type: 'ordinal',
+    colorKeys: [
+      'Wetland', 'Seagrass', 'Mangroves', 'Forest / Scrub',
+      'Coral Reefs'],
+    colors: [
+      '#6FACED', '#99CF78', '#FFEC42', '#D4B577', '#FC8D62'],
+    info: 'Coastal habitat type',
+  },
 }
 
 

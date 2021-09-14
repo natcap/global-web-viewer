@@ -352,7 +352,7 @@ export const supportMenuDetails = [
       disable: true,
     },
     {
-      id: "cvhabs",
+      id: "coastal-habitat",
       label: "Coastal Habitats",
       helpText: {
         text: ``,
@@ -371,7 +371,11 @@ export const supportMenuDetails = [
         },
       },
       iconKey: "ioiosconstruct",
-      disable: true,
+      disable: false,
+      subLayerCtrl: true,
+      subLayerIds: [
+        'wetland', 'seagrass', 'mangroves', 'forest-scrub', 'coral-reef'
+      ],
     },
     {
       id: "protected",
@@ -394,5 +398,133 @@ export const supportMenuDetails = [
       },
       iconKey: "ioiosconstruct",
       disable: true,
+    },
+]
+
+export const coastalHabitats = [
+    {
+      id: "wetland",
+      label: "Wetlands",
+      helpText: {
+        text: ``,
+        metric: "N/A",
+        source: "",
+        resolution: "",
+        date: "",
+        coverage: "Global",
+        license: {
+          link: "",
+          text: "",
+        },
+        citation: {
+          text: ``,
+          link: "",
+        },
+      },
+      iconKey: "ioiosconstruct",
+      disable: true,
+      subLayer: true,
+      subLayerParent: "cvhabs",
+      legend: false,
+    },
+    {
+      id: "seagrass",
+      label: "Seagrass",
+      helpText: {
+        text: ``,
+        metric: "N/A",
+        source: "",
+        resolution: "",
+        date: "",
+        coverage: "Global",
+        license: {
+          link: "",
+          text: "",
+        },
+        citation: {
+          text: ``,
+          link: "",
+        },
+      },
+      iconKey: "ioiosconstruct",
+      disable: true,
+      subLayer: true,
+      subLayerParent: "cvhabs",
+      legend: false,
+    },
+    {
+      id: "mangroves",
+      label: "Mangroves",
+      helpText: {
+        text: ``,
+        metric: "N/A",
+        source: "",
+        resolution: "",
+        date: "",
+        coverage: "Global",
+        license: {
+          link: "",
+          text: "",
+        },
+        citation: {
+          text: ``,
+          link: "",
+        },
+      },
+      iconKey: "ioiosconstruct",
+      disable: true,
+      subLayer: true,
+      subLayerParent: "cvhabs",
+      legend: false,
+    },
+    {
+      id: "forest-scrub",
+      label: "Forest / Scrub",
+      helpText: {
+        text: ``,
+        metric: "N/A",
+        source: "",
+        resolution: "",
+        date: "",
+        coverage: "Global",
+        license: {
+          link: "",
+          text: "",
+        },
+        citation: {
+          text: ``,
+          link: "",
+        },
+      },
+      iconKey: "ioiosconstruct",
+      disable: true,
+      subLayer: true,
+      subLayerParent: "cvhabs",
+      legend: false,
+    },
+    {
+      id: "coral-reef",
+      label: "Coral Reefs",
+      helpText: {
+        text: ``,
+        metric: "N/A",
+        source: "",
+        resolution: "",
+        date: "",
+        coverage: "Global",
+        license: {
+          link: "",
+          text: "",
+        },
+        citation: {
+          text: ``,
+          link: "",
+        },
+      },
+      iconKey: "ioiosconstruct",
+      disable: true,
+      subLayer: true,
+      subLayerParent: "cvhabs",
+      legend: false,
     },
 ]

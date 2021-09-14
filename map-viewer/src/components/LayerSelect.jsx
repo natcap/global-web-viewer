@@ -12,6 +12,8 @@ import Form from 'react-bootstrap/Form';
 import Col from 'react-bootstrap/Col';
 
 import ServicePopover from './ServicePopover';
+//import SubLayerSelect from './SubLayerSelect';
+//import { coastalHabitats } from '../ScaleDefinitions';
 
 const IconMap = {
   iowateroutline: <IoWaterOutline className="labelIcons"/>,
