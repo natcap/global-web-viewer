@@ -17,6 +17,7 @@ import BasemapControl from './components/BasemapControl';
 import mapLayers from './LayerDefinitions';
 import { coastalHabitats } from './ScaleDefinitions';
 
+
 // import MyComponent from './components/MyComponent';
 
 //mapboxgl.workerClass = MapboxWorker;
