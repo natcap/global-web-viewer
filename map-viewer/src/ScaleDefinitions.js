@@ -325,9 +325,42 @@ export const supportMenuDetails = [
       id: "coastal-habitat",
       label: "Coastal Habitats",
       helpText: {
-        text: ``,
+        text: `Mangroves, corals, seagrasses, salt marshes, wetlands and
+        coastal forest are the natural habitats included in modeling Coastal
+        Storm Risk Reduction. These habitats reduce the impact of wind and
+        waves, which helps protect coastal communities from inundation,
+        erosion, and wind damage during storms.`,
         metric: "N/A",
-        source: "",
+        source: [
+          {type: "text", text: "Mangroves: "},
+          {
+            type: "link", link: "https://www.globalmangrovewatch.org/",
+            linkText: "Global Mangrove Watch"},
+          {type: "text", text: " from, "},
+          {
+            type: "link", link: "https://data.unep-wcmc.org/datasets/45",
+            linkText: "UNEP-WCMC"},
+          {type: "break"},
+          {type: "text", text: "Corals: "},
+          {
+            type: "link", link: "https://www.wri.org/research/reefs-risk-revisited",
+            linkText: "World Resources Institute - Reefs at Risk Revisited"},
+          {type: "break"},
+          {type: "text", text: "Seagrasses: UNEP-WCMC Ocean Data Viewer - "},
+          {
+            type: "link", link: "https://data.unep-wcmc.org/datasets/7",
+            linkText: "Global Distribution of Seagrasses"},
+          {type: "break"},
+          {type: "text", text: "Salt marshes: Global Distribution of Saltmarshes - from "},
+          {
+            type: "link", link: "https://data.unep-wcmc.org/datasets/43",
+            linkText: "UNEP-WCMC"},
+          {type: "break"},
+          {type: "text", text: "Wetlands and coastal forest/scrub: "},
+          {
+            type: "link", link: "http://www.esa-landcover-cci.org/?q=node/164",
+            linkText: "European Space Agency Climate Change Initiative 2017"},
+        ],
         resolution: "",
         date: "",
         coverage: "Global",

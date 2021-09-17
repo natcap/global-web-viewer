@@ -8,6 +8,22 @@ import OverlayTrigger from 'react-bootstrap/OverlayTrigger';
 import { BsInfoCircle} from 'react-icons/bs';
 
 const ServicePopover = (props) => {
+  const sourceArray = Array.isArray(props.content.source);
+
+  const renderSource = (sourceObj, i) => {
+    let sourceResult = "N/A";
+    if(sourceObj.type === "text") {
+      sourceResult = <span key={`source-${i}`}>{sourceObj.text}</span>
+    }
+    else if(sourceObj.type === "link") {
+      sourceResult = <a key={`source-${i}`} href={sourceObj.link}>{sourceObj.linkText}</a>
+    }
+    else if(sourceObj.type === "break") {
+      sourceResult = <br/>
+    }
+    return sourceResult;
+  };
+
   const popover = (
     <Popover id="popover-service" className="popover-service">
       <Popover.Title className="popover-service-title">
@@ -19,7 +35,10 @@ const ServicePopover = (props) => {
         <h5>Desciption</h5>
         {props.content.text}
         <h5>Source</h5>
-        {props.content.source}
+        {sourceArray
+          ? props.content.source.map(renderSource)
+          : props.content.source
+        }
         <h5>Resolution</h5>
         {props.content.resolution}
         <h5>Data Date</h5>

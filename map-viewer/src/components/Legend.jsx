@@ -89,7 +89,7 @@ const legendStyle = {
       'Seagrass', 'Wetland'],
     colors: [
       '#D4B577', '#FC8D62', '#FFEC42', '#CA7AF5', '#99CF78', '#6FACED'],
-    info: 'Coastal habitat type',
+    info: 'Coastal and Marine habitats',
   },
 }
 
