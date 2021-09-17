@@ -85,10 +85,10 @@ const legendStyle = {
     desc: 'Coastal habitat types',
     type: 'ordinal',
     colorKeys: [
-      'Wetland', 'Seagrass', 'Mangroves', 'Forest / Scrub',
-      'Coral Reefs'],
+      'Coastal Forest / Scrub', 'Coral Reefs', 'Mangroves', 'Saltmarsh',
+      'Seagrass', 'Wetland'],
     colors: [
-      '#6FACED', '#99CF78', '#FFEC42', '#D4B577', '#FC8D62'],
+      '#D4B577', '#FC8D62', '#FFEC42', '#CA7AF5', '#99CF78', '#6FACED'],
     info: 'Coastal habitat type',
   },
 }

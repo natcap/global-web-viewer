@@ -161,45 +161,6 @@ export const serviceMenuDetails = [
       disable: false,
     },
     {
-      id: "pollination",
-      label: "Crop pollination",
-      helpText: {
-        text: `Up to two-thirds of all crops require some degree of animal
-       pollination to reach their maximum yields, and natural habitat around
-       farmlands can support healthy populations of wild pollinators
-       (e.g. bees, birds, other insects) by providing them with foraging and
-       nesting resources. The potential contribution of wild pollinators to
-       nutrition production is based on the sufficiency of habitat that
-       surrounds farmlands and how dependent a given crop is on pollination.`,
-        metric: `Values represent the average equivalent number of people
-        fed by pollination-dependent crops, attributed to nearby ecosystems
-        based on the area of pollinator habitat within the pollinator flight
-        distance of crops.`,
-        source: "Natural Capital Project",
-        resolution: "~300m",
-        date: "2015",
-        coverage: "Global",
-        license: {
-          link: "https://creativecommons.org/licenses/by/4.0/",
-          text: "CC-By Attribution 4.0 International",
-        },
-        citation: {
-          text: `IN PREP: Rebecca Chaplin-Kramer, Rachel A Neugarten, 
-        Richard P Sharp, Pamela M Collins, Stephen Polasky, David Hole, 
-        Richard Schuster, Matthew Strimas-Mackey, Mark Mulligan, 
-        Carter Brandon, Sandra Diaz, Etienne Fluet-Chouinard, Larry Gorenflo, 
-        Justin A Johnson, Patrick W Keys, Kate Longley-Wood, 
-        Peter B McIntyre, Monica Noon, Unai Pascual, Catherine Reidy Liermann,
-        Patrick R Roehrdanz, Guido Schmidt-Traub, M. Rebecca Shaw, 
-        Mark Spalding, Will R Turner, Arnout van Soesbergen, Reg A Watson
-        bioRxiv 2020.11.08.361014`,
-          link: "https://doi.org/10.1101/2020.11.08.361014",
-        },
-      },
-      iconKey: "gibee",
-      disable: true,
-    },
-    {
       id: "coastalProtection",
       label: "Coastal storm risk reduction",
       helpText: {
@@ -240,6 +201,45 @@ export const serviceMenuDetails = [
       },
       iconKey: "biwater",
       disable: false,
+    },
+    {
+      id: "pollination",
+      label: "Crop pollination",
+      helpText: {
+        text: `Up to two-thirds of all crops require some degree of animal
+       pollination to reach their maximum yields, and natural habitat around
+       farmlands can support healthy populations of wild pollinators
+       (e.g. bees, birds, other insects) by providing them with foraging and
+       nesting resources. The potential contribution of wild pollinators to
+       nutrition production is based on the sufficiency of habitat that
+       surrounds farmlands and how dependent a given crop is on pollination.`,
+        metric: `Values represent the average equivalent number of people
+        fed by pollination-dependent crops, attributed to nearby ecosystems
+        based on the area of pollinator habitat within the pollinator flight
+        distance of crops.`,
+        source: "Natural Capital Project",
+        resolution: "~300m",
+        date: "2015",
+        coverage: "Global",
+        license: {
+          link: "https://creativecommons.org/licenses/by/4.0/",
+          text: "CC-By Attribution 4.0 International",
+        },
+        citation: {
+          text: `IN PREP: Rebecca Chaplin-Kramer, Rachel A Neugarten, 
+        Richard P Sharp, Pamela M Collins, Stephen Polasky, David Hole, 
+        Richard Schuster, Matthew Strimas-Mackey, Mark Mulligan, 
+        Carter Brandon, Sandra Diaz, Etienne Fluet-Chouinard, Larry Gorenflo, 
+        Justin A Johnson, Patrick W Keys, Kate Longley-Wood, 
+        Peter B McIntyre, Monica Noon, Unai Pascual, Catherine Reidy Liermann,
+        Patrick R Roehrdanz, Guido Schmidt-Traub, M. Rebecca Shaw, 
+        Mark Spalding, Will R Turner, Arnout van Soesbergen, Reg A Watson
+        bioRxiv 2020.11.08.361014`,
+          link: "https://doi.org/10.1101/2020.11.08.361014",
+        },
+      },
+      iconKey: "gibee",
+      disable: true,
     },
     {
       id: "grazing",
@@ -322,6 +322,32 @@ export const supportMenuDetails = [
       disable: false,
     },
     {
+      id: "coastal-habitat",
+      label: "Coastal Habitats",
+      helpText: {
+        text: ``,
+        metric: "N/A",
+        source: "",
+        resolution: "",
+        date: "",
+        coverage: "Global",
+        license: {
+          link: "",
+          text: "",
+        },
+        citation: {
+          text: ``,
+          link: "",
+        },
+      },
+      iconKey: "ioiosconstruct",
+      disable: false,
+      subLayerCtrl: true,
+      subLayerIds: [
+        'wetland', 'seagrass', 'mangroves', 'forest-scrub', 'coral-reef'
+      ],
+    },
+    {
       id: "rivers",
       label: "Rivers",
       helpText: {
@@ -350,32 +376,6 @@ export const supportMenuDetails = [
       },
       iconKey: "ioiosconstruct",
       disable: true,
-    },
-    {
-      id: "coastal-habitat",
-      label: "Coastal Habitats",
-      helpText: {
-        text: ``,
-        metric: "N/A",
-        source: "",
-        resolution: "",
-        date: "",
-        coverage: "Global",
-        license: {
-          link: "",
-          text: "",
-        },
-        citation: {
-          text: ``,
-          link: "",
-        },
-      },
-      iconKey: "ioiosconstruct",
-      disable: false,
-      subLayerCtrl: true,
-      subLayerIds: [
-        'wetland', 'seagrass', 'mangroves', 'forest-scrub', 'coral-reef'
-      ],
     },
     {
       id: "protected",
@@ -505,6 +505,31 @@ export const coastalHabitats = [
     {
       id: "coral-reef",
       label: "Coral Reefs",
+      helpText: {
+        text: ``,
+        metric: "N/A",
+        source: "",
+        resolution: "",
+        date: "",
+        coverage: "Global",
+        license: {
+          link: "",
+          text: "",
+        },
+        citation: {
+          text: ``,
+          link: "",
+        },
+      },
+      iconKey: "ioiosconstruct",
+      disable: true,
+      subLayer: true,
+      subLayerParent: "cvhabs",
+      legend: false,
+    },
+    {
+      id: "saltmarsh",
+      label: "Saltmarsh",
       helpText: {
         text: ``,
         metric: "N/A",

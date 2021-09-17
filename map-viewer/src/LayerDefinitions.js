@@ -358,6 +358,28 @@ const mapLayers = [
     }
   },
   {
+    layerID: 'forest-scrub',
+    name: 'Coastal Forest/Scrub',
+    serviceType: 'coastal-habitat',
+    scaleID: 'all',
+    parentID: 'coastal-habitat',
+    mapLayer: {
+      id: 'forest-scrub',
+      'source-layer': 'Coastal_forest_scrub_natural_ESA_CV',
+      type: 'fill',
+      paint: {
+        'fill-color': '#D4B577',
+      },
+      layout: {
+        visibility: 'none',
+      },
+      source: {
+        type: 'vector',
+        url: 'mapbox://ddenu.c27wlmyx',
+      },
+    }
+  },
+  {
     layerID: 'wetland',
     name: 'Wetlands',
     serviceType: 'coastal-habitat',
@@ -402,6 +424,28 @@ const mapLayers = [
     }
   },
   {
+    layerID: 'saltmarsh',
+    name: 'Saltmarsh',
+    serviceType: 'coastal-habitat',
+    scaleID: 'all',
+    parentID: 'coastal-habitat',
+    mapLayer: {
+      id: 'saltmarsh',
+      'source-layer': 'saltmarsh_v2',
+      type: 'fill',
+      paint: {
+        'fill-color': '#CA7AF5',
+      },
+      layout: {
+        visibility: 'none',
+      },
+      source: {
+        type: 'vector',
+        url: 'mapbox://ddenu.aiac232r',
+      },
+    }
+  },
+  {
     layerID: 'mangroves',
     name: 'Mangroves',
     serviceType: 'coastal-habitat',
@@ -420,28 +464,6 @@ const mapLayers = [
       source: {
         type: 'vector',
         url: 'mapbox://ddenu.55cle2yq',
-      },
-    }
-  },
-  {
-    layerID: 'forest-scrub',
-    name: 'Coastal Forest/Scrub',
-    serviceType: 'coastal-habitat',
-    scaleID: 'all',
-    parentID: 'coastal-habitat',
-    mapLayer: {
-      id: 'forest-scrub',
-      'source-layer': 'Coastal_forest_scrub_natural_ESA_CV',
-      type: 'fill',
-      paint: {
-        'fill-color': '#D4B577',
-      },
-      layout: {
-        visibility: 'none',
-      },
-      source: {
-        type: 'vector',
-        url: 'mapbox://ddenu.c27wlmyx',
       },
     }
   },
