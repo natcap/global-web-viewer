@@ -15,6 +15,7 @@ import VerticalMenu from './components/VerticalMenu';
 import Legend from './components/Legend';
 import BasemapControl from './components/BasemapControl';
 import mapLayers from './LayerDefinitions';
+import { coastalHabitats } from './ScaleDefinitions';
 
 // import MyComponent from './components/MyComponent';
 
@@ -128,6 +129,7 @@ const Map = () => {
       zoom: zoom,
       minZoom: 1.6,
       maxZoom: 11.1,
+      logoPosition: "top-right",
     });
 
     // Add zoom and rotation controls to the map.
@@ -529,8 +531,17 @@ const Map = () => {
       setServices([...selectedServicesUpdate]);
 
       const layer = visibleLayers[serviceResult];
-      map.setLayoutProperty(layer.layerID, 'visibility', 'none');
-      delete visibleLayersUpdate[serviceResult];
+      if(serviceResult !== "coastal-habitat") {
+        map.setLayoutProperty(layer.layerID, 'visibility', 'none');
+        delete visibleLayersUpdate[serviceResult];
+      }
+      else {
+        //delete visibleLayersUpdate[serviceResult];
+        coastalHabitats.forEach((chLayer) => {
+            map.setLayoutProperty(chLayer.id, 'visibility', 'none');
+            delete visibleLayersUpdate[chLayer.id];
+        });
+      }
       setLayers({...visibleLayersUpdate});
     }
     else {
@@ -548,6 +559,7 @@ const Map = () => {
         if((layer.scaleID === scale.current || layer.scaleID === 'all') && layer.serviceType === serviceResult) {
           map.setLayoutProperty(layer.layerID, 'visibility', 'visible');
           visibleLayersUpdate[serviceResult] = {...layer};
+
           setLayers({...visibleLayersUpdate});
         }
       });

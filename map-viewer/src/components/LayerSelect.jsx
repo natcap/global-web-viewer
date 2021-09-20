@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 import { IoWaterOutline, IoWater } from 'react-icons/io5';
-import { GiBee, GiCow } from 'react-icons/gi';
+import { GiBee, GiCow, GiCoral } from 'react-icons/gi';
 import { BiWater } from 'react-icons/bi';
 import { TiTree } from 'react-icons/ti';
 import { MdLandscape } from 'react-icons/md';
@@ -23,6 +23,7 @@ const IconMap = {
   ioiospeople: <IoIosPeople className="labelIcons"/>,
   ioiosconstruct: <IoIosConstruct className="labelIcons"/>,
   mdlandscape: <MdLandscape className="labelIcons"/>,
+  gicoral: <GiCoral className="labelIcons"/>,
 }
 
 const LayerSelect = (props) => {

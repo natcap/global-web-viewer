@@ -357,6 +357,138 @@ const mapLayers = [
       },
     }
   },
+  {
+    layerID: 'forest-scrub',
+    name: 'Coastal Forest/Scrub',
+    serviceType: 'coastal-habitat',
+    scaleID: 'all',
+    parentID: 'coastal-habitat',
+    mapLayer: {
+      id: 'forest-scrub',
+      'source-layer': 'Coastal_forest_scrub_natural_ESA_CV',
+      type: 'fill',
+      paint: {
+        'fill-color': '#D4B577',
+      },
+      layout: {
+        visibility: 'none',
+      },
+      source: {
+        type: 'vector',
+        url: 'mapbox://ddenu.c27wlmyx',
+      },
+    }
+  },
+  {
+    layerID: 'wetland',
+    name: 'Wetlands',
+    serviceType: 'coastal-habitat',
+    scaleID: 'all',
+    parentID: 'coastal-habitat',
+    mapLayer: {
+      id: 'wetland',
+      'source-layer': 'Wetland_ESA_CV',
+      type: 'fill',
+      paint: {
+        'fill-color': '#6FACED',
+      },
+      layout: {
+        visibility: 'none',
+      },
+      source: {
+        type: 'vector',
+        url: 'mapbox://ddenu.djwp4p9g',
+      },
+    }
+  },
+  {
+    layerID: 'seagrass',
+    name: 'Seagrass',
+    serviceType: 'coastal-habitat',
+    scaleID: 'all',
+    parentID: 'coastal-habitat',
+    mapLayer: {
+      id: 'seagrass',
+      'source-layer': 'Seagrass',
+      type: 'fill',
+      paint: {
+        'fill-color': '#99CF78',
+      },
+      layout: {
+        visibility: 'none',
+      },
+      source: {
+        type: 'vector',
+        url: 'mapbox://ddenu.4m9y52by',
+      },
+    }
+  },
+  {
+    layerID: 'saltmarsh',
+    name: 'Saltmarsh',
+    serviceType: 'coastal-habitat',
+    scaleID: 'all',
+    parentID: 'coastal-habitat',
+    mapLayer: {
+      id: 'saltmarsh',
+      'source-layer': 'saltmarsh_v2',
+      type: 'fill',
+      paint: {
+        'fill-color': '#CA7AF5',
+      },
+      layout: {
+        visibility: 'none',
+      },
+      source: {
+        type: 'vector',
+        url: 'mapbox://ddenu.aiac232r',
+      },
+    }
+  },
+  {
+    layerID: 'mangroves',
+    name: 'Mangroves',
+    serviceType: 'coastal-habitat',
+    scaleID: 'all',
+    parentID: 'coastal-habitat',
+    mapLayer: {
+      id: 'mangroves',
+      'source-layer': 'Mangroves_2016_v2',
+      type: 'fill',
+      paint: {
+        'fill-color': '#FFEC42',
+      },
+      layout: {
+        visibility: 'none',
+      },
+      source: {
+        type: 'vector',
+        url: 'mapbox://ddenu.55cle2yq',
+      },
+    }
+  },
+  {
+    layerID: 'coral-reef',
+    name: 'Coral Reefs',
+    serviceType: 'coastal-habitat',
+    scaleID: 'all',
+    parentID: 'coastal-habitat',
+    mapLayer: {
+      id: 'coral-reef',
+      'source-layer': 'Coral_reefs',
+      type: 'fill',
+      paint: {
+        'fill-color': '#FC8D62',
+      },
+      layout: {
+        visibility: 'none',
+      },
+      source: {
+        type: 'vector',
+        url: 'mapbox://ddenu.40utsiiz',
+      },
+    }
+  },
 ]
 
 export default mapLayers;
