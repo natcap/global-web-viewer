@@ -9,19 +9,23 @@ import { BsInfoCircle} from 'react-icons/bs';
 
 const ServicePopover = (props) => {
   const sourceArray = Array.isArray(props.content.source);
+  const resolutionArray = Array.isArray(props.content.resolution);
+  const dateArray = Array.isArray(props.content.date);
+  const licenseArray = Array.isArray(props.content.license);
+  const citationArray = Array.isArray(props.content.citation);
 
-  const renderSource = (sourceObj, i) => {
-    let sourceResult = "N/A";
-    if(sourceObj.type === "text") {
-      sourceResult = <span key={`source-${i}`}>{sourceObj.text}</span>
+  const renderMarkup = (inputObj, i) => {
+    let renderResult = "N/A";
+    if(inputObj.type === "text") {
+      renderResult = <span key={`source-text${i}`}>{inputObj.text}</span>
     }
-    else if(sourceObj.type === "link") {
-      sourceResult = <a key={`source-${i}`} href={sourceObj.link}>{sourceObj.linkText}</a>
+    else if(inputObj.type === "link") {
+      renderResult = <a key={`source-link${i}`} href={inputObj.link}>{inputObj.linkText}</a>
     }
-    else if(sourceObj.type === "break") {
-      sourceResult = <br/>
+    else if(inputObj.type === "break") {
+      renderResult = <br key={`source-br${i}`}></br>
     }
-    return sourceResult;
+    return renderResult;
   };
 
   const popover = (
@@ -36,19 +40,31 @@ const ServicePopover = (props) => {
         {props.content.text}
         <h5>Source</h5>
         {sourceArray
-          ? props.content.source.map(renderSource)
+          ? props.content.source.map(renderMarkup)
           : props.content.source
         }
         <h5>Resolution</h5>
-        {props.content.resolution}
+        {resolutionArray
+          ? props.content.resolution.map(renderMarkup)
+          : props.content.resolution
+        }
         <h5>Data Date</h5>
-        {props.content.date}
+        {dateArray
+          ? props.content.date.map(renderMarkup)
+          : props.content.date
+        }
         <h5>Geographic coverage</h5>
         {props.content.coverage}
         <h5>License</h5>
-        <a href={props.content.license.link}>{props.content.license.text}</a>
+        {licenseArray
+          ? props.content.license.map(renderMarkup)
+          : <a href={props.content.license.link}>{props.content.license.text}</a>
+        }
         <h5>Citation</h5>
-        <a href={props.content.citation.link}>{props.content.citation.text}</a>
+        {citationArray
+          ? props.content.citation.map(renderMarkup)
+          : <a href={props.content.citation.link}>{props.content.citation.text}</a>
+        }
       </Popover.Content>
     </Popover>
   );

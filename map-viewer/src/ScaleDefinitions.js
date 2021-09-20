@@ -361,17 +361,92 @@ export const supportMenuDetails = [
             type: "link", link: "http://www.esa-landcover-cci.org/?q=node/164",
             linkText: "European Space Agency Climate Change Initiative 2017"},
         ],
-        resolution: "",
-        date: "",
+        resolution: [
+          {type: "text", text: "Mangroves: 30m-300m"},
+          {type: "break"},
+          {type: "text", text: "Corals: 500m"},
+          {type: "break"},
+          {type: "text", text: "Seagrasses: Not provided by source"},
+          {type: "break"},
+          {type: "text", text: "Salt marshes: Variable"},
+          {type: "break"},
+          {type: "text", text: "Wetlands and coastal forest/scrub: ~500m"},
+          {type: "break"},
+        ],
+        date: [
+          {type: "text", text: "Mangroves: 2016"},
+          {type: "break"},
+          {type: "text", text: "Corals: 2011"},
+          {type: "break"},
+          {type: "text", text: "Seagrasses: 2017"},
+          {type: "break"},
+          {type: "text", text: "Salt marshes: 2015"},
+          {type: "break"},
+          {type: "text", text: "Wetlands and coastal forest/scrub: 2015"},
+          {type: "break"},
+        ],
         coverage: "Global",
-        license: {
-          link: "",
-          text: "",
-        },
-        citation: {
-          text: ``,
-          link: "",
-        },
+        license: [
+          {type: "text", text: "Mangroves: "},
+          {
+            type: "link", link: "https://creativecommons.org/licenses/by/4.0/",
+            linkText: "CC-By Attribution 4.0 Internation"},
+          {type: "break"},
+          {type: "text", text: "Corals: "},
+          {
+            type: "link", link: "https://creativecommons.org/licenses/by/3.0/",
+            linkText: "Create Commons Attribution 3.0 Unported (CC BY 3.0)"},
+          {type: "break"},
+          {type: "text", text: "Seagrasses: "},
+          {
+            type: "link", link: "https://www.unep-wcmc.org/policies/general-data-license-excluding-wdpa#data_policy",
+            linkText: "UNEP-WCMC General data license"},
+          {type: "break"},
+          {type: "text", text: "Salt marshes: "},
+          {
+            type: "link", link: "https://creativecommons.org/licenses/by-nc/3.0/legalcode",
+            linkText: "Attribution-NonCommercial 3.0 Unported"},
+          {type: "break"},
+          {type: "text", text: "Wetlands and coastal forest/scrub: "},
+          {
+            type: "link", link: "http://maps.elie.ucl.ac.be/CCI/viewer/download.php",
+            linkText: "Land Cover CCI Terms of Use"},
+        ],
+        citation: [
+          {type: "text", text: `P. Bunting et al., The Global Mangrove Watch—A
+            New 2010 Global Baseline of Mangrove Extent. Remote Sens. 10, 1669
+            (2018).`},
+          {type: "break"},
+          {type: "break"},
+          {type: "text", text: `L. Burke, K. Reytar, M. Spalding, A. Perry,
+            “Reefs at Risk Revisited” (World Resources Institute, 2011),
+            (available at `},
+          {
+            type: "link", link: "http://www.wri.org/publication/reefs-risk-revisited",
+            linkText: "http://www.wri.org/publication/reefs-risk-revisited)."},
+          {type: "break"},
+          {type: "break"},
+          {type: "text", text: `UNEP-WCMC, F. T. Short, “Global distribution
+            of seagrasses (version 6.0)” (UN Environment World Conservation
+            Monitoring Centre, Cambridge, UK, 2017)`},
+          {type: "break"},
+          {type: "break"},
+          {type: "text", text: `Mcowen C, Weatherdon LV, Bochove J, Sullivan E,
+            Blyth S, Zockler C, Stanwell-Smith D, Kingston N, Martin CS,
+            Spalding M, Fletcher S (2017). A global map of saltmarshes (v6.1).
+            Biodiversity Data Journal 5: e11764. Paper DOI:
+            https://doi.org/10.3897/BDJ.5.e11764; Data DOI: `},
+          {
+            type: "link", link: "https://doi.org/10.34892/07vk-ws51",
+            linkText: "https://doi.org/10.34892/07vk-ws51"},
+          {type: "break"},
+          {type: "break"},
+          {type: "text", text: `Land Cover CCI Product User Guide Version 2.
+            Tech. Rep. (2017). Available at: `},
+          {
+            type: "link", link: "http://maps.elie.ucl.ac.be/CCI/viewer/download/ESACCI-LC-Ph2-PUGv2_2.0.pdf",
+            linkText: "maps.elie.ucl.ac.be/CCI/viewer/download/ESACCI-LC-Ph2-PUGv2_2.0.pdf"},
+        ],
       },
       iconKey: "ioiosconstruct",
       disable: false,
