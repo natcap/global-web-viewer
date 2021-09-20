@@ -43,9 +43,6 @@
   font-size: 16px;
   z-index: 1;
 }
-.sublayer {
-  padding-left: 36px;
-}
 
 .custom-control-input:focus ~ .custom-control-label::before {
 /* when the button is toggled off it is still in focus and a green border will appear */

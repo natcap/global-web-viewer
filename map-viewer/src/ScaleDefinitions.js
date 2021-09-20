@@ -448,7 +448,7 @@ export const supportMenuDetails = [
             linkText: "maps.elie.ucl.ac.be/CCI/viewer/download/ESACCI-LC-Ph2-PUGv2_2.0.pdf"},
         ],
       },
-      iconKey: "ioiosconstruct",
+      iconKey: "gicoral",
       disable: false,
       subLayerCtrl: true,
       subLayerIds: [
