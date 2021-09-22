@@ -91,6 +91,15 @@ const legendStyle = {
       '#D4B577', '#FC8D62', '#FFEC42', '#CA7AF5', '#99CF78', '#6FACED'],
     info: 'Coastal and marine habitats',
   },
+  'protected-areas': {
+    id: 'protected-areas',
+    name: 'Protected areas',
+    desc: 'Protected areas',
+    type: 'ordinal',
+    colorKeys: ['Protected'],
+    colors: ['#31a335'],
+    info: 'Terrestrial and coastal protected areas',
+  },
 }
 
 

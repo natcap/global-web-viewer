@@ -17,6 +17,7 @@ function formatColors(colors, numberStops) {
 const D3Legend = (props) => {
 
   const d3Container = useRef(null);
+  const legendType = props.legendStyle[props.serviceType].type;
   //const svgEl = d3.select(d3Container.current);
   //svgEl.selectAll("*").remove();
 
@@ -33,7 +34,7 @@ const D3Legend = (props) => {
       // function, like ComponentWillUnmount
       svg.selectAll("*").remove();
 
-      if(props.legendStyle[props.serviceType].type === 'ordinal'){
+      if(legendType === 'ordinal'){
         const keys = props.legendStyle[props.serviceType].colorKeys;
         const colors = props.legendStyle[props.serviceType].colors;
 
@@ -105,7 +106,7 @@ const D3Legend = (props) => {
   return (
     <>
       <svg
-        className={"d3-legend " + props.legendStyle[props.serviceType].type}
+        className={`d3-legend ${legendType} ${props.serviceType}`}
         ref={d3Container}
       />
       {props.legendStyle[props.serviceType].type !== 'ordinal' &&

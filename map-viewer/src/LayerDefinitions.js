@@ -489,6 +489,174 @@ const mapLayers = [
       },
     }
   },
+  {
+    layerID: 'protected-points',
+    name: 'Protected points',
+    serviceType: 'protected-areas',
+    scaleID: 'all',
+    mapLayer: {
+      id: 'protected-points',
+      'source-layer': 'protected_points_all_no_duplicatesgeojsonl',
+      type: 'circle',
+      paint: {
+        'circle-color': '#31a335',
+      },
+      layout: {
+        visibility: 'none',
+      },
+      source: {
+        type: 'vector',
+        url: 'mapbox://ddenu.b29f9oyl',
+      },
+    }
+  },
+  {
+    layerID: 'protected-asia-pacific',
+    name: 'Protected Asia and Pacific',
+    serviceType: 'protected-areas',
+    scaleID: 'all',
+    mapLayer: {
+      id: 'protected-asia-pacific',
+      'source-layer': 'protected_polygons_Asia_and_Pacific',
+      type: 'fill',
+      paint: {
+        'fill-color': '#31a335',
+      },
+      layout: {
+        visibility: 'none',
+      },
+      source: {
+        type: 'vector',
+        url: 'mapbox://ddenu.9es2n1jq',
+      },
+    }
+  },
+  {
+    layerID: 'protected-la-caribbean',
+    name: 'Protected Latin America and Caribbean',
+    serviceType: 'protected-areas',
+    scaleID: 'all',
+    mapLayer: {
+      id: 'protected-la-caribbean',
+      'source-layer': 'protected_polygons_LatinAmerica_Caribbean',
+      type: 'fill',
+      paint: {
+        'fill-color': '#31a335',
+      },
+      layout: {
+        visibility: 'none',
+      },
+      source: {
+        type: 'vector',
+        url: 'mapbox://ddenu.d4a9sff0',
+      },
+    }
+  },
+  {
+    layerID: 'protected-af-polar-wa',
+    name: 'Protected Africa, Polar, West Asia',
+    serviceType: 'protected-areas',
+    scaleID: 'all',
+    mapLayer: {
+      id: 'protected-af-polar-wa',
+      'source-layer': 'protected_polygons_Africa_Polar_WestAsia',
+      type: 'fill',
+      paint: {
+        'fill-color': '#31a335',
+      },
+      layout: {
+        visibility: 'none',
+      },
+      source: {
+        type: 'vector',
+        url: 'mapbox://ddenu.71dz1ont',
+      },
+    }
+  },
+  {
+    layerID: 'protected-north-america',
+    name: 'Protected North America',
+    serviceType: 'protected-areas',
+    scaleID: 'all',
+    mapLayer: {
+      id: 'protected-north-america',
+      'source-layer': 'protected_polygons_NorthAmerica',
+      type: 'fill',
+      paint: {
+        'fill-color': '#31a335',
+      },
+      layout: {
+        visibility: 'none',
+      },
+      source: {
+        type: 'vector',
+        url: 'mapbox://ddenu.77rrl311',
+      },
+    }
+  },
+  {
+    layerID: 'protected-eu-0',
+    name: 'Protected Europe 0',
+    serviceType: 'protected-areas',
+    scaleID: 'all',
+    mapLayer: {
+      id: 'protected-eu-0',
+      'source-layer': 'protected_polygon_Europe_0',
+      type: 'fill',
+      paint: {
+        'fill-color': '#31a335',
+      },
+      layout: {
+        visibility: 'none',
+      },
+      source: {
+        type: 'vector',
+        url: 'mapbox://ddenu.8yydsukv',
+      },
+    }
+  },
+  {
+    layerID: 'protected-eu-1',
+    name: 'Protected Europe 1',
+    serviceType: 'protected-areas',
+    scaleID: 'all',
+    mapLayer: {
+      id: 'protected-eu-1',
+      'source-layer': 'protected_polygon_Europe_1',
+      type: 'fill',
+      paint: {
+        'fill-color': '#31a335',
+      },
+      layout: {
+        visibility: 'none',
+      },
+      source: {
+        type: 'vector',
+        url: 'mapbox://ddenu.9hiyxrqz',
+      },
+    }
+  },
+  {
+    layerID: 'protected-eu-2',
+    name: 'Protected Europe 2',
+    serviceType: 'protected-areas',
+    scaleID: 'all',
+    mapLayer: {
+      id: 'protected-eu-2',
+      'source-layer': 'protected_polygon_Europe_2',
+      type: 'fill',
+      paint: {
+        'fill-color': '#31a335',
+      },
+      layout: {
+        visibility: 'none',
+      },
+      source: {
+        type: 'vector',
+        url: 'mapbox://ddenu.protected-EU-2',
+      },
+    }
+  },
 ]
 
 export default mapLayers;

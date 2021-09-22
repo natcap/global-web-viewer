@@ -44,6 +44,7 @@
   z-index: 1;
 }
 
+/* TOGGLE CSS */
 .custom-control-input:focus ~ .custom-control-label::before {
 /* when the button is toggled off it is still in focus and a green border will appear */
   border-color: #009b76 !important;
@@ -66,6 +67,7 @@
   border-color: #009b76 !important;
 }
 
+/* POPOVER CSS */
 .popover-body {
   font-family: 'Source Sans Pro', sans-serif;
 }
@@ -82,6 +84,7 @@
   font-size: 20px;
 }
 
+/* INFO BUTTON CSS */
 .btn {
   outline: none;
   box-shadow:none;
@@ -116,6 +119,7 @@
   padding-left: .3rem;
 }
 
+/* BASEMAP CSS */
 .basemap-control {
   z-index: 1;
   position: absolute;
@@ -163,6 +167,7 @@
   padding: 0.25rem;
 }
 
+/* LEGEND CSS */
 .legend-group {
   font-family: 'Source Sans Pro', sans-serif;
   z-index: 1;
@@ -208,6 +213,12 @@
   height: 200px;
   overflow-y: auto;
 }
+.d3-legend.ordinal.protected-areas{
+  z-index: 1;
+  width: 220px;
+  height: 20px;
+  overflow-y: auto;
+}
 .d3-x-axis:not(:last-child) {
   padding-right: 4.75rem;
 }
@@ -222,6 +233,7 @@
   cursor: pointer;
 }
 
+/* MAPBOX POPUP CSS */
 .mapboxgl-popup {
   padding-bottom: 20px;
   width: 280px;
@@ -277,19 +289,18 @@
   font-weight: 200;
   /*float: right;*/
 }
- 
 .mapboxgl-popup-content div {
   padding: 10px;
 }
- 
+
 .mapboxgl-container .leaflet-marker-icon {
   cursor: pointer;
 }
- 
+
 .mapboxgl-popup-anchor-top > .mapboxgl-popup-content {
   margin-top: 15px;
 }
- 
+
 .mapboxgl-popup-anchor-top > .mapboxgl-popup-tip {
   border-bottom-color: #91c949;
 }

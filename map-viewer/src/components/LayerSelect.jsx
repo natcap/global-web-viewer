@@ -7,6 +7,7 @@ import { BiWater } from 'react-icons/bi';
 import { TiTree } from 'react-icons/ti';
 import { MdLandscape } from 'react-icons/md';
 import { IoIosPeople, IoIosConstruct } from 'react-icons/io';
+import { FiLock } from 'react-icons/fi';
 
 import Form from 'react-bootstrap/Form';
 import Col from 'react-bootstrap/Col';
@@ -24,6 +25,7 @@ const IconMap = {
   ioiosconstruct: <IoIosConstruct className="labelIcons"/>,
   mdlandscape: <MdLandscape className="labelIcons"/>,
   gicoral: <GiCoral className="labelIcons"/>,
+  filock: <FiLock className="labelIcons"/>,
 }
 
 const LayerSelect = (props) => {

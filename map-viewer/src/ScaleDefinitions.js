@@ -456,18 +456,10 @@ export const supportMenuDetails = [
       ],
     },
     {
-      id: "rivers",
-      label: "Rivers",
+      id: "protected-areas",
+      label: "Protected Areas",
       helpText: {
-        text: `The InVEST Sediment and Nutrient models trace the path of
-        erosion and nutrient from their origins until they reach a stream.
-        While in-stream processes are not modelled, the assumption is that
-        once these reach a river, they can cause water quality issues for
-        people and infrastructure downstream. So, it is often useful to
-        visualize rivers along with hydrologic service maps, to understand
-        which rivers and downstream communities are likely to benefit when
-        natural lands hold back sediment and nutrient from entering the
-        water supply.  `,
+        text: ``,
         metric: "N/A",
         source: "",
         resolution: "",
@@ -482,14 +474,22 @@ export const supportMenuDetails = [
           link: "",
         },
       },
-      iconKey: "ioiosconstruct",
-      disable: true,
+      iconKey: "filock",
+      disable: false,
     },
     {
-      id: "protected",
-      label: "Protected Areas",
+      id: "rivers",
+      label: "Rivers",
       helpText: {
-        text: ``,
+        text: `The InVEST Sediment and Nutrient models trace the path of
+        erosion and nutrient from their origins until they reach a stream.
+        While in-stream processes are not modelled, the assumption is that
+        once these reach a river, they can cause water quality issues for
+        people and infrastructure downstream. So, it is often useful to
+        visualize rivers along with hydrologic service maps, to understand
+        which rivers and downstream communities are likely to benefit when
+        natural lands hold back sediment and nutrient from entering the
+        water supply.  `,
         metric: "N/A",
         source: "",
         resolution: "",
@@ -658,6 +658,209 @@ export const coastalHabitats = [
       disable: true,
       subLayer: true,
       subLayerParent: "cvhabs",
+      legend: false,
+    },
+]
+
+export const protectedLayers = [
+    {
+      id: "protected-points",
+      label: "Protected points",
+      helpText: {
+        text: ``,
+        metric: "N/A",
+        source: "",
+        resolution: "",
+        date: "",
+        coverage: "Global",
+        license: {
+          link: "",
+          text: "",
+        },
+        citation: {
+          text: ``,
+          link: "",
+        },
+      },
+      iconKey: "ioiosconstruct",
+      disable: true,
+      subLayer: true,
+      subLayerParent: "protected-areas",
+      legend: false,
+    },
+    {
+      id: "protected-asia-pacific",
+      label: "Protected areas",
+      helpText: {
+        text: ``,
+        metric: "N/A",
+        source: "",
+        resolution: "",
+        date: "",
+        coverage: "Global",
+        license: {
+          link: "",
+          text: "",
+        },
+        citation: {
+          text: ``,
+          link: "",
+        },
+      },
+      iconKey: "ioiosconstruct",
+      disable: true,
+      subLayer: true,
+      subLayerParent: "protected-areas",
+      legend: false,
+    },
+    {
+      id: "protected-la-caribbean",
+      label: "Protected areas",
+      helpText: {
+        text: ``,
+        metric: "N/A",
+        source: "",
+        resolution: "",
+        date: "",
+        coverage: "Global",
+        license: {
+          link: "",
+          text: "",
+        },
+        citation: {
+          text: ``,
+          link: "",
+        },
+      },
+      iconKey: "ioiosconstruct",
+      disable: true,
+      subLayer: true,
+      subLayerParent: "protected-areas",
+      legend: false,
+    },
+    {
+      id: "protected-af-polar-wa",
+      label: "Protected areas",
+      helpText: {
+        text: ``,
+        metric: "N/A",
+        source: "",
+        resolution: "",
+        date: "",
+        coverage: "Global",
+        license: {
+          link: "",
+          text: "",
+        },
+        citation: {
+          text: ``,
+          link: "",
+        },
+      },
+      iconKey: "ioiosconstruct",
+      disable: true,
+      subLayer: true,
+      subLayerParent: "protected-areas",
+      legend: false,
+    },
+    {
+      id: "protected-north-america",
+      label: "Protected areas",
+      helpText: {
+        text: ``,
+        metric: "N/A",
+        source: "",
+        resolution: "",
+        date: "",
+        coverage: "Global",
+        license: {
+          link: "",
+          text: "",
+        },
+        citation: {
+          text: ``,
+          link: "",
+        },
+      },
+      iconKey: "ioiosconstruct",
+      disable: true,
+      subLayer: true,
+      subLayerParent: "protected-areas",
+      legend: false,
+    },
+    {
+      id: "protected-eu-0",
+      label: "Protected areas",
+      helpText: {
+        text: ``,
+        metric: "N/A",
+        source: "",
+        resolution: "",
+        date: "",
+        coverage: "Global",
+        license: {
+          link: "",
+          text: "",
+        },
+        citation: {
+          text: ``,
+          link: "",
+        },
+      },
+      iconKey: "ioiosconstruct",
+      disable: true,
+      subLayer: true,
+      subLayerParent: "protected-areas",
+      legend: false,
+    },
+    {
+      id: "protected-eu-1",
+      label: "Protected areas",
+      helpText: {
+        text: ``,
+        metric: "N/A",
+        source: "",
+        resolution: "",
+        date: "",
+        coverage: "Global",
+        license: {
+          link: "",
+          text: "",
+        },
+        citation: {
+          text: ``,
+          link: "",
+        },
+      },
+      iconKey: "ioiosconstruct",
+      disable: true,
+      subLayer: true,
+      subLayerParent: "protected-areas",
+      legend: false,
+    },
+    {
+      id: "protected-eu-2",
+      label: "Protected areas",
+      helpText: {
+        text: ``,
+        metric: "N/A",
+        source: "",
+        resolution: "",
+        date: "",
+        coverage: "Global",
+        license: {
+          link: "",
+          text: "",
+        },
+        citation: {
+          text: ``,
+          link: "",
+        },
+      },
+      iconKey: "ioiosconstruct",
+      disable: true,
+      subLayer: true,
+      subLayerParent: "protected-areas",
       legend: false,
     },
 ]
