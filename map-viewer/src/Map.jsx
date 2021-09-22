@@ -16,6 +16,7 @@ import Legend from './components/Legend';
 import BasemapControl from './components/BasemapControl';
 import mapLayers from './LayerDefinitions';
 import { coastalHabitats } from './ScaleDefinitions';
+import { protectedLayers } from './ScaleDefinitions';
 
 // import MyComponent from './components/MyComponent';
 
@@ -23,6 +24,10 @@ import { coastalHabitats } from './ScaleDefinitions';
 mapboxgl.accessToken =
   'pk.eyJ1IjoiZGRlbnUiLCJhIjoiY2ttZjQwamU2MTE1bjJ3bGpmZGZncG52NCJ9.u2cSHaEPPDgZH7PYBZNhWw';
 
+const multiFileLayers = {
+  'coastal-habitat': coastalHabitats,
+  'protected-areas': protectedLayers,
+}
 
 const Map = () => {
 
@@ -531,16 +536,15 @@ const Map = () => {
       setServices([...selectedServicesUpdate]);
 
       const layer = visibleLayers[serviceResult];
-      if(serviceResult !== "coastal-habitat") {
-        map.setLayoutProperty(layer.layerID, 'visibility', 'none');
-        delete visibleLayersUpdate[serviceResult];
+      if(serviceResult in multiFileLayers) {
+        multiFileLayers[serviceResult].forEach((childLayer) => {
+            map.setLayoutProperty(childLayer.id, 'visibility', 'none');
+            delete visibleLayersUpdate[childLayer.id];
+        });
       }
       else {
-        //delete visibleLayersUpdate[serviceResult];
-        coastalHabitats.forEach((chLayer) => {
-            map.setLayoutProperty(chLayer.id, 'visibility', 'none');
-            delete visibleLayersUpdate[chLayer.id];
-        });
+        map.setLayoutProperty(layer.layerID, 'visibility', 'none');
+        delete visibleLayersUpdate[serviceResult];
       }
       setLayers({...visibleLayersUpdate});
     }
