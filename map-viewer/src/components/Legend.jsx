@@ -94,11 +94,20 @@ const legendStyle = {
     desc: 'Coastal habitat types',
     type: 'ordinal',
     colorKeys: [
-      'Wetland', 'Seagrass', 'Mangroves', 'Forest / Scrub',
-      'Coral Reefs'],
+      'Coastal Forest / Scrub', 'Coral Reefs', 'Mangroves', 'Saltmarsh',
+      'Seagrass', 'Wetland'],
     colors: [
-      '#6FACED', '#99CF78', '#FFEC42', '#D4B577', '#FC8D62'],
-    info: 'Coastal habitat type',
+      '#D4B577', '#FC8D62', '#FFEC42', '#CA7AF5', '#99CF78', '#6FACED'],
+    info: 'Coastal and marine habitats',
+  },
+  'protected-areas': {
+    id: 'protected-areas',
+    name: 'Protected areas',
+    desc: 'Protected areas',
+    type: 'ordinal',
+    colorKeys: ['Protected'],
+    colors: ['#31a335'],
+    info: 'Terrestrial and coastal protected areas',
   },
 }
 

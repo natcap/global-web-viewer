@@ -114,7 +114,7 @@ const VerticalMenu = (props) => {
         <Card>
           <Accordion.Toggle as={Card.Header} eventKey="2" className="accordion-header">
             <Row>
-              <Col>3) Explore Other Layers -- Coming Soon</Col>
+              <Col>3) Explore Other Layers</Col>
               <Col xs="auto"><IoIosArrowDropdown className="dropdown-icon"/></Col>
             </Row>
           </Accordion.Toggle>
