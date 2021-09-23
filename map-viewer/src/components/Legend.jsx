@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
 
 import ListGroup from 'react-bootstrap/ListGroup';
@@ -138,12 +138,10 @@ const SortableContainer = sortableContainer(({children}) => {
 
 
 const Legend = (props) => {
-  const [items, setItems] = useState(props.services);
 
   function handleDragEnd({oldIndex, newIndex}) {
-    setItems(() => {
-        return arrayMoveImmutable(items, oldIndex, newIndex);
-    });
+    const sortedServices = arrayMoveImmutable(props.services, oldIndex, newIndex);
+    props.changeLayerOrder(sortedServices, oldIndex, newIndex);
   }
 
   const renderLegend = (serviceType, i) => {
@@ -180,6 +178,7 @@ const Legend = (props) => {
 Legend.propTypes = {
   layers: PropTypes.object.isRequired,
   services: PropTypes.array.isRequired,
+  changeLayerOrder: PropTypes.func.isRequired,
 }
 
 export default Legend;
