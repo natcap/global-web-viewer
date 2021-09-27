@@ -112,12 +112,18 @@ const legendStyle = {
 }
 
 const DragHandle = sortableHandle(() => 
-  <span className="drag-handle" >{<GrDrag/>}</span>);
+  <span>{<GrDrag/>}</span>);
 
 const SortableItem = sortableElement(({value, index}) => (
-    <ListGroup.Item key={`legendStyle-${index}`} className="legend-container">
-      <DragHandle />
-      <div className="legend-desc">{legendStyle[value].desc}</div>
+    <ListGroup.Item key={`legendStyle-${index}`} className="legend-item">
+      <Row>
+        <Col className="drag-handle" xs="auto">
+          <DragHandle />
+        </Col>
+        <Col className="legend-desc" xs="auto">
+          {legendStyle[value].desc}
+        </Col>
+      </Row>
       <Row>
         <Col>
           <D3Legend serviceType={value} legendStyle={legendStyle}/>
@@ -133,7 +139,7 @@ const SortableItem = sortableElement(({value, index}) => (
 ));
 
 const SortableContainer = sortableContainer(({children}) => {
-  return <ul className="legend-container-1">{children}</ul>;
+  return <ul className="sortable-container">{children}</ul>;
 });
 
 
@@ -147,7 +153,7 @@ const Legend = (props) => {
   const renderLegend = (serviceType, i) => {
       return (
         <SortableItem
-          className="legend-item-2"
+          className="sortable-item"
           key={`item-${serviceType}-${i}`}
           index={i}
           value={serviceType} />
@@ -156,18 +162,19 @@ const Legend = (props) => {
 
   if (props.services.length > 0) {
     return (
-      <SortableContainer
-        onSortEnd={handleDragEnd}
-        helperClass="legend-container-2"
-        axis='y'
-        lockAxis='y'
-        lockToContainerEdges={true}
-        lockOffset='50%'
-        useDragHandle>
-          <ListGroup variant="flush" className="legend-group">
-            {props.services.map(renderLegend)}
-          </ListGroup>
-      </SortableContainer>
+      <ListGroup variant="flush" className="legend-group">
+        <SortableContainer
+          onSortEnd={handleDragEnd}
+          helperClass="sortable-container-helper"
+          axis='y'
+          //lockAxis='y'
+          //lockToContainerEdges={true}
+          lockOffset='0%'
+          transitionDuration='600'
+          useDragHandle>
+          {props.services.map(renderLegend)}
+        </SortableContainer>
+      </ListGroup>
     );
   }
   else {

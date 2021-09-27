@@ -181,7 +181,7 @@
   background-color: #f5f6f7;
   border-radius: 4px;
   line-height: 18px;
-  max-height: 200px;
+  max-height: 300px;
   width: 340px;
   overflow-y: auto;
 }
@@ -193,6 +193,7 @@
   margin-right: 5px;
 }
 .legend-desc {
+  padding-left: 2px;
   padding-bottom: 5px;
   font-weight: bold;
   font-size: 13px;
@@ -219,9 +220,34 @@
   height: 20px;
   overflow-y: auto;
 }
+.d3-x-axis {
+  font-size: 12px;
+}
 .d3-x-axis:not(:last-child) {
   padding-right: 4.75rem;
 }
+.legend-item {
+  font-size: 16px;
+}
+.sortable-container-helper {
+  z-index: 1;
+  font-family: 'Source Sans Pro', sans-serif;
+  line-height: 18px;
+  font-weight: 400;
+  padding-left: 20px;
+}
+.drag-handle {
+  font-size: 12px;
+  padding-left: 0;
+  padding-right: 0;
+  margin-right: 0;
+  cursor: grab;
+}
+.sortable-container {
+}
+.sortable-container:active {
+}
+
 
 .labelIcons {
   font-size: 30px;
