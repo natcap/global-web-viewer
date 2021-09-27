@@ -18,6 +18,9 @@ import mapLayers from './LayerDefinitions';
 import { coastalHabitats } from './ScaleDefinitions';
 import { protectedLayers } from './ScaleDefinitions';
 
+import {arrayMoveImmutable} from 'array-move';
+
+
 // import MyComponent from './components/MyComponent';
 
 //mapboxgl.workerClass = MapboxWorker;
@@ -549,7 +552,8 @@ const Map = () => {
       setLayers({...visibleLayersUpdate});
     }
     else {
-      selectedServicesUpdate.push(serviceResult);
+      //Using concat because we want newly added things in front of array 
+      selectedServicesUpdate = [serviceResult].concat(selectedServicesUpdate);
       //You're calling setNumbers and passing it the array it already has.
       //You've changed one of its values but it's still the same array, and
       //I suspect React doesn't see any reason to re-render because state
@@ -561,6 +565,7 @@ const Map = () => {
         // Check 'all' for coastal protection case where we want this one 
         // layer visible across all scales
         if((layer.scaleID === scale.current || layer.scaleID === 'all') && layer.serviceType === serviceResult) {
+          map.moveLayer(layer.layerID);
           map.setLayoutProperty(layer.layerID, 'visibility', 'visible');
           visibleLayersUpdate[serviceResult] = {...layer};
 
@@ -600,6 +605,60 @@ const Map = () => {
     setMap(map);
   }
 
+  const changeLayerOrder = (servicesSorted, oldIndex, newIndex) => {
+    console.log("change order");
+    console.log(selectedServices);
+    console.log(oldIndex + " : " + newIndex);
+    console.log(visibleLayers);
+    // Reverse the sorted services to start with the layers in the back
+    const reversedServices = servicesSorted.slice().reverse();
+    reversedServices.forEach((serviceType, i) => {
+      let zbackId = [];
+      // Add all layers from a service type if there are multiple of them
+      if(serviceType in multiFileLayers) {
+        multiFileLayers[serviceType].forEach((childLayer) => {
+          zbackId.push(childLayer.id);
+        });
+      }
+      else {
+        zbackId.push(visibleLayers[serviceType].layerID);
+      }
+
+      if(reversedServices.length < i+1) {
+        const nextService = reversedServices[i+1];
+        let zfrontId = [];
+        // Add all layers from a service type if there are multiple of them
+        if(nextService in multiFileLayers) {
+          multiFileLayers[nextService].forEach((childLayer) => {
+            zfrontId.push(childLayer.id);
+          });
+        }
+        else {
+          zfrontId.push(visibleLayers[nextService].layerID);
+        }
+        // Move each layer behind each next layer
+        zbackId.forEach((backLayerId) => {
+          zfrontId.forEach((frontLayerId) => {
+            map.moveLayer(backLayerId, frontLayerId);
+          });
+        });
+      }
+      else {
+        // We are at the most visible set of layers, just move them to the top.
+        zbackId.forEach((backLayerId) => {
+          map.moveLayer(backLayerId);
+        });
+      }
+    });
+
+    setServices(() => {
+        return arrayMoveImmutable(selectedServices, oldIndex, newIndex);
+    });
+    console.log("servicesSorted ", servicesSorted);
+    console.log("selectedServices: after order change ", [...selectedServices]);
+    setMap(map);
+  };
+
   return (
       <Col className="map-container" ref={mapContainer} >
         <VerticalMenu
@@ -611,6 +670,7 @@ const Map = () => {
         <Legend
           layers={visibleLayers}
           services={selectedServices}
+          changeLayerOrder={changeLayerOrder}
         />
         <BasemapControl className="basemap-control"
           basemaps={basemaps}

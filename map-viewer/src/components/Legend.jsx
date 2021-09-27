@@ -8,6 +8,15 @@ import Row from 'react-bootstrap/Row';
 import D3Legend from './D3Legend';
 import InfoPopover from './InfoPopover';
 
+import {
+  sortableContainer,
+  sortableElement,
+  sortableHandle,
+} from 'react-sortable-hoc';
+import {arrayMoveImmutable} from 'array-move';
+
+import { GrDrag } from 'react-icons/gr';
+
 const legendStyle = {
   'sediment': {
     id: 'sediment',
@@ -102,32 +111,69 @@ const legendStyle = {
   },
 }
 
+const DragHandle = sortableHandle(() => 
+  <span>{<GrDrag/>}</span>);
+
+const SortableItem = sortableElement(({value, index}) => (
+    <ListGroup.Item key={`legendStyle-${index}`} className="legend-item">
+      <Row>
+        <Col className="drag-handle" xs="auto">
+          <DragHandle />
+        </Col>
+        <Col className="legend-desc" xs="auto">
+          {legendStyle[value].desc}
+        </Col>
+      </Row>
+      <Row>
+        <Col>
+          <D3Legend serviceType={value} legendStyle={legendStyle}/>
+        </Col>
+        <Col xs="auto">
+          <InfoPopover
+            key={`legend-popover-${value}`}
+            content={legendStyle[value].info}
+          />
+        </Col>
+      </Row>
+    </ListGroup.Item>
+));
+
+const SortableContainer = sortableContainer(({children}) => {
+  return <ul className="sortable-container">{children}</ul>;
+});
+
 
 const Legend = (props) => {
 
+  function handleDragEnd({oldIndex, newIndex}) {
+    const sortedServices = arrayMoveImmutable(props.services, oldIndex, newIndex);
+    props.changeLayerOrder(sortedServices, oldIndex, newIndex);
+  }
+
   const renderLegend = (serviceType, i) => {
       return (
-        <ListGroup.Item key={`legendStyle-${i}`} className="legend-container">
-          <div className="legend-desc">{legendStyle[serviceType].desc}</div>
-          <Row>
-            <Col>
-              <D3Legend serviceType={serviceType} legendStyle={legendStyle}/>
-            </Col>
-            <Col xs="auto">
-              <InfoPopover
-                key={`legend-popover-${serviceType}`}
-                content={legendStyle[serviceType].info}
-              />
-            </Col>
-          </Row>
-        </ListGroup.Item>
+        <SortableItem
+          className="sortable-item"
+          key={`item-${serviceType}-${i}`}
+          index={i}
+          value={serviceType} />
       );
   };
 
   if (props.services.length > 0) {
     return (
       <ListGroup variant="flush" className="legend-group">
-        {props.services.map(renderLegend)}
+        <SortableContainer
+          onSortEnd={handleDragEnd}
+          helperClass="sortable-container-helper"
+          axis='y'
+          //lockAxis='y'
+          //lockToContainerEdges={true}
+          lockOffset='0%'
+          transitionDuration='600'
+          useDragHandle>
+          {props.services.map(renderLegend)}
+        </SortableContainer>
       </ListGroup>
     );
   }
@@ -139,6 +185,7 @@ const Legend = (props) => {
 Legend.propTypes = {
   layers: PropTypes.object.isRequired,
   services: PropTypes.array.isRequired,
+  changeLayerOrder: PropTypes.func.isRequired,
 }
 
 export default Legend;

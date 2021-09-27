@@ -511,6 +511,31 @@ export const supportMenuDetails = [
 
 export const coastalHabitats = [
     {
+      id: "forest-scrub",
+      label: "Forest / Scrub",
+      helpText: {
+        text: ``,
+        metric: "N/A",
+        source: "",
+        resolution: "",
+        date: "",
+        coverage: "Global",
+        license: {
+          link: "",
+          text: "",
+        },
+        citation: {
+          text: ``,
+          link: "",
+        },
+      },
+      iconKey: "ioiosconstruct",
+      disable: true,
+      subLayer: true,
+      subLayerParent: "cvhabs",
+      legend: false,
+    },
+    {
       id: "wetland",
       label: "Wetlands",
       helpText: {
@@ -561,6 +586,31 @@ export const coastalHabitats = [
       legend: false,
     },
     {
+      id: "saltmarsh",
+      label: "Saltmarsh",
+      helpText: {
+        text: ``,
+        metric: "N/A",
+        source: "",
+        resolution: "",
+        date: "",
+        coverage: "Global",
+        license: {
+          link: "",
+          text: "",
+        },
+        citation: {
+          text: ``,
+          link: "",
+        },
+      },
+      iconKey: "ioiosconstruct",
+      disable: true,
+      subLayer: true,
+      subLayerParent: "cvhabs",
+      legend: false,
+    },
+    {
       id: "mangroves",
       label: "Mangroves",
       helpText: {
@@ -586,58 +636,8 @@ export const coastalHabitats = [
       legend: false,
     },
     {
-      id: "forest-scrub",
-      label: "Forest / Scrub",
-      helpText: {
-        text: ``,
-        metric: "N/A",
-        source: "",
-        resolution: "",
-        date: "",
-        coverage: "Global",
-        license: {
-          link: "",
-          text: "",
-        },
-        citation: {
-          text: ``,
-          link: "",
-        },
-      },
-      iconKey: "ioiosconstruct",
-      disable: true,
-      subLayer: true,
-      subLayerParent: "cvhabs",
-      legend: false,
-    },
-    {
       id: "coral-reef",
       label: "Coral Reefs",
-      helpText: {
-        text: ``,
-        metric: "N/A",
-        source: "",
-        resolution: "",
-        date: "",
-        coverage: "Global",
-        license: {
-          link: "",
-          text: "",
-        },
-        citation: {
-          text: ``,
-          link: "",
-        },
-      },
-      iconKey: "ioiosconstruct",
-      disable: true,
-      subLayer: true,
-      subLayerParent: "cvhabs",
-      legend: false,
-    },
-    {
-      id: "saltmarsh",
-      label: "Saltmarsh",
       helpText: {
         text: ``,
         metric: "N/A",
