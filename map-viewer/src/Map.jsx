@@ -609,16 +609,45 @@ const Map = () => {
     console.log("change order");
     console.log(selectedServices);
     console.log(oldIndex + " : " + newIndex);
+    console.log(visibleLayers);
+    // Reverse the sorted services to start with the layers in the back
     const reversedServices = servicesSorted.slice().reverse();
     reversedServices.forEach((serviceType, i) => {
-      const zbackId = visibleLayers[serviceType].layerID;
-      if(reversedServices.length < i+1) {
-        const nextService = reversedServices[i+1];
-        const zfrontId = visibleLayers[nextService].layerID;
-        map.moveLayer(zbackId, zfrontId);
+      let zbackId = [];
+      // Add all layers from a service type if there are multiple of them
+      if(serviceType in multiFileLayers) {
+        multiFileLayers[serviceType].forEach((childLayer) => {
+          zbackId.push(childLayer.id);
+        });
       }
       else {
-        map.moveLayer(zbackId);
+        zbackId.push(visibleLayers[serviceType].layerID);
+      }
+
+      if(reversedServices.length < i+1) {
+        const nextService = reversedServices[i+1];
+        let zfrontId = [];
+        // Add all layers from a service type if there are multiple of them
+        if(nextService in multiFileLayers) {
+          multiFileLayers[nextService].forEach((childLayer) => {
+            zfrontId.push(childLayer.id);
+          });
+        }
+        else {
+          zfrontId.push(visibleLayers[nextService].layerID);
+        }
+        // Move each layer behind each next layer
+        zbackId.forEach((backLayerId) => {
+          zfrontId.forEach((frontLayerId) => {
+            map.moveLayer(backLayerId, frontLayerId);
+          });
+        });
+      }
+      else {
+        // We are at the most visible set of layers, just move them to the top.
+        zbackId.forEach((backLayerId) => {
+          map.moveLayer(backLayerId);
+        });
       }
     });
 
