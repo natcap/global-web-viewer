@@ -17,8 +17,6 @@ import { scales } from '../ScaleDefinitions';
 import InfoPopover from './InfoPopover';
 import { serviceMenuDetails, supportMenuDetails } from '../ScaleDefinitions';
 
-import { TestSortable } from './TestSortable';
-
 const IconMap = {
   faglobe: <FaGlobe className="labelIcons"/>,
   giafrica: <GiAfrica className="labelIcons"/>,
@@ -145,7 +143,6 @@ const VerticalMenu = (props) => {
         </Card>
       </Accordion>
 
-      <TestSortable />
     </Form>
   );
 };
