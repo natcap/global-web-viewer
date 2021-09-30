@@ -231,51 +231,70 @@ const Map = () => {
         if(scale.current !== 'national') {
           return;
         }
-        //results.innerText = JSON.stringify(e.result, null, 2);
-        console.log(e);
         const countryName = e.result.place_name;
-        console.log(countryName);
         const lngLatBbox = e.result.bbox;
-        map.fitBounds(lngLatBbox, {padding:40});
-        const resultCenter = e.result.center;
-        const centerPointLike = map.project(resultCenter);
+        map.fitBounds(lngLatBbox, {padding:40}).once('moveend', () => {
+        //const resultCenter = e.result.center;
+        //const centerPointLike = map.project(resultCenter);
+          const bbXYMinLike = map.project([lngLatBbox[0], lngLatBbox[1]]);
+          const bbXYMaxLike = map.project([lngLatBbox[2], lngLatBbox[3]]);
+          const bbXYLike = [
+            [bbXYMinLike.x, bbXYMinLike.y],
+            [bbXYMaxLike.x, bbXYMaxLike.y]
+          ];
 
-        // The geometry of the query region in pixels: either a single point
-        // or bottom left and top right points describing a bounding box,
-        // where the origin is at the top left.
-        var features = map.queryRenderedFeatures(centerPointLike, {
-          layers: ['stats-gadm0']
+          // The geometry of the query region in pixels: either a single point
+          // or bottom left and top right points describing a bounding box,
+          // where the origin is at the top left.
+          const features = map.queryRenderedFeatures(bbXYLike, {
+            layers: ['stats-gadm0']
+          });
+
+          features.forEach((feat) => {
+            const featID = feat.properties.NAME_0;
+            if(featID === countryName) {
+              map.setPaintProperty(
+                'stats-gadm0', 'fill-opacity', [
+                  'match', ['get', 'NAME_0'], featID, 0.0, 0.8]);
+            }
+          });
         });
-        const featID = features[0].properties.NAME_0;
-
-        map.setPaintProperty(
-          'stats-gadm0', 'fill-opacity', [
-            'match', ['get', 'NAME_0'], featID, 0.0, 0.8]);
+        setMap(map);
       });
       geocoderAdmin.on('result', function (e) {
         if(scale.current !== 'admin') {
           return;
         }
-        //results.innerText = JSON.stringify(e.result, null, 2);
-        console.log(e);
-        const countryName = e.result.place_name;
-        console.log(countryName);
+        // Get only the admin name, separate from associated country
+        const adminName = e.result.place_name.split(',')[0];
         const lngLatBbox = e.result.bbox;
-        map.fitBounds(lngLatBbox, {padding:40});
-        const resultCenter = e.result.center;
-        const centerPointLike = map.project(resultCenter);
+        map.fitBounds(lngLatBbox, {padding:40}).once('moveend', () => {
+        //const resultCenter = e.result.center;
+        //const centerPointLike = map.project(resultCenter);
+          const bbXYMinLike = map.project([lngLatBbox[0], lngLatBbox[1]]);
+          const bbXYMaxLike = map.project([lngLatBbox[2], lngLatBbox[3]]);
+          const bbXYLike = [
+            [bbXYMinLike.x, bbXYMinLike.y],
+            [bbXYMaxLike.x, bbXYMaxLike.y]
+          ];
 
-        // The geometry of the query region in pixels: either a single point
-        // or bottom left and top right points describing a bounding box,
-        // where the origin is at the top left.
-        var features = map.queryRenderedFeatures(centerPointLike, {
-          layers: ['stats-gadm1']
+          // The geometry of the query region in pixels: either a single point
+          // or bottom left and top right points describing a bounding box,
+          // where the origin is at the top left.
+          const features = map.queryRenderedFeatures(bbXYLike, {
+            layers: ['stats-gadm1']
+          });
+
+          features.forEach((feat) => {
+            const featID = feat.properties.NAME_1;
+            if(featID === adminName) {
+              map.setPaintProperty(
+                'stats-gadm1', 'fill-opacity', [
+                  'match', ['get', 'NAME_1'], featID, 0.0, 0.8]);
+            }
+          });
         });
-        const featID = features[0].properties.NAME_1;
-
-        map.setPaintProperty(
-          'stats-gadm1', 'fill-opacity', [
-            'match', ['get', 'NAME_1'], featID, 0.0, 0.8]);
+        setMap(map);
       });
 //      if (map.getLayer('rcp-points')) {
 //        map.setPaintProperty('rcp-points', 'circle-radius', [
