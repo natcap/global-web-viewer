@@ -26,12 +26,23 @@
   height: 100%;
   overflow-y: auto;
 }
+.accordion .card {
+/* Allow for search dropdowns to appear over the next accordion and cards */
+    overflow: inherit;
+}
 .accordion-header {
   background-color: #2f2f30;
   color: #ffffff;
 }
 .scale-accordian {
   overflow-y: visible;
+}
+.card {
+  border-radius: 0;
+}
+.accordion:last-of-type > .card:last-of-type {
+/* see bug here: https://github.com/react-bootstrap/react-bootstrap/issues/4556 */
+  border-bottom: 1.5px solid rgba(0, 0, 0, 0.125);
 }
 .scale-options {
   background-color: #2f2f30;
@@ -153,12 +164,10 @@
   font-family: 'Source Sans Pro', sans-serif;
   font-size: 14px;
 }
-.suggestions-wrapper {
-  overflow: visible !important;
-  z-index: 1001 !important;
-}
-
 #geocoder-national .mapboxgl-ctrl-geocoder {
+  /*Mapbox sets z-index for geocoders at 1000, set first search bar to 
+   * 1001 so it's results appear above the lower search bar
+   */
   z-index: 1001;
 }
 
