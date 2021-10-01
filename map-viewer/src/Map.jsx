@@ -18,11 +18,6 @@ import mapLayers from './LayerDefinitions';
 import { coastalHabitats } from './ScaleDefinitions';
 import { protectedLayers } from './ScaleDefinitions';
 
-import {arrayMoveImmutable} from 'array-move';
-
-
-// import MyComponent from './components/MyComponent';
-
 //mapboxgl.workerClass = MapboxWorker;
 mapboxgl.accessToken =
   'pk.eyJ1IjoiZGRlbnUiLCJhIjoiY2ttZjQwamU2MTE1bjJ3bGpmZGZncG52NCJ9.u2cSHaEPPDgZH7PYBZNhWw';
@@ -31,8 +26,29 @@ const multiFileLayers = {
   'coastal-habitat': coastalHabitats,
   'protected-areas': protectedLayers,
 }
+const statsScaleMap = {
+  local: 'stats-hybas',
+  admin: 'stats-gadm1',
+  national: 'stats-gadm0',
+}
+
 
 const Map = () => {
+
+  function getMapStyleSymbolId() {
+      //let originLayers = map.getStyle().layers;
+      let firstSymbolId = 'building';
+      /*
+      for (let i = 0; i < originLayers.length; i++) {
+        if (originLayers[i].type === 'symbol') {
+          firstSymbolId = originLayers[i].id;
+          console.log("fist symbol id: ", firstSymbolId);
+          break;
+        }
+      }
+      */
+    return firstSymbolId;
+  }
 
   const basemaps = [
     {
@@ -76,6 +92,7 @@ const Map = () => {
   const [lng, setLng] = useState(16.8);
   const [lat, setLat] = useState(30.0);
   const [zoom, setZoom] = useState(1.64);
+  const [basemapId, setBasemap] = useState('streets-v11');
   //const [mapLayers, setLayers] = useState(layers);
   //const [scale, _setScale] = useState('global');
   //const [scale, setScale] = useState('global');
@@ -308,14 +325,7 @@ const Map = () => {
 //        ]);
 //      }
 
-      let originLayers = map.getStyle().layers;
-      let firstSymbolId = '';
-      for (let i = 0; i < originLayers.length; i++) {
-        if (originLayers[i].type === 'symbol') {
-          firstSymbolId = originLayers[i].id;
-          break;
-        }
-      }
+      const firstSymbolId = getMapStyleSymbolId(map);
       mapLayers.forEach((layer) => {
         map.addLayer(layer.mapLayer, firstSymbolId);
       });
@@ -350,7 +360,7 @@ const Map = () => {
       //scale.current = 'global;
       if (scale.current === 'national') {
         console.log("click stats-gadm0");
-        console.log(selectedServices);
+        console.log([...servicesRef.current]);
         let htmlString = `<h3>${e.features[0].properties.NAME_0}</h3>`;
         let currentServices = [...servicesRef.current];
         if (currentServices.length > 0) {
@@ -503,10 +513,14 @@ const Map = () => {
     let visibleLayersUpdate = {};
     let visibleVar = 'none';
     const currentServices = [...selectedServices];
+    console.log("change scale sel serv: ", currentServices);
+    console.log("change scale vis lay: ", visibleLayers);
     mapLayers.forEach((layer) => {
       if(layer.scaleID === scaleResult && currentServices.includes(layer.serviceType)) {
+        console.log("change scale show: ", layer.layerID);
         visibleLayersUpdate[layer.serviceType] = layer;
         visibleVar = 'visible';
+        //map.setLayoutProperty(layer.layerID, 'visibility', visibleVar);
       }
       // This is the case for coastal protection. Show the same output across
       // scales
@@ -519,7 +533,47 @@ const Map = () => {
       }
       map.setLayoutProperty(layer.layerID, 'visibility', visibleVar);
       visibleVar = 'none';
+      setMap(map);
+      setLayers({...visibleLayersUpdate});
     });
+
+    const firstSymbolId = getMapStyleSymbolId(map);
+    //changeLayerOrder(currentServices);
+    let zIndex = [];
+    if(basemapId !== 'satellite-v9') {
+      zIndex = [firstSymbolId];
+    }
+    else {
+      zIndex = ['none'];
+    }
+
+    currentServices.forEach((serviceType, i) => {
+      let curIds = [];
+      // Add all layers from a service type if there are multiple of them
+      if(serviceType in multiFileLayers) {
+        multiFileLayers[serviceType].forEach((childLayer) => {
+          curIds.push(childLayer.id);
+          if(zIndex[i] !== 'none') {
+            map.moveLayer(childLayer.id, zIndex[i]);
+          }
+          else {
+            map.moveLayer(childLayer.id);
+          }
+        });
+        zIndex.push(curIds[0]);
+      }
+      else {
+        curIds.push(visibleLayersUpdate[serviceType].layerID);
+        if(zIndex[i] !== 'none') {
+          map.moveLayer(visibleLayersUpdate[serviceType].layerID, zIndex[i]);
+        }
+        else {
+          map.moveLayer(visibleLayersUpdate[serviceType].layerID);
+        }
+        zIndex.push(visibleLayersUpdate[serviceType].layerID);
+      }
+    });
+
     if(scaleResult === 'local') {
       map.setPaintProperty('stats-hybas', 'fill-opacity', 0.60);
       map.setPaintProperty('stats-gadm0', 'fill-opacity', 0.00);
@@ -540,6 +594,14 @@ const Map = () => {
       map.setPaintProperty('stats-gadm0', 'fill-opacity', 0.00);
       map.setPaintProperty('stats-gadm1', 'fill-opacity', 0.00);
     }
+    if(scaleResult !== 'global') {
+      if(basemapId !== 'satellite-v9') {
+        map.moveLayer(statsScaleMap[scaleResult], firstSymbolId);
+      }
+      else {
+        map.moveLayer(statsScaleMap[scaleResult]);
+      }
+    }
     setLayers({...visibleLayersUpdate});
     setMap(map);
   };
@@ -548,6 +610,7 @@ const Map = () => {
     console.log("service ", serviceResult);
     console.log("checked ", checked);
     let visibleLayersUpdate = visibleLayers;
+    console.log("change vis vis: ", visibleLayersUpdate);
     let selectedServicesUpdate = [...selectedServices];
     console.log("servicesRef current: ", selectedServicesUpdate);
     if(!checked) {
@@ -579,102 +642,144 @@ const Map = () => {
       //hasn't changed; the new array is the old array. 
       //One easy way to avoid this is by spreading the array into a new array:
       setServices([...selectedServicesUpdate]);
+      console.log("change Vis State sel serv: ", selectedServicesUpdate);
       console.log("change Vis State: ", scale.current);
       mapLayers.forEach((layer) => {
         // Check 'all' for coastal protection case where we want this one 
         // layer visible across all scales
         if((layer.scaleID === scale.current || layer.scaleID === 'all') && layer.serviceType === serviceResult) {
-          map.moveLayer(layer.layerID);
           map.setLayoutProperty(layer.layerID, 'visibility', 'visible');
           visibleLayersUpdate[serviceResult] = {...layer};
+          console.log("change vis update layer : ", layer.layerID);
 
           setLayers({...visibleLayersUpdate});
         }
       });
+      changeLayerOrder(selectedServicesUpdate);
     }
     console.log("selectedServices: after visibility change ", [...selectedServices]);
     setMap(map);
   };
 
-  async function changeBasemapState(basemapId, checked){
-    console.log("basemapId ", basemapId);
+  async function changeBasemapState(newBasemapId, checked){
+    console.log("new basemapId ", newBasemapId);
+    setBasemap(newBasemapId);
     console.log("checked ", checked);
-    await map.setStyle('mapbox://styles/mapbox/' + basemapId);
-    setTimeout(() => {
-      let originLayers = map.getStyle().layers;
-      let firstSymbolId = '';
-      for (let i = 0; i < originLayers.length; i++) {
-        if (originLayers[i].type === 'symbol') {
-          firstSymbolId = originLayers[i].id;
-          break;
+    map.setStyle('mapbox://styles/mapbox/' + newBasemapId).once('styledata', () => {
+      // Turns all road layers in basemap non-visible
+      map.getStyle().layers.map(function (layer) {
+        if (layer.id.indexOf('road') >= 0) {
+          map.setLayoutProperty(layer.id, 'visibility', 'none');
         }
-      }
+      });
+      setMap(map);
+      const firstSymbolId = getMapStyleSymbolId(map);
       //addSources(map);
       mapLayers.forEach((layer) => {
-        map.addLayer(layer.mapLayer, firstSymbolId);
+        map.addLayer(layer.mapLayer);
       });
-      for (const serviceType in visibleLayers) {
-        map.setLayoutProperty(visibleLayers[serviceType].layerID, 'visibility', 'visible');
+      console.log("change basemap sel serv: ", selectedServices);
+      const reversedServices = selectedServices.slice().reverse();
+      reversedServices.forEach((serviceType) => {
+        const layerId = visibleLayers[serviceType].layerID;
+        // Add all layers from a service type if there are multiple of them
+        if(serviceType in multiFileLayers) {
+          multiFileLayers[serviceType].forEach((childLayer) => {
+            map.setLayoutProperty(childLayer.id, 'visibility', 'visible');
+            if(newBasemapId !== 'satellite-v9') {
+              map.moveLayer(childLayer.id, firstSymbolId);
+            }
+            else {
+              map.moveLayer(childLayer.id);
+            }
+          });
+        }
+        else {
+          map.setLayoutProperty(layerId, 'visibility', 'visible');
+          if(newBasemapId !== 'satellite-v9') {
+            map.moveLayer(layerId, firstSymbolId);
+          }
+          else {
+            map.moveLayer(layerId);
+          }
+        }
+      });
+      // Make sure to move the stats vector mask up front.
+      console.log("scale.current is ", scale.current);
+      if(scale.current !== 'global') {
+        map.setLayoutProperty(statsScaleMap[scale.current], 'visibility', 'visible');
+        map.setPaintProperty(statsScaleMap[scale.current], 'fill-opacity', 0.60);
+        if(newBasemapId !== 'satellite-v9') {
+          console.log("basemap move mask: ", statsScaleMap[scale.current]);
+          map.moveLayer(statsScaleMap[scale.current], firstSymbolId);
+        }
+        else {
+          map.moveLayer(statsScaleMap[scale.current]);
+        }
       }
-    }, 1000);
-
+    });
     console.log("change BM visible layers:");
     console.log(visibleLayers);
 
     setMap(map);
   }
 
-  const changeLayerOrder = (servicesSorted, oldIndex, newIndex) => {
+  const changeLayerOrder = (servicesSorted) => {
     console.log("change order");
-    console.log(selectedServices);
-    console.log(oldIndex + " : " + newIndex);
-    console.log(visibleLayers);
     // Reverse the sorted services to start with the layers in the back
-    const reversedServices = servicesSorted.slice().reverse();
-    reversedServices.forEach((serviceType, i) => {
-      let zbackId = [];
+    //const reversedServices = servicesSorted.slice().reverse();
+    //console.log("change order rev serv: ", reversedServices);
+    console.log("change order serv: ", servicesSorted);
+    console.log("change order vis lay: ", visibleLayers);
+    const firstSymbolId = getMapStyleSymbolId(map);
+    //const zIndex = [firstSymbolId];
+    let zIndex = [];
+    if(basemapId !== 'satellite-v9') {
+      zIndex = [firstSymbolId];
+    }
+    else {
+      zIndex = ['none'];
+    }
+    console.log("change order zindex: ", zIndex);
+
+    servicesSorted.forEach((serviceType, i) => {
+      let curIds = [];
       // Add all layers from a service type if there are multiple of them
       if(serviceType in multiFileLayers) {
         multiFileLayers[serviceType].forEach((childLayer) => {
-          zbackId.push(childLayer.id);
+          curIds.push(childLayer.id);
+          if(zIndex[i] !== 'none') {
+            map.moveLayer(childLayer.id, zIndex[i]);
+          }
+          else {
+            map.moveLayer(childLayer.id);
+          }
         });
+        zIndex.push(curIds[0]);
       }
       else {
-        zbackId.push(visibleLayers[serviceType].layerID);
-      }
-
-      if(reversedServices.length < i+1) {
-        const nextService = reversedServices[i+1];
-        let zfrontId = [];
-        // Add all layers from a service type if there are multiple of them
-        if(nextService in multiFileLayers) {
-          multiFileLayers[nextService].forEach((childLayer) => {
-            zfrontId.push(childLayer.id);
-          });
+        curIds.push(visibleLayers[serviceType].layerID);
+        if(zIndex[i] !== 'none') {
+          map.moveLayer(visibleLayers[serviceType].layerID, zIndex[i]);
         }
         else {
-          zfrontId.push(visibleLayers[nextService].layerID);
+          map.moveLayer(visibleLayers[serviceType].layerID);
         }
-        // Move each layer behind each next layer
-        zbackId.forEach((backLayerId) => {
-          zfrontId.forEach((frontLayerId) => {
-            map.moveLayer(backLayerId, frontLayerId);
-          });
-        });
+        zIndex.push(visibleLayers[serviceType].layerID);
+      }
+    });
+    // Need to bring any vector masks up front
+    if(scale.current !== 'global') {
+      if(basemapId !== 'satellite-v9') {
+        map.moveLayer(statsScaleMap[scale.current], firstSymbolId);
       }
       else {
-        // We are at the most visible set of layers, just move them to the top.
-        zbackId.forEach((backLayerId) => {
-          map.moveLayer(backLayerId);
-        });
+        map.moveLayer(statsScaleMap[scale.current]);
       }
-    });
+    }
 
-    setServices(() => {
-        return arrayMoveImmutable(selectedServices, oldIndex, newIndex);
-    });
+    setServices([...servicesSorted]);
     console.log("servicesSorted ", servicesSorted);
-    console.log("selectedServices: after order change ", [...selectedServices]);
     setMap(map);
   };
 
