@@ -499,7 +499,10 @@ const mapLayers = [
       'source-layer': 'protected_points_all_no_duplicatesgeojsonl',
       type: 'circle',
       paint: {
-        'circle-color': '#31a335',
+        'circle-color': '#8cd11d',
+        'circle-opacity': 0,
+        'circle-stroke-color': '#8cd11d',
+        'circle-stroke-width': 1,
       },
       layout: {
         visibility: 'none',
@@ -518,9 +521,10 @@ const mapLayers = [
     mapLayer: {
       id: 'protected-asia-pacific',
       'source-layer': 'protected_polygons_Asia_and_Pacific',
-      type: 'fill',
+      type: 'line',
       paint: {
-        'fill-color': '#31a335',
+        'line-color': '#8cd11d',
+        'line-width': 1,
       },
       layout: {
         visibility: 'none',
@@ -539,9 +543,10 @@ const mapLayers = [
     mapLayer: {
       id: 'protected-la-caribbean',
       'source-layer': 'protected_polygons_LatinAmerica_Caribbean',
-      type: 'fill',
+      type: 'line',
       paint: {
-        'fill-color': '#31a335',
+        'line-color': '#8cd11d',
+        'line-width': 1,
       },
       layout: {
         visibility: 'none',
@@ -560,9 +565,10 @@ const mapLayers = [
     mapLayer: {
       id: 'protected-af-polar-wa',
       'source-layer': 'protected_polygons_Africa_Polar_WestAsia',
-      type: 'fill',
+      type: 'line',
       paint: {
-        'fill-color': '#31a335',
+        'line-color': '#8cd11d',
+        'line-width': 1,
       },
       layout: {
         visibility: 'none',
@@ -581,9 +587,10 @@ const mapLayers = [
     mapLayer: {
       id: 'protected-north-america',
       'source-layer': 'protected_polygons_NorthAmerica',
-      type: 'fill',
+      type: 'line',
       paint: {
-        'fill-color': '#31a335',
+        'line-color': '#8cd11d',
+        'line-width': 1,
       },
       layout: {
         visibility: 'none',
@@ -602,9 +609,10 @@ const mapLayers = [
     mapLayer: {
       id: 'protected-eu-0',
       'source-layer': 'protected_polygon_Europe_0',
-      type: 'fill',
+      type: 'line',
       paint: {
-        'fill-color': '#31a335',
+        'line-color': '#8cd11d',
+        'line-width': 1,
       },
       layout: {
         visibility: 'none',
@@ -623,9 +631,10 @@ const mapLayers = [
     mapLayer: {
       id: 'protected-eu-1',
       'source-layer': 'protected_polygon_Europe_1',
-      type: 'fill',
+      type: 'line',
       paint: {
-        'fill-color': '#31a335',
+        'line-color': '#8cd11d',
+        'line-width': 1,
       },
       layout: {
         visibility: 'none',
@@ -644,9 +653,10 @@ const mapLayers = [
     mapLayer: {
       id: 'protected-eu-2',
       'source-layer': 'protected_polygon_Europe_2',
-      type: 'fill',
+      type: 'line',
       paint: {
-        'fill-color': '#31a335',
+        'line-color': '#8cd11d',
+        'line-width': 1,
       },
       layout: {
         visibility: 'none',
