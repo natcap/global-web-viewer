@@ -2,8 +2,11 @@
 ########### VARIABLES ##############
 ####################################
 GCP_PROJECT="secret"
-SERVICE_NAME="natcap-viewer"
+PRODUCT_NAME="natcap-viewer"
 REGION="us-east1"
+GIT_BRANCH="$(git branch --show-current)"
+GIT_COMMIT="$(git rev-parse --short HEAD)"
+SERVICE_NAME="$PRODUCT_NAME-$GIT_BRANCH-$GIT_COMMIT"
 
 ####################################
 ###### GENERATED VARIABLES #########
