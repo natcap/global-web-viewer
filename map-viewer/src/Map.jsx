@@ -517,10 +517,8 @@ const Map = () => {
     console.log("change scale vis lay: ", visibleLayers);
     mapLayers.forEach((layer) => {
       if(layer.scaleID === scaleResult && currentServices.includes(layer.serviceType)) {
-        console.log("change scale show: ", layer.layerID);
         visibleLayersUpdate[layer.serviceType] = layer;
         visibleVar = 'visible';
-        //map.setLayoutProperty(layer.layerID, 'visibility', visibleVar);
       }
       // This is the case for coastal protection. Show the same output across
       // scales
@@ -726,13 +724,9 @@ const Map = () => {
 
   const changeLayerOrder = (servicesSorted) => {
     console.log("change order");
-    // Reverse the sorted services to start with the layers in the back
-    //const reversedServices = servicesSorted.slice().reverse();
-    //console.log("change order rev serv: ", reversedServices);
     console.log("change order serv: ", servicesSorted);
     console.log("change order vis lay: ", visibleLayers);
     const firstSymbolId = getMapStyleSymbolId(map);
-    //const zIndex = [firstSymbolId];
     let zIndex = [];
     if(basemapId !== 'satellite-v9') {
       zIndex = [firstSymbolId];
