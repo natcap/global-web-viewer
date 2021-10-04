@@ -474,7 +474,7 @@ export const supportMenuDetails = [
           link: "",
         },
       },
-      iconKey: "filock",
+      iconKey: "giplantsandanimals",
       disable: false,
     },
     {
