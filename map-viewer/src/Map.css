@@ -60,8 +60,7 @@
 /* when the button is toggled off it is still in focus and a green border will appear */
   border-color: #009b76 !important;
 /* box shadow is blue by default but we do not want any shadow hence we have set all the values as 0 */
-  box-shadow:
-    0 0 0 0rem rgba(0, 0, 0, 0) !important;
+  box-shadow: 0 0 0 0rem rgba(0, 0, 0, 0) !important;
   }
 /*sets the background color of switch to #009b76 when it is checked*/
 .custom-control-input:checked ~ .custom-control-label::before {
@@ -76,6 +75,10 @@
 /*sets the border color of switch to green when it is not checked*/
 .custom-control-input:focus:not(:checked) ~ .custom-control-label::before {
   border-color: #009b76 !important;
+}
+.custom-control{
+  /* settin z-index to auto allowed geocoder search suggestions to remain in front */
+  z-index:auto;
 }
 
 /* POPOVER CSS */
