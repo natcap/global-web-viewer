@@ -9,6 +9,10 @@
   position:relative;
   min-height: 30rem;
   */
+  padding: 0;
+  height: 100%;
+}
+.mapboxgl-map {
   height: 100%;
 }
 /*

@@ -882,8 +882,8 @@ const Map = () => {
   };
 
   return (
-      //<Col ref={mapContainer} >
-      <Col className="map-container" ref={mapContainer} >
+      <Col className="map-container" >
+        <div ref={mapContainer}></div>
         <VerticalMenu
           changeVisibilityState={changeVisibilityState}
           changeScaleState={changeScaleState}
