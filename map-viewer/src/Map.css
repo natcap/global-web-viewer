@@ -11,6 +11,11 @@
   */
   height: 100%;
 }
+/*
+canvas {
+  cursor: crosshair;
+}
+*/
 .vertical-menu {
   background-color: #2f2f30;
   color: #ffffff;

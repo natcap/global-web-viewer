@@ -25,12 +25,18 @@ mapboxgl.accessToken =
 const multiFileLayers = {
   'coastal-habitat': coastalHabitats,
   'protected-areas': protectedLayers,
-}
+};
 const statsScaleMap = {
   local: 'stats-hybas',
   admin: 'stats-gadm1',
   national: 'stats-gadm0',
-}
+};
+
+const protectedIds = [
+  'protected-points', 'protected-asia-pacific-fill',
+  'protected-la-caribbean-fill', 'protected-af-polar-wa-fill',
+  'protected-north-america-fill', 'protected-eu-0-fill',
+  'protected-eu-1-fill', 'protected-eu-2-fill'];
 
 
 const Map = () => {
@@ -97,7 +103,12 @@ const Map = () => {
   //const [scale, _setScale] = useState('global');
   //const [scale, setScale] = useState('global');
   //const [selectedServices, setServices] = useState([]);
-  const [visibleLayers, setLayers] = useState({});
+  const [visibleLayers, _setLayers] = useState({});
+  const layersRef = useRef(visibleLayers);
+  const setLayers= (data) => {
+    layersRef.current = data;
+    _setLayers(data);
+  };
 
   const [selectedServices, _setServices] = useState([]);
   const servicesRef = useRef(selectedServices);
@@ -351,61 +362,88 @@ const Map = () => {
       setZoom(map.getZoom().toFixed(2));
     });
 
-
-    // When a click event occurs on a feature in the states layer, open a popup at the
-    // location of the click, with description HTML from its properties.
-    map.on('click', 'stats-gadm0', function (e) {
-      // Only pop up info if gadm1 scale is selected
-      console.log("clicked scale: ", scale.current);
-      //scale.current = 'global;
-      if (scale.current === 'national') {
-        console.log("click stats-gadm0");
-        console.log([...servicesRef.current]);
-        let htmlString = `<h3>${e.features[0].properties.NAME_0}</h3>`;
-        let currentServices = [...servicesRef.current];
-        if (currentServices.length > 0) {
-          currentServices.forEach((service) => {
-            console.log(service);
-            const attrKey = clickPopupKey[service].key;
-            htmlString = htmlString + `
-             <h4><u>${clickPopupKey[service].name}</u></h4>
-             <h5>Mean:  ${e.features[0].properties[attrKey+'mean'].toExponential(3)}</h5>
-            `
-          });
-          new mapboxgl.Popup({closeButton:true})
-          .setLngLat(e.lngLat)
-          .setHTML(htmlString)
-          .addTo(map);
-        }
-        else {
-          htmlString = htmlString + `<h5>Select a service layer to see 
-          aggregated statistics.</h5>`
-          new mapboxgl.Popup({closeButton:true})
-          .setLngLat(e.lngLat)
-          .setHTML(htmlString)
-          .addTo(map);
-        }
+    const clickPopupDialogHandler = (e) => {
+      console.log("scale current: ", scale.current);
+      console.log("clickPopup e: ", e);
+      let currentServices = [...servicesRef.current];
+      if (currentServices.length === 1 && 'coastal-habitat' in currentServices) {
+        const feat = map.queryRenderedFeatures(e.point, { layers: ['stats-gadm0'] });
+        let htmlString = `<h3>${feat[0].properties.NAME_0}</h3>`;
+        htmlString = htmlString + `<h5>Select a service layer to see
+        aggregated statistics.</h5>`
+        return htmlString;
       }
-    });
-    map.on('click', 'stats-gadm1', function (e) {
-      // Only pop up info if gadm1 scale is selected
-      if (scale.current === 'admin') {
-        console.log("click stats-gadm1");
-        let htmlString = `<h3>${e.features[0].properties.NAME_1}</h3>`;
-        let currentServices = [...servicesRef.current];
-        let pctNotice = false;
-        if (currentServices.length > 0) {
+      if (currentServices.length > 0) {
+        if ('national' === scale.current) {
+          const feat = map.queryRenderedFeatures(e.point, { layers: ['stats-gadm0'] });
+          let htmlString = `<h3>Unidentied area</h3>`;
+          if(feat.length) {
+            htmlString = `<h3>${feat[0].properties.NAME_0}</h3>`;
+          }
           currentServices.forEach((service) => {
-            const attrKey = clickPopupKey[service].key;
-            htmlString = htmlString + `
-             <h4><u>${clickPopupKey[service].name}</u></h4>
-             <h5>Mean:  ${e.features[0].properties[attrKey+'mean'].toExponential(3)}</h5>
-            `
-            if(service !== 'coastalProtection') {
+            if(service === 'coastal-habitat') {
+              return;
+            }
+            else if(service === 'protected-areas') {
+              const protFeat = map.queryRenderedFeatures(e.point, { layers: protectedIds });
+              if(protFeat.length) {
+                htmlString = htmlString + `
+                 <h4><u>Protected area</u></h4>
+                 <h5>Name:  ${protFeat[0].properties.NAME}</h5>
+                `
+              }
+            }
+            else {
+              if(feat.length) {
+                const attrKey = clickPopupKey[service].key;
+                htmlString = htmlString + `
+                 <h4><u>${clickPopupKey[service].name}</u></h4>
+                 <h5>Mean:  ${feat[0].properties[attrKey+'mean'].toExponential(3)}</h5>
+                `
+              }
+            }
+          });
+          if (!htmlString.includes('h4')) {
               htmlString = htmlString + `
-                <h5>Percentile*:  ${e.features[0].properties[attrKey+'pct'].toFixed(2)}</h5>
-              `
-              pctNotice = true;
+                <h5>No active layer selected. Select a service layer
+                to see aggregated statistics.</h5>`;
+          }
+          return htmlString;
+        }
+        else if('admin' === scale.current) {
+          const feat = map.queryRenderedFeatures(e.point, { layers: ['stats-gadm1'] });
+          let htmlString = `<h3>Unidentied area</h3>`;
+          if(feat.length) {
+            htmlString = `<h3>${feat[0].properties.NAME_1}</h3>`;
+          }
+          let pctNotice = false;
+          currentServices.forEach((service) => {
+            if(service === 'coastal-habitat') {
+              return;
+            }
+            else if(service === 'protected-areas') {
+              const protFeat = map.queryRenderedFeatures(e.point, { layers: protectedIds });
+              if(protFeat.length) {
+                htmlString = htmlString + `
+                 <h4><u>Protected area</u></h4>
+                 <h5>Name:  ${protFeat[0].properties.NAME}</h5>
+                `
+              }
+            }
+            else {
+              if(feat.length) {
+                const attrKey = clickPopupKey[service].key;
+                htmlString = htmlString + `
+                 <h4><u>${clickPopupKey[service].name}</u></h4>
+                 <h5>Mean:  ${feat[0].properties[attrKey+'mean'].toExponential(3)}</h5>
+                `
+                if(service !== 'coastalProtection') {
+                  htmlString = htmlString + `
+                    <h5>Percentile*:  ${feat[0].properties[attrKey+'pct'].toFixed(2)}</h5>
+                  `
+                  pctNotice = true;
+                }
+              }
             }
           });
           if(pctNotice) {
@@ -414,57 +452,119 @@ const Map = () => {
               of other regions within the same country.</h5>
             `
           }
-
-          new mapboxgl.Popup({closeButton:true})
-          .setLngLat(e.lngLat)
-          .setHTML(htmlString)
-          .addTo(map);
+          if (!htmlString.includes('h4')) {
+              htmlString = htmlString + `
+                <h5>No active layer selected. Select a service layer
+                to see aggregated statistics.</h5>`;
+          }
+          return htmlString;
         }
-        else {
-          htmlString = htmlString + `<h5>Select a service layer to see 
-          aggregated statistics.</h5>`
-          new mapboxgl.Popup({closeButton:true})
-          .setLngLat(e.lngLat)
-          .setHTML(htmlString)
-          .addTo(map);
-        }
-      }
-    });
-    map.on('click', 'stats-hybas', function (e) {
-      if (scale.current === 'local' && draw.getMode() === 'simple_select') {
-        console.log("click stats-hybas");
-        console.log(e);
-        let htmlString = `
-          <h3>${e.features[0].properties.NAME_0}<br/>
-            <span>HydroBASIN ID ${e.features[0].properties.HYBAS_ID}</span>
-          </h3>`;
-        let currentServices = [...servicesRef.current];
-        if (currentServices.length > 0) {
+        else if('local' === scale.current && draw.getMode() === 'simple_select') {
+          const feat = map.queryRenderedFeatures(e.point, { layers: ['stats-hybas'] });
+          let htmlString = `<h3>Unidentied area</h3>`;
+          if(feat.length) {
+            htmlString = `
+              <h3>${feat[0].properties.NAME_0}<br/>
+                <span>HydroBASIN ID ${feat[0].properties.HYBAS_ID}</span>
+              </h3>`;
+          }
+          let pctNotice = false;
           currentServices.forEach((service) => {
-            const attrKey = clickPopupKey[service].key;
-            htmlString = htmlString + `
-             <h4><u>${clickPopupKey[service].name}</u></h4>
-             <h5>Mean:  ${e.features[0].properties[attrKey+'mean'].toExponential(3)}</h5>
-             <h5>Percentile*:  ${e.features[0].properties[attrKey+'pct'].toFixed(2)}</h5>
-            `
+            if(service === 'coastal-habitat') {
+              return;
+            }
+            else if(service === 'protected-areas') {
+              const protFeat = map.queryRenderedFeatures(e.point, { layers: protectedIds });
+              if(protFeat.length) {
+                htmlString = htmlString + `
+                 <h4><u>Protected area</u></h4>
+                 <h5>Name:  ${protFeat[0].properties.NAME}</h5>
+                `
+              }
+            }
+            else {
+              if(feat.length) {
+                const attrKey = clickPopupKey[service].key;
+                htmlString = htmlString + `
+                 <h4><u>${clickPopupKey[service].name}</u></h4>
+                 <h5>Mean:  ${feat[0].properties[attrKey+'mean'].toExponential(3)}</h5>
+                 <h5>Percentile*:  ${feat[0].properties[attrKey+'pct'].toFixed(2)}</h5>
+                `
+                pctNotice = true;
+              }
+            }
           });
-          new mapboxgl.Popup({closeButton:true})
-          .setLngLat(e.lngLat)
-          .setHTML(
+          if(pctNotice) {
             htmlString + `<br/><h5>* percentile is in comparison with the mean value
-            of other regions within the same country.</h5>`)
-          .addTo(map);
+            of other regions within the same country.</h5>`;
+          }
+          if (!htmlString.includes('h4')) {
+              htmlString = htmlString + `
+                <h5>No active layer selected. Select a service layer
+                to see aggregated statistics.</h5>`;
+          }
+          return htmlString;
         }
         else {
-          htmlString = htmlString + `<h5>Select a service layer to see 
-          aggregated statistics.</h5>`
-          new mapboxgl.Popup({closeButton:true})
-          .setLngLat(e.lngLat)
-          .setHTML(htmlString)
-          .addTo(map);
+          const feat = map.queryRenderedFeatures(e.point, { layers: ['stats-gadm0'] });
+          let htmlString = `<h3>Unidentied area</h3>`;
+          if(feat.length) {
+            htmlString = `<h3>${feat[0].properties.NAME_0}</h3>`;
+          }
+          currentServices.forEach((service) => {
+            if(service === 'coastal-habitat') {
+              return;
+            }
+            else if(service === 'protected-areas') {
+              const protFeat = map.queryRenderedFeatures(e.point, { layers: protectedIds });
+              if(protFeat.length) {
+                htmlString = htmlString + `
+                 <h4><u>Protected area</u></h4>
+                 <h5>Name:  ${protFeat[0].properties.NAME}</h5>
+                `;
+              }
+              else {
+                htmlString = htmlString + `
+                <h5>No active layer selected. Select a service layer and
+                non global scale to see aggregated statistics.</h5>`;
+              }
+            }
+          });
+          return htmlString;
         }
       }
+      else {
+        const feat = map.queryRenderedFeatures(e.point, { layers: ['stats-gadm0'] });
+        let htmlString = `<h3>Unidentied area</h3>`;
+        if(feat.length) {
+          htmlString = `<h3>${feat[0].properties.NAME_0}</h3>`;
+        }
+        htmlString = htmlString + `<h5>No active layer selected. Select a service layer to see
+        aggregated statistics.</h5>`;
+        return htmlString;
+      }
+    }
+
+    // Handle click events on the map. When a click event occurs on a feature
+    // layer open a popup at the location of the click, with description HTML
+    // from its properties.
+    map.on('click', function (e) {
+      const htmlString = clickPopupDialogHandler(e);
+      new mapboxgl.Popup({closeButton:true})
+      .setLngLat(e.lngLat)
+      .setHTML(htmlString)
+      .addTo(map);
     });
+
+    // Change the cursor to a pointer when the mouse is over the places layer.
+    //  map.on('mouseenter', 'protected-points', () => {
+    //  map.getCanvas().style.cursor = 'pointer';
+    //});
+
+    // Change it back to a pointer when it leaves.
+    //  map.on('mouseleave', 'protected-points', () => {
+    //  map.getCanvas().style.cursor = '';
+    //});
 
     console.log("main useeffect");
     // Clean up on unmount
@@ -514,7 +614,7 @@ const Map = () => {
     let visibleVar = 'none';
     const currentServices = [...selectedServices];
     console.log("change scale sel serv: ", currentServices);
-    console.log("change scale vis lay: ", visibleLayers);
+    console.log("change scale vis lay: ", layersRef.current);
     mapLayers.forEach((layer) => {
       if(layer.scaleID === scaleResult && currentServices.includes(layer.serviceType)) {
         visibleLayersUpdate[layer.serviceType] = layer;
@@ -607,7 +707,7 @@ const Map = () => {
   const changeVisibilityState = (serviceResult, checked) => {
     console.log("service ", serviceResult);
     console.log("checked ", checked);
-    let visibleLayersUpdate = visibleLayers;
+    let visibleLayersUpdate = {...layersRef.current};
     console.log("change vis vis: ", visibleLayersUpdate);
     let selectedServicesUpdate = [...selectedServices];
     console.log("servicesRef current: ", selectedServicesUpdate);
@@ -618,12 +718,16 @@ const Map = () => {
       }
       setServices([...selectedServicesUpdate]);
 
-      const layer = visibleLayers[serviceResult];
+      const layer = layersRef.current[serviceResult];
       if(serviceResult in multiFileLayers) {
+        console.log("vis layer update: ", visibleLayersUpdate);
         multiFileLayers[serviceResult].forEach((childLayer) => {
             map.setLayoutProperty(childLayer.id, 'visibility', 'none');
-            delete visibleLayersUpdate[childLayer.id];
+            //delete visibleLayersUpdate[serviceResult][childLayer.id];
         });
+        delete visibleLayersUpdate[serviceResult];
+        console.log("vis layer update: ", visibleLayersUpdate);
+        setLayers({...visibleLayersUpdate});
       }
       else {
         map.setLayoutProperty(layer.layerID, 'visibility', 'none');
@@ -679,7 +783,7 @@ const Map = () => {
       console.log("change basemap sel serv: ", selectedServices);
       const reversedServices = selectedServices.slice().reverse();
       reversedServices.forEach((serviceType) => {
-        const layerId = visibleLayers[serviceType].layerID;
+        const layerId = visibleLayers.current[serviceType].layerID;
         // Add all layers from a service type if there are multiple of them
         if(serviceType in multiFileLayers) {
           multiFileLayers[serviceType].forEach((childLayer) => {
@@ -717,7 +821,7 @@ const Map = () => {
       }
     });
     console.log("change BM visible layers:");
-    console.log(visibleLayers);
+    console.log(layersRef.current);
 
     setMap(map);
   }
@@ -725,7 +829,7 @@ const Map = () => {
   const changeLayerOrder = (servicesSorted) => {
     console.log("change order");
     console.log("change order serv: ", servicesSorted);
-    console.log("change order vis lay: ", visibleLayers);
+    console.log("change order vis lay: ", layersRef.current);
     const firstSymbolId = getMapStyleSymbolId(map);
     let zIndex = [];
     if(basemapId !== 'satellite-v9') {
@@ -752,14 +856,14 @@ const Map = () => {
         zIndex.push(curIds[0]);
       }
       else {
-        curIds.push(visibleLayers[serviceType].layerID);
+        curIds.push(layersRef.current[serviceType].layerID);
         if(zIndex[i] !== 'none') {
-          map.moveLayer(visibleLayers[serviceType].layerID, zIndex[i]);
+          map.moveLayer(layersRef.current[serviceType].layerID, zIndex[i]);
         }
         else {
-          map.moveLayer(visibleLayers[serviceType].layerID);
+          map.moveLayer(layersRef.current[serviceType].layerID);
         }
-        zIndex.push(visibleLayers[serviceType].layerID);
+        zIndex.push(layersRef.current[serviceType].layerID);
       }
     });
     // Need to bring any vector masks up front
@@ -778,6 +882,7 @@ const Map = () => {
   };
 
   return (
+      //<Col ref={mapContainer} >
       <Col className="map-container" ref={mapContainer} >
         <VerticalMenu
           changeVisibilityState={changeVisibilityState}
