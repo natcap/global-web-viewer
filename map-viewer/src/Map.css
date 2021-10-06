@@ -9,8 +9,17 @@
   position:relative;
   min-height: 30rem;
   */
+  padding: 0;
   height: 100%;
 }
+.mapboxgl-map {
+  height: 100%;
+}
+/*
+canvas {
+  cursor: crosshair;
+}
+*/
 .vertical-menu {
   background-color: #2f2f30;
   color: #ffffff;

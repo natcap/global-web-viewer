@@ -2,12 +2,11 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 import { IoWaterOutline, IoWater } from 'react-icons/io5';
-import { GiBee, GiCow, GiCoral } from 'react-icons/gi';
+import { GiBee, GiCow, GiCoral, GiPlantsAndAnimals} from 'react-icons/gi';
 import { BiWater } from 'react-icons/bi';
 import { TiTree } from 'react-icons/ti';
 import { MdLandscape } from 'react-icons/md';
 import { IoIosPeople, IoIosConstruct } from 'react-icons/io';
-import { FiLock } from 'react-icons/fi';
 
 import Form from 'react-bootstrap/Form';
 import Col from 'react-bootstrap/Col';
@@ -25,7 +24,7 @@ const IconMap = {
   ioiosconstruct: <IoIosConstruct className="labelIcons"/>,
   mdlandscape: <MdLandscape className="labelIcons"/>,
   gicoral: <GiCoral className="labelIcons"/>,
-  filock: <FiLock className="labelIcons"/>,
+  giplantsandanimals: <GiPlantsAndAnimals className="labelIcons"/>,
 }
 
 const LayerSelect = (props) => {
