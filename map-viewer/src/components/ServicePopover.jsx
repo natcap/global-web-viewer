@@ -5,7 +5,7 @@ import Popover from 'react-bootstrap/Popover';
 import Button from 'react-bootstrap/Button';
 import OverlayTrigger from 'react-bootstrap/OverlayTrigger';
 import Col from 'react-bootstrap/Col';
-import Row from 'react-bootstrap/Row';
+import Form from 'react-bootstrap/Form';
 
 import { BsInfoCircle} from 'react-icons/bs';
 
@@ -33,7 +33,7 @@ const ServicePopover = (props) => {
   const popover = (
     <Popover id="popover-service" className="popover-service">
       <Popover.Title className="popover-service-title">
-        <Row>
+        <Form.Row>
           <Col>
             {props.title}
           </Col>
@@ -43,10 +43,10 @@ const ServicePopover = (props) => {
               bsPrefix="popover-close-btn"
               onClick={() => document.body.click()}
             >
-            x 
+            x
             </Button>
           </Col>
-        </Row>
+        </Form.Row>
       </Popover.Title>
       <Popover.Content>
         <h5>Metric</h5>
