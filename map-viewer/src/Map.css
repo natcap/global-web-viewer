@@ -106,6 +106,22 @@ canvas {
   color: #ffffff;
   font-size: 20px;
 }
+.service-info-close-col {
+  padding: 0;
+  padding-right: 0.3rem;
+}
+.service-info-close-button {
+  padding: 0.3rem;
+  font-size: 22px;
+  line-height: 22px;
+  background-color: transparent;
+  color: black;
+  border: 0;
+  border-radius: 0 0 0 0;
+}
+.service-info-close-button:hover {
+  background-color: #f58e87;
+}
 
 /* INFO BUTTON CSS */
 .btn {
@@ -288,6 +304,11 @@ canvas {
 }
 .mapboxgl-popup-close-button {
 /*display: none;*/
+  font-size: 24px;
+  padding: 0.3rem;
+}
+.mapboxgl-popup-close-button:hover {
+  background-color: #f58e87;
 }
 .mapboxgl-popup-content {
   font: 400 15px/22px 'Source Sans Pro', Sans-serif;

@@ -131,6 +131,7 @@ const SortableItem = sortableElement(({value, index}) => (
         <Col xs="auto">
           <InfoPopover
             key={`legend-popover-${value}`}
+            title={legendStyle[value].name}
             content={legendStyle[value].info}
           />
         </Col>

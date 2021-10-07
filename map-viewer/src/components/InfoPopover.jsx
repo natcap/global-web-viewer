@@ -4,6 +4,8 @@ import PropTypes from 'prop-types';
 import Popover from 'react-bootstrap/Popover';
 import Button from 'react-bootstrap/Button';
 import OverlayTrigger from 'react-bootstrap/OverlayTrigger';
+import Col from 'react-bootstrap/Col';
+import Row from 'react-bootstrap/Row';
 
 import { BsInfoCircle} from 'react-icons/bs';
 
@@ -12,8 +14,21 @@ const InfoPopover = (props) => {
   if(props.title) {
     popover = (
       <Popover id="popover-service">
-        <Popover.Title>
-          {props.title}
+        <Popover.Title className="popover-service-title">
+          <Row>
+            <Col>
+              {props.title}
+            </Col>
+            <Col xs="auto" className="service-info-close-col">
+              <Button
+                className="service-info-close-button"
+                bsPrefix="popover-close-btn"
+                onClick={() => document.body.click()}
+              >
+              x
+              </Button>
+            </Col>
+          </Row>
         </Popover.Title>
         <Popover.Content>
           {props.content}
