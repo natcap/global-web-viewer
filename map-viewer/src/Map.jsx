@@ -362,6 +362,24 @@ const Map = () => {
       setZoom(map.getZoom().toFixed(2));
     });
 
+    const highlightClickHandler = (e, layerId, featName) => {
+      const resultCenter = e.lngLat;
+      const centerPointLike = map.project(resultCenter);
+
+      // The geometry of the query region in pixels: either a single point
+      // or bottom left and top right points describing a bounding box,
+      // where the origin is at the top left.
+      const features = map.queryRenderedFeatures(centerPointLike, {
+        layers: [layerId]
+      });
+      console.log("highlight click feats: ", features);
+
+      const featID = features[0].properties[featName];
+      map.setPaintProperty(
+        layerId, 'fill-opacity', [
+          'match', ['get', featName], featID, 0.0, 0.8]);
+    };
+
     const clickPopupDialogHandler = (e) => {
       console.log("scale current: ", scale.current);
       console.log("clickPopup e: ", e);
@@ -375,6 +393,7 @@ const Map = () => {
       }
       if (currentServices.length > 0) {
         if ('national' === scale.current) {
+          highlightClickHandler(e, 'stats-gadm0', 'NAME_0');
           const feat = map.queryRenderedFeatures(e.point, { layers: ['stats-gadm0'] });
           let htmlString = `<h3>Unidentied area</h3>`;
           if(feat.length) {
@@ -411,6 +430,7 @@ const Map = () => {
           return htmlString;
         }
         else if('admin' === scale.current) {
+          highlightClickHandler(e, 'stats-gadm1', 'NAME_1');
           const feat = map.queryRenderedFeatures(e.point, { layers: ['stats-gadm1'] });
           let htmlString = `<h3>Unidentied area</h3>`;
           if(feat.length) {
@@ -460,6 +480,7 @@ const Map = () => {
           return htmlString;
         }
         else if('local' === scale.current && draw.getMode() === 'simple_select') {
+          highlightClickHandler(e, 'stats-hybas', 'HYBAS_ID');
           const feat = map.queryRenderedFeatures(e.point, { layers: ['stats-hybas'] });
           let htmlString = `<h3>Unidentied area</h3>`;
           if(feat.length) {
@@ -528,6 +549,11 @@ const Map = () => {
                 <h5>No active layer selected. Select a service layer and
                 non global scale to see aggregated statistics.</h5>`;
               }
+            }
+            else {
+              htmlString = htmlString + `
+              <h5>No active layer selected. Select a service layer and
+              non global scale to see aggregated statistics.</h5>`;
             }
           });
           return htmlString;
