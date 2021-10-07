@@ -74,6 +74,7 @@ const VerticalMenu = (props) => {
                     <Col xs="auto" key={`form-col-popover-${scaleObj.id}`}>
                       <InfoPopover
                         key={`scale-popover-${scaleObj.id}`}
+                        title={scaleObj.name}
                         content={scaleObj.label}
                       />
                     </Col>
