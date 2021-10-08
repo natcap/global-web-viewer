@@ -1,9 +1,14 @@
-import React from 'react';
+import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 
 import ListGroup from 'react-bootstrap/ListGroup';
 import Col from 'react-bootstrap/Col';
 import Row from 'react-bootstrap/Row';
+import Card from 'react-bootstrap/Card';
+import Accordion from 'react-bootstrap/Accordion';
+import Form from 'react-bootstrap/Form';
+
+import { FaChevronCircleUp, FaChevronCircleDown } from 'react-icons/fa';
 
 import D3Legend from './D3Legend';
 import InfoPopover from './InfoPopover';
@@ -145,6 +150,7 @@ const SortableContainer = sortableContainer(({children}) => {
 
 
 const Legend = (props) => {
+  const [legendOpen, setLegendOpen] = useState(true);
 
   function handleDragEnd({oldIndex, newIndex}) {
     const sortedServices = arrayMoveImmutable(props.services, oldIndex, newIndex);
@@ -163,19 +169,37 @@ const Legend = (props) => {
 
   if (props.services.length > 0) {
     return (
-      <ListGroup variant="flush" className="legend-group">
-        <SortableContainer
-          onSortEnd={handleDragEnd}
-          helperClass="sortable-container-helper"
-          axis='y'
-          //lockAxis='y'
-          //lockToContainerEdges={true}
-          lockOffset='0%'
-          transitionDuration='600'
-          useDragHandle>
-          {props.services.map(renderLegend)}
-        </SortableContainer>
-      </ListGroup>
+      <Form className="legend-form">
+        <Accordion defaultActiveKey="0">
+          <Card>
+            <Accordion.Toggle as={Card.Header} eventKey="0" className="accordion-header" onClick={() => setLegendOpen(!legendOpen)}>
+              <Row>
+                <Col>Legend</Col>
+                <Col xs="auto">
+                  {legendOpen ? <FaChevronCircleDown/> : <FaChevronCircleUp/> }
+                </Col>
+              </Row>
+            </Accordion.Toggle>
+            <Accordion.Collapse eventKey="0" className="accordion-header">
+              <Card.Body className="card-body-legend">
+                <ListGroup variant="flush" className="legend-group">
+                  <SortableContainer
+                    onSortEnd={handleDragEnd}
+                    helperClass="sortable-container-helper"
+                    axis='y'
+                    //lockAxis='y'
+                    //lockToContainerEdges={true}
+                    lockOffset='0%'
+                    transitionDuration='600'
+                    useDragHandle>
+                    {props.services.map(renderLegend)}
+                  </SortableContainer>
+                </ListGroup>
+              </Card.Body>
+            </Accordion.Collapse>
+          </Card>
+        </Accordion>
+      </Form>
     );
   }
   else {
