@@ -43,6 +43,14 @@ canvas {
   background-color: #2f2f30;
   color: #ffffff;
 }
+.accordion-basemap {
+}
+.accordion-header-basemap {
+  background-color: #2f2f30;
+  color: #ffffff;
+  z-index: 2;
+  overflow-y: visible;
+}
 .scale-accordian {
   overflow-y: visible;
 }
@@ -163,7 +171,7 @@ canvas {
   z-index: 1;
   position: absolute;
   right: 0;
-  bottom: 0;
+  bottom: 50px;
   background-color: #f5f6f7;
   color: #000000;
   padding-top: 6px;
@@ -179,6 +187,21 @@ canvas {
 [name=radio-basemaps]:checked + label{
   outline-style: solid;
   outline-color: blue;
+}
+.basemap-control-button {
+  display: flx;
+  z-index: 1;
+  position: absolute;
+  right: 10px;
+  bottom: 30px;
+  background-color: #2f2f30;
+  color: #fff;
+  padding: 0.5rem;
+  border-radius: 0.3rem;
+  align-items: center;
+}
+.basemap-ctrl-name {
+  padding-right: 0.5rem;
 }
 
 .menu-main-text {

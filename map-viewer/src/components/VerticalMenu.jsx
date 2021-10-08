@@ -22,7 +22,6 @@ const IconMap = {
   giafrica: <GiAfrica className="labelIcons"/>,
   bipolygon: <BiPolygon className="labelIcons"/>,
   bimappin: <BiMapPin className="labelIcons"/>,
-IoIosArrowDropdown
 }
 
 const VerticalMenu = (props) => {

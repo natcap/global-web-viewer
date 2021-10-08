@@ -1,6 +1,8 @@
 import React, { useRef, useEffect, useState } from 'react';
 
 import Col from 'react-bootstrap/Col';
+import Button from 'react-bootstrap/Button';
+import { FaChevronCircleUp, FaChevronCircleDown } from 'react-icons/fa';
 
 import mapboxgl from 'mapbox-gl';
 // Had to npm install @mapbox/mapbox-gl-draw and import like below
@@ -99,6 +101,8 @@ const Map = () => {
   const [lat, setLat] = useState(30.0);
   const [zoom, setZoom] = useState(1.64);
   const [basemapId, setBasemap] = useState('streets-v11');
+  const [basemapControl, setBasemapControl] = useState(true);
+  const [basemapChev, setBasemapChev] = useState(true);
   //const [mapLayers, setLayers] = useState(layers);
   //const [scale, _setScale] = useState('global');
   //const [scale, setScale] = useState('global');
@@ -907,6 +911,12 @@ const Map = () => {
     setMap(map);
   };
 
+  const changeBasemapControl = () => {
+    setBasemapControl(!basemapControl);
+    setBasemapChev(!basemapChev);
+  }
+
+
   return (
       <Col className="map-container" >
         <div ref={mapContainer}></div>
@@ -921,9 +931,17 @@ const Map = () => {
           services={selectedServices}
           changeLayerOrder={changeLayerOrder}
         />
+        <Button
+          onClick={changeBasemapControl}
+          bsPrefix="basemap-control-button"
+        >
+          <span className="basemap-ctrl-name">Basemap Control</span>
+          {basemapChev ? <FaChevronCircleDown/> : <FaChevronCircleUp/> }
+        </Button>
         <BasemapControl className="basemap-control"
           basemaps={basemaps}
           changeBasemapState={changeBasemapState}
+          showBasemapControl={basemapControl}
           lng={lng}
           lat={lat}
           zoom={zoom}
