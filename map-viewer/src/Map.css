@@ -23,7 +23,7 @@ canvas {
 .vertical-menu {
   background-color: #2f2f30;
   color: #ffffff;
-  padding: 6px 12px;
+  padding: 6px 6px;
   font-family: 'Source Sans Pro', sans-serif;
   font-size: 16px;
   z-index: 1;
@@ -32,7 +32,7 @@ canvas {
   top: 0;
   /*border-radius: 4px;*/
   max-width: 37rem;
-  min-width: 350px;
+  min-width: 340px;
   height: 100%;
   overflow-y: auto;
 }
@@ -229,7 +229,7 @@ canvas {
 /* LEGEND CSS */
 .legend-form {
   position: absolute;
-  left: 23rem;
+  left: 22rem;
   bottom: 2rem;
   padding: 0px;
   margin-left: 0px;
