@@ -65,7 +65,7 @@ canvas {
   z-index: 1;
 }
 
-/* TOGGLE CSS */
+/*## TOGGLE CSS ##*/
 .custom-control-input:focus ~ .custom-control-label::before {
 /* when the button is toggled off it is still in focus and a green border will appear */
   border-color: #009b76 !important;
@@ -91,7 +91,7 @@ canvas {
   z-index:auto;
 }
 
-/* POPOVER CSS */
+/*## POPOVER CSS ##*/
 .popover-body {
   font-family: 'Source Sans Pro', sans-serif;
 }
@@ -123,8 +123,11 @@ canvas {
 .service-info-close-button:hover {
   background-color: #f58e87;
 }
+.popover-body h5:not(:first-child) {
+  margin-top: 0.75rem;
+}
 
-/* INFO BUTTON CSS */
+/*## INFO BUTTON CSS ##*/
 .btn {
   outline: none;
   box-shadow:none;
@@ -162,7 +165,7 @@ canvas {
   padding-left: .3rem;
 }
 
-/* BASEMAP CSS */
+/*## BASEMAP CSS ##*/
 .basemap-control {
   z-index: 1;
   position: absolute;
@@ -226,7 +229,7 @@ canvas {
   padding: 0.25rem;
 }
 
-/* LEGEND CSS */
+/*## LEGEND CSS ##*/
 .legend-form {
   position: absolute;
   left: 22rem;
@@ -364,7 +367,7 @@ canvas {
   cursor: pointer;
 }
 
-/* MAPBOX POPUP CSS */
+/*## MAPBOX POPUP CSS ##*/
 .mapboxgl-popup {
   padding-bottom: 20px;
   width: 280px;

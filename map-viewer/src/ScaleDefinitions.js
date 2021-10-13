@@ -459,20 +459,34 @@ export const supportMenuDetails = [
       id: "protected-areas",
       label: "Protected Areas",
       helpText: {
-        text: ``,
+        text: `Protected areas are not used for ecosystem service modeling,
+        but are provided for reference, since they often have significant
+        overlap with areas of high ecosystem service provision.`,
         metric: "N/A",
-        source: "",
-        resolution: "",
-        date: "",
+        source: [
+          {type: "text", text: "IUCN - "},
+          {
+            type: "link", link: "https://www.iucn.org/theme/protected-areas/our-work/world-database-protected-areas",
+            linkText: "World Database on Protected Areas"},
+        ],
+        resolution: "N/A",
+        date: "2021",
         coverage: "Global",
-        license: {
-          link: "",
-          text: "",
-        },
-        citation: {
-          text: ``,
-          link: "",
-        },
+        license: [
+          {
+            type: "link", link: "https://www.protectedplanet.net/en/legal",
+            linkText: "WDPA license"},
+        ],
+        citation: [
+          {type: "text", text: `UNEP-WCMC and IUCN (2021), Protected Planet:
+            The World Database on Protected Areas (WDPA) and World Database
+            on Other Effective Area-based Conservation Measures (WD-OECM)
+            [Online], March 2021, Cambridge, UK: UNEP-WCMC and IUCN.
+            Available at: `},
+          {
+            type: "link", link: "www.protectedplanet.net",
+            linkText: "www.protectedplanet.net"},
+        ],
       },
       iconKey: "giplantsandanimals",
       disable: false,
