@@ -190,7 +190,7 @@ const Legend = (props) => {
                     //lockAxis='y'
                     //lockToContainerEdges={true}
                     lockOffset='0%'
-                    transitionDuration='600'
+                    transitionDuration={600}
                     useDragHandle>
                     {props.services.map(renderLegend)}
                   </SortableContainer>

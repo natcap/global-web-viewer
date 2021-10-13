@@ -42,20 +42,15 @@ const protectedIds = [
 
 
 const Map = () => {
-
-  function getMapStyleSymbolId() {
-      //let originLayers = map.getStyle().layers;
-      let firstSymbolId = 'building';
-      /*
-      for (let i = 0; i < originLayers.length; i++) {
-        if (originLayers[i].type === 'symbol') {
-          firstSymbolId = originLayers[i].id;
-          console.log("fist symbol id: ", firstSymbolId);
-          break;
+  function getMapStyleSymbolId(map) {
+      const basemapLayers = map.getStyle().layers;
+      let firstSymbolId = 'tunnel-path';
+      basemapLayers.forEach((baseLayer) => {
+        if(baseLayer.id === 'building') {
+          firstSymbolId = 'building';
         }
-      }
-      */
-    return firstSymbolId;
+      });
+      return firstSymbolId;
   }
 
   const basemaps = [
@@ -75,7 +70,7 @@ const Map = () => {
       imageIcon: 'streets.png',
     },
     {
-      layerID: 'satellite-v9',
+      layerID: 'satellite-streets-v11',
       name: 'satellite',
       imageIcon: 'satellite.png',
     },
@@ -100,7 +95,6 @@ const Map = () => {
   const [lng, setLng] = useState(16.8);
   const [lat, setLat] = useState(30.0);
   const [zoom, setZoom] = useState(1.64);
-  const [basemapId, setBasemap] = useState('streets-v11');
   const [basemapControl, setBasemapControl] = useState(true);
   const [basemapChev, setBasemapChev] = useState(true);
   //const [mapLayers, setLayers] = useState(layers);
@@ -667,13 +661,7 @@ const Map = () => {
 
     const firstSymbolId = getMapStyleSymbolId(map);
     //changeLayerOrder(currentServices);
-    let zIndex = [];
-    if(basemapId !== 'satellite-v9') {
-      zIndex = [firstSymbolId];
-    }
-    else {
-      zIndex = ['none'];
-    }
+    let zIndex = [firstSymbolId];
 
     currentServices.forEach((serviceType, i) => {
       let curIds = [];
@@ -723,12 +711,7 @@ const Map = () => {
       map.setPaintProperty('stats-gadm1', 'fill-opacity', 0.00);
     }
     if(scaleResult !== 'global') {
-      if(basemapId !== 'satellite-v9') {
-        map.moveLayer(statsScaleMap[scaleResult], firstSymbolId);
-      }
-      else {
-        map.moveLayer(statsScaleMap[scaleResult]);
-      }
+      map.moveLayer(statsScaleMap[scaleResult], firstSymbolId);
     }
     setLayers({...visibleLayersUpdate});
     setMap(map);
@@ -795,7 +778,6 @@ const Map = () => {
 
   async function changeBasemapState(newBasemapId, checked){
     console.log("new basemapId ", newBasemapId);
-    setBasemap(newBasemapId);
     console.log("checked ", checked);
     map.setStyle('mapbox://styles/mapbox/' + newBasemapId).once('styledata', () => {
       // Turns all road layers in basemap non-visible
@@ -819,22 +801,12 @@ const Map = () => {
         if(serviceType in multiFileLayers) {
           multiFileLayers[serviceType].forEach((childLayer) => {
             map.setLayoutProperty(childLayer.id, 'visibility', 'visible');
-            if(newBasemapId !== 'satellite-v9') {
-              map.moveLayer(childLayer.id, firstSymbolId);
-            }
-            else {
-              map.moveLayer(childLayer.id);
-            }
+            map.moveLayer(childLayer.id, firstSymbolId);
           });
         }
         else {
           map.setLayoutProperty(layerId, 'visibility', 'visible');
-          if(newBasemapId !== 'satellite-v9') {
-            map.moveLayer(layerId, firstSymbolId);
-          }
-          else {
-            map.moveLayer(layerId);
-          }
+          map.moveLayer(layerId, firstSymbolId);
         }
       });
       // Make sure to move the stats vector mask up front.
@@ -842,13 +814,8 @@ const Map = () => {
       if(scale.current !== 'global') {
         map.setLayoutProperty(statsScaleMap[scale.current], 'visibility', 'visible');
         map.setPaintProperty(statsScaleMap[scale.current], 'fill-opacity', 0.60);
-        if(newBasemapId !== 'satellite-v9') {
-          console.log("basemap move mask: ", statsScaleMap[scale.current]);
-          map.moveLayer(statsScaleMap[scale.current], firstSymbolId);
-        }
-        else {
-          map.moveLayer(statsScaleMap[scale.current]);
-        }
+        console.log("basemap move mask: ", statsScaleMap[scale.current]);
+        map.moveLayer(statsScaleMap[scale.current], firstSymbolId);
       }
     });
     console.log("change BM visible layers:");
@@ -862,13 +829,7 @@ const Map = () => {
     console.log("change order serv: ", servicesSorted);
     console.log("change order vis lay: ", layersRef.current);
     const firstSymbolId = getMapStyleSymbolId(map);
-    let zIndex = [];
-    if(basemapId !== 'satellite-v9') {
-      zIndex = [firstSymbolId];
-    }
-    else {
-      zIndex = ['none'];
-    }
+    let zIndex = [firstSymbolId];
     console.log("change order zindex: ", zIndex);
 
     servicesSorted.forEach((serviceType, i) => {
@@ -899,12 +860,7 @@ const Map = () => {
     });
     // Need to bring any vector masks up front
     if(scale.current !== 'global') {
-      if(basemapId !== 'satellite-v9') {
-        map.moveLayer(statsScaleMap[scale.current], firstSymbolId);
-      }
-      else {
-        map.moveLayer(statsScaleMap[scale.current]);
-      }
+      map.moveLayer(statsScaleMap[scale.current], firstSymbolId);
     }
 
     setServices([...servicesSorted]);

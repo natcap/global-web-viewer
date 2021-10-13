@@ -3,8 +3,7 @@ export const scales = [
       id: "global",
       name: "Global",
       label: "Compare ecosystem service values globally.",
-      helpText: `Compare how different places anywhere on the globe 
-        contribute nature's benefits to people.`,
+      helpText: `Compare ecosystem service values globally`,
       iconKey: "faglobe",
       defaultChecked: true,
     },
@@ -12,7 +11,7 @@ export const scales = [
       id: "national",
       name: "National",
       label: "Identify hotspots of ecosystem service values within a country.",
-      helpText: `Identify hotspots of nature's benefits to people within a 
+      helpText: `Identify hotspots of ecosystem service values within a
         country.`,
       iconKey: "giafrica",
       defaultChecked: false,
@@ -22,25 +21,68 @@ export const scales = [
       name: "In-country Region",
       label: `Identify hotspots of ecoystem service values within a sub-national
               administrative unit (province, state, department, etc.)`,
-      helpText: `Identify hotspots of nature's benefits to people for an 
-        administrative region within a country (i.e., province, department, 
-        state, etc.)`,
+      helpText: `Identify hotspots of ecoystem service values within a sub-national
+              administrative unit (province, state, department, etc.)`,
       iconKey: "bipolygon",
       defaultChecked: false,
     },
     {
       id: "local",
-      name: "Local",
-      label: `Provide an AOI (area of interest) and examine ecosystem service
-              values in the surrounding area.`,
-      helpText: `Draw an area of interest (AOI) to explore nature's benefits 
-        to people in the surrounding watersheds.`,
+      name: "Level 08 Hydrobasins",
+      label:  `Identify hotspots of ecosystem service values within a
+      level 08 hydrobasin. Hydrobasins are visible when zoomed past zoom
+      level 5. See the basemap control for a display of the current zoom level.
+      Using the drawing tool on the right, one can draw an area of interest
+      to highlight more than one hydrobasin at a time.`,
+      helpText: `Identify hotspots of ecosystem service values within a
+      level 08 hydrobasin. Hydrobasins are visible when zoomed past zoom
+      level 5. See the basemap control for a display of the current zoom level.`,
       iconKey: "bimappin",
       defaultChecked: false,
     },
 ]
 
 export const serviceMenuDetails = [
+    {
+      id: "nitrogen",
+      label: "Clean water: nitrogen retention",
+      helpText: {
+        text: `Fertilizers like nitrogen are a major source of pollution for
+       freshwater systems and drinking water. However, some of this nitrogen
+       pollution may be retained by healthy ecosystems, therefore regulating
+       water quality in streams. The people benefitting from nitrogen
+       retention are those downstream from pollution sources, who would
+       otherwise be exposed to nitrogen contamination in their drinking water.
+       Nitrogen retention is modeled using the InVEST Nutrient Delivery Ratio
+       model, adapted for global analysis, and downstream beneficiaries are
+       derived from LandScan population data.`,
+        metric: `Values are a unitless index representing nitrogen retention
+        in natural and semi-natural areas multiplied by the number of people
+        downstream of those areas.`,
+        source: "Natural Capital Project",
+        resolution: "~300m",
+        date: "2015",
+        coverage: "Global",
+        license: {
+          link: "https://creativecommons.org/licenses/by/4.0/",
+          text: "CC-By Attribution 4.0 International",
+        },
+        citation: {
+          text: `IN PREP: Rebecca Chaplin-Kramer, Rachel A Neugarten, 
+        Richard P Sharp, Pamela M Collins, Stephen Polasky, David Hole, 
+        Richard Schuster, Matthew Strimas-Mackey, Mark Mulligan, 
+        Carter Brandon, Sandra Diaz, Etienne Fluet-Chouinard, Larry Gorenflo, 
+        Justin A Johnson, Patrick W Keys, Kate Longley-Wood, 
+        Peter B McIntyre, Monica Noon, Unai Pascual, Catherine Reidy Liermann,
+        Patrick R Roehrdanz, Guido Schmidt-Traub, M. Rebecca Shaw, 
+        Mark Spalding, Will R Turner, Arnout van Soesbergen, Reg A Watson
+        bioRxiv 2020.11.08.361014`,
+          link: "https://doi.org/10.1101/2020.11.08.361014",
+        },
+      },
+      iconKey: "iowater",
+      disable: false,
+    },
     {
       id: "sediment",
       label: "Clean water: sediment retention",
@@ -84,83 +126,6 @@ export const serviceMenuDetails = [
       disable: false,
     },
     {
-      id: "nitrogen",
-      label: "Clean water: nitrogen retention",
-      helpText: {
-        text: `Fertilizers like nitrogen are a major source of pollution for
-       freshwater systems and drinking water. However, some of this nitrogen
-       pollution may be retained by healthy ecosystems, therefore regulating
-       water quality in streams. The people benefitting from nitrogen
-       retention are those downstream from pollution sources, who would
-       otherwise be exposed to nitrogen contamination in their drinking water.
-       Nitrogen retention is modeled using the InVEST Nutrient Delivery Ratio
-       model, adapted for global analysis, and downstream beneficiaries are
-       derived from LandScan population data.`,
-        metric: `Values are a unitless index representing nitrogen retention
-        in natural and semi-natural areas multiplied by the number of people
-        downstream of those areas.`,
-        source: "Natural Capital Project",
-        resolution: "~300m",
-        date: "2015",
-        coverage: "Global",
-        license: {
-          link: "https://creativecommons.org/licenses/by/4.0/",
-          text: "CC-By Attribution 4.0 International",
-        },
-        citation: {
-          text: `IN PREP: Rebecca Chaplin-Kramer, Rachel A Neugarten, 
-        Richard P Sharp, Pamela M Collins, Stephen Polasky, David Hole, 
-        Richard Schuster, Matthew Strimas-Mackey, Mark Mulligan, 
-        Carter Brandon, Sandra Diaz, Etienne Fluet-Chouinard, Larry Gorenflo, 
-        Justin A Johnson, Patrick W Keys, Kate Longley-Wood, 
-        Peter B McIntyre, Monica Noon, Unai Pascual, Catherine Reidy Liermann,
-        Patrick R Roehrdanz, Guido Schmidt-Traub, M. Rebecca Shaw, 
-        Mark Spalding, Will R Turner, Arnout van Soesbergen, Reg A Watson
-        bioRxiv 2020.11.08.361014`,
-          link: "https://doi.org/10.1101/2020.11.08.361014",
-        },
-      },
-      iconKey: "iowater",
-      disable: false,
-    },
-    {
-      id: "natureAccess",
-      label: "Local nature access",
-      helpText: {
-        text: `Ecosystems provide numerous direct and indirect benefits to
-       people, such as recreation, hunting and gathering, aesthetics
-       (visual beauty), mental and physical health, cultural and traditional
-       value, and sense of place. Many of these contributions depend on the
-       ability of people to access nature, so proximity to natural lands
-       is used as a proxy for nature’s contributions to people, and population
-       is derived from LandScan data.`,
-        metric: `Values represent the number of people within 10 km of 
-        natural and semi-natural lands.`,
-        source: "Natural Capital Project",
-        resolution: "~300m",
-        date: "2015",
-        coverage: "Global",
-        license: {
-          link: "https://creativecommons.org/licenses/by/4.0/",
-          text: "CC-By Attribution 4.0 International",
-        },
-        citation: {
-          text: `IN PREP: Rebecca Chaplin-Kramer, Rachel A Neugarten, 
-        Richard P Sharp, Pamela M Collins, Stephen Polasky, David Hole, 
-        Richard Schuster, Matthew Strimas-Mackey, Mark Mulligan, 
-        Carter Brandon, Sandra Diaz, Etienne Fluet-Chouinard, Larry Gorenflo, 
-        Justin A Johnson, Patrick W Keys, Kate Longley-Wood, 
-        Peter B McIntyre, Monica Noon, Unai Pascual, Catherine Reidy Liermann,
-        Patrick R Roehrdanz, Guido Schmidt-Traub, M. Rebecca Shaw, 
-        Mark Spalding, Will R Turner, Arnout van Soesbergen, Reg A Watson
-        bioRxiv 2020.11.08.361014`,
-          link: "https://doi.org/10.1101/2020.11.08.361014",
-        },
-      },
-      iconKey: "titree",
-      disable: false,
-    },
-    {
       id: "coastalProtection",
       label: "Coastal storm risk reduction",
       helpText: {
@@ -200,6 +165,43 @@ export const serviceMenuDetails = [
         },
       },
       iconKey: "biwater",
+      disable: false,
+    },
+    {
+      id: "natureAccess",
+      label: "Local nature access",
+      helpText: {
+        text: `Ecosystems provide numerous direct and indirect benefits to
+       people, such as recreation, hunting and gathering, aesthetics
+       (visual beauty), mental and physical health, cultural and traditional
+       value, and sense of place. Many of these contributions depend on the
+       ability of people to access nature, so proximity to natural lands
+       is used as a proxy for nature’s contributions to people, and population
+       is derived from LandScan data.`,
+        metric: `Values represent the number of people within 10 km of 
+        natural and semi-natural lands.`,
+        source: "Natural Capital Project",
+        resolution: "~300m",
+        date: "2015",
+        coverage: "Global",
+        license: {
+          link: "https://creativecommons.org/licenses/by/4.0/",
+          text: "CC-By Attribution 4.0 International",
+        },
+        citation: {
+          text: `IN PREP: Rebecca Chaplin-Kramer, Rachel A Neugarten, 
+        Richard P Sharp, Pamela M Collins, Stephen Polasky, David Hole, 
+        Richard Schuster, Matthew Strimas-Mackey, Mark Mulligan, 
+        Carter Brandon, Sandra Diaz, Etienne Fluet-Chouinard, Larry Gorenflo, 
+        Justin A Johnson, Patrick W Keys, Kate Longley-Wood, 
+        Peter B McIntyre, Monica Noon, Unai Pascual, Catherine Reidy Liermann,
+        Patrick R Roehrdanz, Guido Schmidt-Traub, M. Rebecca Shaw, 
+        Mark Spalding, Will R Turner, Arnout van Soesbergen, Reg A Watson
+        bioRxiv 2020.11.08.361014`,
+          link: "https://doi.org/10.1101/2020.11.08.361014",
+        },
+      },
+      iconKey: "titree",
       disable: false,
     },
     {
@@ -459,20 +461,34 @@ export const supportMenuDetails = [
       id: "protected-areas",
       label: "Protected Areas",
       helpText: {
-        text: ``,
+        text: `Protected areas are not used for ecosystem service modeling,
+        but are provided for reference, since they often have significant
+        overlap with areas of high ecosystem service provision.`,
         metric: "N/A",
-        source: "",
-        resolution: "",
-        date: "",
+        source: [
+          {type: "text", text: "IUCN - "},
+          {
+            type: "link", link: "https://www.iucn.org/theme/protected-areas/our-work/world-database-protected-areas",
+            linkText: "World Database on Protected Areas"},
+        ],
+        resolution: "N/A",
+        date: "2021",
         coverage: "Global",
-        license: {
-          link: "",
-          text: "",
-        },
-        citation: {
-          text: ``,
-          link: "",
-        },
+        license: [
+          {
+            type: "link", link: "https://www.protectedplanet.net/en/legal",
+            linkText: "WDPA license"},
+        ],
+        citation: [
+          {type: "text", text: `UNEP-WCMC and IUCN (2021), Protected Planet:
+            The World Database on Protected Areas (WDPA) and World Database
+            on Other Effective Area-based Conservation Measures (WD-OECM)
+            [Online], March 2021, Cambridge, UK: UNEP-WCMC and IUCN.
+            Available at: `},
+          {
+            type: "link", link: "www.protectedplanet.net",
+            linkText: "www.protectedplanet.net"},
+        ],
       },
       iconKey: "giplantsandanimals",
       disable: false,
