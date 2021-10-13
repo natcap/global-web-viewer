@@ -42,6 +42,46 @@ export const scales = [
 
 export const serviceMenuDetails = [
     {
+      id: "nitrogen",
+      label: "Clean water: nitrogen retention",
+      helpText: {
+        text: `Fertilizers like nitrogen are a major source of pollution for
+       freshwater systems and drinking water. However, some of this nitrogen
+       pollution may be retained by healthy ecosystems, therefore regulating
+       water quality in streams. The people benefitting from nitrogen
+       retention are those downstream from pollution sources, who would
+       otherwise be exposed to nitrogen contamination in their drinking water.
+       Nitrogen retention is modeled using the InVEST Nutrient Delivery Ratio
+       model, adapted for global analysis, and downstream beneficiaries are
+       derived from LandScan population data.`,
+        metric: `Values are a unitless index representing nitrogen retention
+        in natural and semi-natural areas multiplied by the number of people
+        downstream of those areas.`,
+        source: "Natural Capital Project",
+        resolution: "~300m",
+        date: "2015",
+        coverage: "Global",
+        license: {
+          link: "https://creativecommons.org/licenses/by/4.0/",
+          text: "CC-By Attribution 4.0 International",
+        },
+        citation: {
+          text: `IN PREP: Rebecca Chaplin-Kramer, Rachel A Neugarten, 
+        Richard P Sharp, Pamela M Collins, Stephen Polasky, David Hole, 
+        Richard Schuster, Matthew Strimas-Mackey, Mark Mulligan, 
+        Carter Brandon, Sandra Diaz, Etienne Fluet-Chouinard, Larry Gorenflo, 
+        Justin A Johnson, Patrick W Keys, Kate Longley-Wood, 
+        Peter B McIntyre, Monica Noon, Unai Pascual, Catherine Reidy Liermann,
+        Patrick R Roehrdanz, Guido Schmidt-Traub, M. Rebecca Shaw, 
+        Mark Spalding, Will R Turner, Arnout van Soesbergen, Reg A Watson
+        bioRxiv 2020.11.08.361014`,
+          link: "https://doi.org/10.1101/2020.11.08.361014",
+        },
+      },
+      iconKey: "iowater",
+      disable: false,
+    },
+    {
       id: "sediment",
       label: "Clean water: sediment retention",
       helpText: {
@@ -84,83 +124,6 @@ export const serviceMenuDetails = [
       disable: false,
     },
     {
-      id: "nitrogen",
-      label: "Clean water: nitrogen retention",
-      helpText: {
-        text: `Fertilizers like nitrogen are a major source of pollution for
-       freshwater systems and drinking water. However, some of this nitrogen
-       pollution may be retained by healthy ecosystems, therefore regulating
-       water quality in streams. The people benefitting from nitrogen
-       retention are those downstream from pollution sources, who would
-       otherwise be exposed to nitrogen contamination in their drinking water.
-       Nitrogen retention is modeled using the InVEST Nutrient Delivery Ratio
-       model, adapted for global analysis, and downstream beneficiaries are
-       derived from LandScan population data.`,
-        metric: `Values are a unitless index representing nitrogen retention
-        in natural and semi-natural areas multiplied by the number of people
-        downstream of those areas.`,
-        source: "Natural Capital Project",
-        resolution: "~300m",
-        date: "2015",
-        coverage: "Global",
-        license: {
-          link: "https://creativecommons.org/licenses/by/4.0/",
-          text: "CC-By Attribution 4.0 International",
-        },
-        citation: {
-          text: `IN PREP: Rebecca Chaplin-Kramer, Rachel A Neugarten, 
-        Richard P Sharp, Pamela M Collins, Stephen Polasky, David Hole, 
-        Richard Schuster, Matthew Strimas-Mackey, Mark Mulligan, 
-        Carter Brandon, Sandra Diaz, Etienne Fluet-Chouinard, Larry Gorenflo, 
-        Justin A Johnson, Patrick W Keys, Kate Longley-Wood, 
-        Peter B McIntyre, Monica Noon, Unai Pascual, Catherine Reidy Liermann,
-        Patrick R Roehrdanz, Guido Schmidt-Traub, M. Rebecca Shaw, 
-        Mark Spalding, Will R Turner, Arnout van Soesbergen, Reg A Watson
-        bioRxiv 2020.11.08.361014`,
-          link: "https://doi.org/10.1101/2020.11.08.361014",
-        },
-      },
-      iconKey: "iowater",
-      disable: false,
-    },
-    {
-      id: "natureAccess",
-      label: "Local nature access",
-      helpText: {
-        text: `Ecosystems provide numerous direct and indirect benefits to
-       people, such as recreation, hunting and gathering, aesthetics
-       (visual beauty), mental and physical health, cultural and traditional
-       value, and sense of place. Many of these contributions depend on the
-       ability of people to access nature, so proximity to natural lands
-       is used as a proxy for nature’s contributions to people, and population
-       is derived from LandScan data.`,
-        metric: `Values represent the number of people within 10 km of 
-        natural and semi-natural lands.`,
-        source: "Natural Capital Project",
-        resolution: "~300m",
-        date: "2015",
-        coverage: "Global",
-        license: {
-          link: "https://creativecommons.org/licenses/by/4.0/",
-          text: "CC-By Attribution 4.0 International",
-        },
-        citation: {
-          text: `IN PREP: Rebecca Chaplin-Kramer, Rachel A Neugarten, 
-        Richard P Sharp, Pamela M Collins, Stephen Polasky, David Hole, 
-        Richard Schuster, Matthew Strimas-Mackey, Mark Mulligan, 
-        Carter Brandon, Sandra Diaz, Etienne Fluet-Chouinard, Larry Gorenflo, 
-        Justin A Johnson, Patrick W Keys, Kate Longley-Wood, 
-        Peter B McIntyre, Monica Noon, Unai Pascual, Catherine Reidy Liermann,
-        Patrick R Roehrdanz, Guido Schmidt-Traub, M. Rebecca Shaw, 
-        Mark Spalding, Will R Turner, Arnout van Soesbergen, Reg A Watson
-        bioRxiv 2020.11.08.361014`,
-          link: "https://doi.org/10.1101/2020.11.08.361014",
-        },
-      },
-      iconKey: "titree",
-      disable: false,
-    },
-    {
       id: "coastalProtection",
       label: "Coastal storm risk reduction",
       helpText: {
@@ -200,6 +163,43 @@ export const serviceMenuDetails = [
         },
       },
       iconKey: "biwater",
+      disable: false,
+    },
+    {
+      id: "natureAccess",
+      label: "Local nature access",
+      helpText: {
+        text: `Ecosystems provide numerous direct and indirect benefits to
+       people, such as recreation, hunting and gathering, aesthetics
+       (visual beauty), mental and physical health, cultural and traditional
+       value, and sense of place. Many of these contributions depend on the
+       ability of people to access nature, so proximity to natural lands
+       is used as a proxy for nature’s contributions to people, and population
+       is derived from LandScan data.`,
+        metric: `Values represent the number of people within 10 km of 
+        natural and semi-natural lands.`,
+        source: "Natural Capital Project",
+        resolution: "~300m",
+        date: "2015",
+        coverage: "Global",
+        license: {
+          link: "https://creativecommons.org/licenses/by/4.0/",
+          text: "CC-By Attribution 4.0 International",
+        },
+        citation: {
+          text: `IN PREP: Rebecca Chaplin-Kramer, Rachel A Neugarten, 
+        Richard P Sharp, Pamela M Collins, Stephen Polasky, David Hole, 
+        Richard Schuster, Matthew Strimas-Mackey, Mark Mulligan, 
+        Carter Brandon, Sandra Diaz, Etienne Fluet-Chouinard, Larry Gorenflo, 
+        Justin A Johnson, Patrick W Keys, Kate Longley-Wood, 
+        Peter B McIntyre, Monica Noon, Unai Pascual, Catherine Reidy Liermann,
+        Patrick R Roehrdanz, Guido Schmidt-Traub, M. Rebecca Shaw, 
+        Mark Spalding, Will R Turner, Arnout van Soesbergen, Reg A Watson
+        bioRxiv 2020.11.08.361014`,
+          link: "https://doi.org/10.1101/2020.11.08.361014",
+        },
+      },
+      iconKey: "titree",
       disable: false,
     },
     {
