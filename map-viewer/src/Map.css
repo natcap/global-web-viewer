@@ -23,7 +23,7 @@ canvas {
 .vertical-menu {
   background-color: #2f2f30;
   color: #ffffff;
-  padding: 6px 12px;
+  padding: 6px 6px;
   font-family: 'Source Sans Pro', sans-serif;
   font-size: 16px;
   z-index: 1;
@@ -31,7 +31,8 @@ canvas {
   left: 0;
   top: 0;
   /*border-radius: 4px;*/
-  max-width: 37rem;
+  max-width: 380px;
+  min-width: 340px;
   height: 100%;
   overflow-y: auto;
 }
@@ -137,6 +138,9 @@ canvas {
   border: 0;
   outline-style: none;
 }
+.legend-item .button-info {
+  color: #000;
+}
 .button-info:hover {
   background-color: transparent;
 }
@@ -163,7 +167,7 @@ canvas {
   z-index: 1;
   position: absolute;
   right: 0;
-  bottom: 0;
+  bottom: 3rem;
   background-color: #f5f6f7;
   color: #000000;
   padding-top: 6px;
@@ -179,6 +183,20 @@ canvas {
 [name=radio-basemaps]:checked + label{
   outline-style: solid;
   outline-color: blue;
+}
+.basemap-control-button {
+  z-index: 1;
+  position: absolute;
+  right: 0.5rem;
+  bottom: 2rem;
+  background-color: #2f2f30;
+  color: #fff;
+  padding: 0.5rem;
+  border-radius: 0.3rem;
+  align-items: center;
+}
+.basemap-ctrl-name {
+  padding-right: 0.5rem;
 }
 
 .menu-main-text {
@@ -198,6 +216,10 @@ canvas {
    */
   z-index: 1001;
 }
+.mapboxgl-ctrl-geocoder {
+    width: 200px!important;
+    min-width: 150px!important;
+}
 
 .dep-form-check-label {
   background-color: #99ccff;
@@ -205,24 +227,50 @@ canvas {
 }
 
 /* LEGEND CSS */
+.legend-form {
+  position: absolute;
+  left: 22rem;
+  bottom: 2rem;
+  padding: 0px;
+  margin-left: 0px;
+  width: 320px;
+}
+.legend-form .card{
+  border-radius: 5px;
+}
+.legend-form .accordion-header.card-header {
+  border-radius: 5px 5px 0px 0px;
+}
+.legend-form .accordion-header.collapse {
+  border-radius: 0px 0px 5px 5px;
+}
 .legend-group {
+  margin-right: 0;
   font-family: 'Source Sans Pro', sans-serif;
   z-index: 1;
+  /*
   position: absolute;
   right: 0;
   margin-right: 0.5rem;
   bottom: 10rem;
   padding: 10px;
+  background-color: rgba(222, 235, 247, 0.8);
+  */
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
-  /*background-color: rgba(222, 235, 247, 0.8);*/
   background-color: #f5f6f7;
   border-radius: 4px;
   line-height: 18px;
-  max-height: 300px;
-  width: 340px;
+  max-height: 600px;
+  width: 300px;
   overflow-y: auto;
+  padding: 0px;
+}
+.card-body-legend {
+  padding: 10px;
+  margin:0;
 }
 .legend-key {
+  z-index: 1;
   display: inline-block;
   border-radius: 20%;
   width: 10px;
@@ -230,6 +278,8 @@ canvas {
   margin-right: 5px;
 }
 .legend-desc {
+  z-index: 1;
+  color: #000;
   padding-left: 2px;
   padding-bottom: 5px;
   font-weight: bold;
@@ -248,7 +298,7 @@ canvas {
 .d3-legend.ordinal{
   z-index: 1;
   width: 220px;
-  height: 200px;
+  height: 220px;
   overflow-y: auto;
 }
 .d3-legend.ordinal.protected-areas{
@@ -257,14 +307,30 @@ canvas {
   height: 20px;
   overflow-y: auto;
 }
+.d3-legend.ordinal.coastal-habitat{
+  z-index: 1;
+  width: 220px;
+  height: 150px;
+  overflow-y: auto;
+}
 .d3-x-axis {
   font-size: 12px;
+  color: #000;
 }
 .d3-x-axis:not(:last-child) {
   padding-right: 4.75rem;
 }
 .legend-item {
   font-size: 16px;
+  padding-right: 20px;
+}
+.legend-item .col {
+  padding: 0px;
+  margin-left: 15px;
+}
+.legend-item .col-auto {
+  padding-left: 0px;
+  padding-right: 0px;
 }
 .sortable-container-helper {
   z-index: 1;
@@ -281,6 +347,8 @@ canvas {
   cursor: grab;
 }
 .sortable-container {
+  margin: 0;
+  padding-left: 0px;
 }
 .sortable-container:active {
 }

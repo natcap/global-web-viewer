@@ -1,6 +1,8 @@
 import React, { useRef, useEffect, useState } from 'react';
 
 import Col from 'react-bootstrap/Col';
+import Button from 'react-bootstrap/Button';
+import { FaChevronCircleUp, FaChevronCircleDown } from 'react-icons/fa';
 
 import mapboxgl from 'mapbox-gl';
 // Had to npm install @mapbox/mapbox-gl-draw and import like below
@@ -99,13 +101,15 @@ const Map = () => {
   const [lat, setLat] = useState(30.0);
   const [zoom, setZoom] = useState(1.64);
   const [basemapId, setBasemap] = useState('streets-v11');
+  const [basemapControl, setBasemapControl] = useState(true);
+  const [basemapChev, setBasemapChev] = useState(true);
   //const [mapLayers, setLayers] = useState(layers);
   //const [scale, _setScale] = useState('global');
   //const [scale, setScale] = useState('global');
   //const [selectedServices, setServices] = useState([]);
   const [visibleLayers, _setLayers] = useState({});
   const layersRef = useRef(visibleLayers);
-  const setLayers= (data) => {
+  const setLayers = (data) => {
     layersRef.current = data;
     _setLayers(data);
   };
@@ -808,8 +812,9 @@ const Map = () => {
       });
       console.log("change basemap sel serv: ", selectedServices);
       const reversedServices = selectedServices.slice().reverse();
+      console.log("change base vis layers: ", layersRef.current);
       reversedServices.forEach((serviceType) => {
-        const layerId = visibleLayers.current[serviceType].layerID;
+        const layerId = layersRef.current[serviceType].layerID;
         // Add all layers from a service type if there are multiple of them
         if(serviceType in multiFileLayers) {
           multiFileLayers[serviceType].forEach((childLayer) => {
@@ -907,6 +912,12 @@ const Map = () => {
     setMap(map);
   };
 
+  const changeBasemapControl = () => {
+    setBasemapControl(!basemapControl);
+    setBasemapChev(!basemapChev);
+  }
+
+
   return (
       <Col className="map-container" >
         <div ref={mapContainer}></div>
@@ -921,9 +932,17 @@ const Map = () => {
           services={selectedServices}
           changeLayerOrder={changeLayerOrder}
         />
+        <Button
+          onClick={changeBasemapControl}
+          bsPrefix="basemap-control-button"
+        >
+          <span className="basemap-ctrl-name">Basemap Control</span>
+          {basemapChev ? <FaChevronCircleDown/> : <FaChevronCircleUp/> }
+        </Button>
         <BasemapControl className="basemap-control"
           basemaps={basemaps}
           changeBasemapState={changeBasemapState}
+          showBasemapControl={basemapControl}
           lng={lng}
           lat={lat}
           zoom={zoom}

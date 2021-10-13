@@ -22,7 +22,6 @@ const IconMap = {
   giafrica: <GiAfrica className="labelIcons"/>,
   bipolygon: <BiPolygon className="labelIcons"/>,
   bimappin: <BiMapPin className="labelIcons"/>,
-IoIosArrowDropdown
 }
 
 const VerticalMenu = (props) => {
@@ -90,7 +89,7 @@ const VerticalMenu = (props) => {
         </Card>
       </Accordion>
 
-      <Accordion>
+      <Accordion defaultActiveKey="1">
         <Card>
           <Accordion.Toggle as={Card.Header} eventKey="1" className="accordion-header">
             <Row>
@@ -132,7 +131,7 @@ const VerticalMenu = (props) => {
         <Card>
           <Accordion.Toggle as={Card.Header} eventKey="3" className="accordion-header">
             <Row>
-              <Col>Discover and Case Studies -- Coming Soon</Col>
+              <Col>Discover and Case Studies<br/>[ Coming Soon ]</Col>
               <Col xs="auto"><IoIosArrowDropdown className="dropdown-icon"/></Col>
             </Row>
           </Accordion.Toggle>
