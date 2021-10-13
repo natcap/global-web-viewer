@@ -3,8 +3,7 @@ export const scales = [
       id: "global",
       name: "Global",
       label: "Compare ecosystem service values globally.",
-      helpText: `Compare how different places anywhere on the globe 
-        contribute nature's benefits to people.`,
+      helpText: `Compare ecosystem service values globally`,
       iconKey: "faglobe",
       defaultChecked: true,
     },
@@ -12,7 +11,7 @@ export const scales = [
       id: "national",
       name: "National",
       label: "Identify hotspots of ecosystem service values within a country.",
-      helpText: `Identify hotspots of nature's benefits to people within a 
+      helpText: `Identify hotspots of ecosystem service values within a
         country.`,
       iconKey: "giafrica",
       defaultChecked: false,
@@ -22,19 +21,22 @@ export const scales = [
       name: "In-country Region",
       label: `Identify hotspots of ecoystem service values within a sub-national
               administrative unit (province, state, department, etc.)`,
-      helpText: `Identify hotspots of nature's benefits to people for an 
-        administrative region within a country (i.e., province, department, 
-        state, etc.)`,
+      helpText: `Identify hotspots of ecoystem service values within a sub-national
+              administrative unit (province, state, department, etc.)`,
       iconKey: "bipolygon",
       defaultChecked: false,
     },
     {
       id: "local",
-      name: "Local",
-      label: `Provide an AOI (area of interest) and examine ecosystem service
-              values in the surrounding area.`,
-      helpText: `Draw an area of interest (AOI) to explore nature's benefits 
-        to people in the surrounding watersheds.`,
+      name: "Level 08 Hydrobasins",
+      label:  `Identify hotspots of ecosystem service values within a
+      level 08 hydrobasin. Hydrobasins are visible when zoomed past zoom
+      level 5. See the basemap control for a display of the current zoom level.
+      Using the drawing tool on the right, one can draw an area of interest
+      to highlight more than one hydrobasin at a time.`,
+      helpText: `Identify hotspots of ecosystem service values within a
+      level 08 hydrobasin. Hydrobasins are visible when zoomed past zoom
+      level 5. See the basemap control for a display of the current zoom level.`,
       iconKey: "bimappin",
       defaultChecked: false,
     },
