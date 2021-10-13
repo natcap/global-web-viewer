@@ -298,7 +298,7 @@ canvas {
 .d3-legend.ordinal{
   z-index: 1;
   width: 220px;
-  height: 200px;
+  height: 220px;
   overflow-y: auto;
 }
 .d3-legend.ordinal.protected-areas{
