@@ -109,7 +109,7 @@ const Map = () => {
   //const [selectedServices, setServices] = useState([]);
   const [visibleLayers, _setLayers] = useState({});
   const layersRef = useRef(visibleLayers);
-  const setLayers= (data) => {
+  const setLayers = (data) => {
     layersRef.current = data;
     _setLayers(data);
   };
@@ -812,8 +812,9 @@ const Map = () => {
       });
       console.log("change basemap sel serv: ", selectedServices);
       const reversedServices = selectedServices.slice().reverse();
+      console.log("change base vis layers: ", layersRef.current);
       reversedServices.forEach((serviceType) => {
-        const layerId = visibleLayers.current[serviceType].layerID;
+        const layerId = layersRef.current[serviceType].layerID;
         // Add all layers from a service type if there are multiple of them
         if(serviceType in multiFileLayers) {
           multiFileLayers[serviceType].forEach((childLayer) => {
