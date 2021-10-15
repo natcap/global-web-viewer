@@ -309,9 +309,15 @@ const Map = () => {
     });
     map.addControl(draw);
 
-    map.on('draw.create', () => {
-      highlightSelected();
-      setTimeout(() => {setDrawing(false)}, 1000);
+    map.on('draw.create', (e) => {
+      const result = highlightSelected(e);
+      setTimeout(() => {
+        new mapboxgl.Popup({closeButton:true})
+          .setLngLat(result.lngLat)
+          .setHTML(result.htmlString)
+          .addTo(map);
+
+        setDrawing(false)}, 1000);
     });
     map.on('draw.modechange', () => {
       console.log("draw modechange: ", draw.getMode());
@@ -337,12 +343,14 @@ const Map = () => {
         });
 
         const bbox = [[Math.min(...arrayX), Math.max(...arrayY)], [Math.max(...arrayX), Math.min(...arrayY)]];
+        console.log("highlight hybas bbox: ", bbox);
         // The geometry of the query region in pixels: either a single point
         // or bottom left and top right points describing a bounding box,
         // where the origin is at the top left.
         var features = map.queryRenderedFeatures(bbox, {
           layers: ['stats-hybas']
         });
+        console.log("highlight hybas query results: ", features);
         let featList = [];
         features.forEach((feat) => {
           const featID = feat.properties.HYBAS_ID;
@@ -353,13 +361,69 @@ const Map = () => {
         map.setPaintProperty(
           'stats-hybas', 'fill-opacity', [
             'match', ['get', 'HYBAS_ID'], [...featList], 0.0, 0.8]);
+        map.setPaintProperty(
+          'stats-hybas-line', 'line-opacity', [
+            'match', ['get', 'HYBAS_ID'], [...featList], 1.0, 0.0]);
 
+        // Need to make sure the line layer is on top of the fill layer
+        const topLayer = getMapStyleSymbolId(map);
+        map.moveLayer('stats-hybas-line', topLayer);
         //map.setFeatureState(
         //  { source: 'stats-hybas', sourceLayer: 'hybas_all_stats', id: featId },
         //  { hover: true }
         //);
-      }
 
+        // Format popup with combines highlighted features
+        //
+        if(features.length > 0) {
+          let htmlString = `<h3>Hydrobasin level 08 Stats</h3>`;
+          let pctNotice = false;
+          const currentServices = [...servicesRef.current];
+          features.forEach((feat) => {
+            htmlString += `<h4>HydroBASIN ID ${feat.properties.HYBAS_ID}</h4>`
+            currentServices.forEach((service) => {
+              if(service === 'coastal-habitat' || service === 'protected-areas') {
+                return;
+              }
+              /*
+              else if(service === 'protected-areas') {
+                const protFeat = map.queryRenderedFeatures(e.point, { layers: protectedIds });
+                if(protFeat.length) {
+                  htmlString = htmlString + `
+                   <h5><u>Protected area</u></h5>
+                   <h5>Name:  ${protFeat[0].properties.NAME}</h5>
+                  `
+                }
+              }
+              */
+              else {
+                const attrKey = clickPopupKey[service].key;
+                htmlString = htmlString + `
+                 <h4><u>${clickPopupKey[service].name}</u></h4>
+                 <h5>Mean:  ${feat.properties[attrKey+'mean'].toExponential(3)}</h5>
+                 <h5>Percentile*:  ${feat.properties[attrKey+'pct'].toFixed(2)}</h5>
+                `
+                pctNotice = true;
+              }
+            });
+          });
+          if(pctNotice) {
+            htmlString += `<br/><h5>* percentile is in comparison with the mean value
+            of other regions within the same country.</h5>`;
+          }
+          if (!htmlString.includes('h4')) {
+              htmlString = htmlString + `
+                <h5>No active layer selected. Select a service layer
+                to see aggregated statistics.</h5>`;
+          }
+          const popupLngLat = map.unproject(bbox[1]);
+          console.log("popup hybas lnglat: ", popupLngLat);
+          return {
+            htmlString: htmlString,
+            lngLat: popupLngLat,
+          }
+        }
+      }
     }
 
     function removeHighlight(e) {
