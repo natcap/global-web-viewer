@@ -95,6 +95,14 @@ const Map = () => {
   const [lng, setLng] = useState(16.8);
   const [lat, setLat] = useState(30.0);
   const [zoom, setZoom] = useState(1.64);
+
+  const [drawing, _setDrawing] = useState(false);
+  const drawingRef = useRef(drawing);
+  const setDrawing = (data) => {
+    drawingRef.current = data;
+    _setDrawing(data);
+  }
+
   const [basemapControl, setBasemapControl] = useState(true);
   const [basemapChev, setBasemapChev] = useState(true);
   //const [mapLayers, setLayers] = useState(layers);
@@ -175,10 +183,142 @@ const Map = () => {
         polygon: true,
         trash: true,
       },
+      styles: [
+        // ACTIVE (being drawn)
+        // line stroke
+        {
+            "id": "gl-draw-line",
+            "type": "line",
+            "filter": ["all", ["==", "$type", "LineString"], ["!=", "mode", "static"]],
+            "layout": {
+              "line-cap": "round",
+              "line-join": "round"
+            },
+            "paint": {
+              //"line-color": "#D20C0C",
+              "line-color": "#0cd258",
+              "line-dasharray": [0.2, 2],
+              "line-width": 2
+            }
+        },
+        // polygon fill
+        {
+          "id": "gl-draw-polygon-fill",
+          "type": "fill",
+          "filter": ["all", ["==", "$type", "Polygon"], ["!=", "mode", "static"]],
+          "paint": {
+            //"fill-color": "#D20C0C",
+            "fill-color": "#0cd258",
+            "fill-outline-color": "#D20C0C",
+            "fill-opacity": 0.1
+          }
+        },
+        // polygon mid points
+        {
+          'id': 'gl-draw-polygon-midpoint',
+          'type': 'circle',
+          'filter': ['all',
+            ['==', '$type', 'Point'],
+            ['==', 'meta', 'midpoint']],
+          'paint': {
+            'circle-radius': 3,
+            'circle-color': '#fbb03b'
+          }
+        },
+        // polygon outline stroke
+        // This doesn't style the first edge of the polygon, which uses the line stroke styling instead
+        /*
+        {
+          "id": "gl-draw-polygon-stroke-active",
+          "type": "line",
+          "filter": ["all", ["==", "$type", "Polygon"], ["!=", "mode", "static"]],
+          "layout": {
+            "line-cap": "round",
+            "line-join": "round"
+          },
+          "paint": {
+            //"line-color": "#D20C0C",
+            "line-color": "#283880",
+            "line-dasharray": [0.2, 2],
+            "line-width": 2
+          }
+        },
+        */
+        // vertex point halos
+        {
+          "id": "gl-draw-polygon-and-line-vertex-halo-active",
+          "type": "circle",
+          "filter": ["all", ["==", "meta", "vertex"], ["==", "$type", "Point"], ["!=", "mode", "static"]],
+          "paint": {
+            "circle-radius": 5,
+            "circle-color": "#FFF"
+          }
+        },
+        // vertex points
+        {
+          "id": "gl-draw-polygon-and-line-vertex-active",
+          "type": "circle",
+          "filter": ["all", ["==", "meta", "vertex"], ["==", "$type", "Point"], ["!=", "mode", "static"]],
+          "paint": {
+            "circle-radius": 3,
+            "circle-color": "#D20C0C",
+          }
+        },
+
+        // INACTIVE (static, already drawn)
+        // line stroke
+        {
+          "id": "gl-draw-line-static",
+          "type": "line",
+          "filter": ["all", ["==", "$type", "LineString"], ["==", "mode", "simple_select"]],
+          "layout": {
+            "line-cap": "round",
+            "line-join": "round"
+          },
+          "paint": {
+            "line-color": "#000",
+            "line-width": 3,
+          }
+        },
+        // polygon fill
+        {
+          "id": "gl-draw-polygon-fill-static",
+          "type": "fill",
+          "filter": ["all", ["==", "$type", "Polygon"], ["==", "mode", "simple_select"]],
+          "paint": {
+            "fill-color": "#000",
+            "fill-outline-color": "#000",
+            "fill-opacity": 0.1
+          }
+        },
+        // polygon outline
+        {
+          "id": "gl-draw-polygon-stroke-static",
+          "type": "line",
+          "filter": ["all", ["==", "$type", "Polygon"], ["==", "mode", "simple_select"]],
+          "layout": {
+            "line-cap": "round",
+            "line-join": "round"
+          },
+          "paint": {
+            "line-color": "#000",
+            "line-width": 3,
+          }
+        }
+      ]
     });
     map.addControl(draw);
 
-    map.on('draw.create', highlightSelected);
+    map.on('draw.create', () => {
+      highlightSelected();
+      setTimeout(() => {setDrawing(false)}, 1000);
+    });
+    map.on('draw.modechange', () => {
+      console.log("draw modechange: ", draw.getMode());
+      if(draw.getMode() !== 'simple_select') {
+        setDrawing(true);
+      }
+    });
     map.on('draw.delete', removeHighlight);
     //map.on('draw.update', updateArea);
 
@@ -208,6 +348,7 @@ const Map = () => {
           const featID = feat.properties.HYBAS_ID;
           featList.push(featID);
         });
+        console.log("draw hybas selected: ", featList);
 
         map.setPaintProperty(
           'stats-hybas', 'fill-opacity', [
@@ -573,11 +714,16 @@ const Map = () => {
     // layer open a popup at the location of the click, with description HTML
     // from its properties.
     map.on('click', function (e) {
-      const htmlString = clickPopupDialogHandler(e);
-      new mapboxgl.Popup({closeButton:true})
-      .setLngLat(e.lngLat)
-      .setHTML(htmlString)
-      .addTo(map);
+      //if(draw.getMode() === 'simple_select') {
+      console.log("map click draw mode: ", draw.getMode());
+      console.log("map click drawing: ", drawingRef.current);
+      if(!drawingRef.current) {
+        const htmlString = clickPopupDialogHandler(e);
+        new mapboxgl.Popup({closeButton:true})
+        .setLngLat(e.lngLat)
+        .setHTML(htmlString)
+        .addTo(map);
+      }
     });
 
     // Change the cursor to a pointer when the mouse is over the places layer.
