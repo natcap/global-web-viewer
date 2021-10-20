@@ -474,10 +474,12 @@ const Map = () => {
       });
       console.log("highlight click feats: ", features);
 
-      const featID = features[0].properties[featName];
-      map.setPaintProperty(
-        layerId, 'fill-opacity', [
-          'match', ['get', featName], featID, 0.0, 0.8]);
+      if(features.length > 0) {
+        const featID = features[0].properties[featName];
+        map.setPaintProperty(
+          layerId, 'fill-opacity', [
+            'match', ['get', featName], featID, 0.0, 0.8]);
+      }
     };
 
     const clickPopupDialogHandler = (e) => {
