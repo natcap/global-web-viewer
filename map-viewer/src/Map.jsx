@@ -10,6 +10,7 @@ import MapboxDraw from '@mapbox/mapbox-gl-draw';
 import '@mapbox/mapbox-gl-draw/dist/mapbox-gl-draw.css';
 // Had to npm install @mapbox/mapbox-gl-geocoder and import like below
 import * as MapboxGeocoder from '@mapbox/mapbox-gl-geocoder';
+import * as turf from '@turf/turf';
 
 import './Map.css';
 
@@ -19,6 +20,7 @@ import BasemapControl from './components/BasemapControl';
 import mapLayers from './LayerDefinitions';
 import { coastalHabitats } from './ScaleDefinitions';
 import { protectedLayers } from './ScaleDefinitions';
+import { modifiedDefaultStyle } from './mapboxDrawStyle';
 
 //mapboxgl.workerClass = MapboxWorker;
 mapboxgl.accessToken =
@@ -183,149 +185,59 @@ const Map = () => {
         polygon: true,
         trash: true,
       },
-      styles: [
-        // ACTIVE (being drawn)
-        // line stroke
-        {
-            "id": "gl-draw-line",
-            "type": "line",
-            "filter": ["all", ["==", "$type", "LineString"], ["!=", "mode", "static"]],
-            "layout": {
-              "line-cap": "round",
-              "line-join": "round"
-            },
-            "paint": {
-              //"line-color": "#D20C0C",
-              "line-color": "#0cd258",
-              "line-dasharray": [0.2, 2],
-              "line-width": 2
-            }
-        },
-        // polygon fill
-        {
-          "id": "gl-draw-polygon-fill",
-          "type": "fill",
-          "filter": ["all", ["==", "$type", "Polygon"], ["!=", "mode", "static"]],
-          "paint": {
-            //"fill-color": "#D20C0C",
-            "fill-color": "#0cd258",
-            "fill-outline-color": "#D20C0C",
-            "fill-opacity": 0.1
-          }
-        },
-        // polygon mid points
-        {
-          'id': 'gl-draw-polygon-midpoint',
-          'type': 'circle',
-          'filter': ['all',
-            ['==', '$type', 'Point'],
-            ['==', 'meta', 'midpoint']],
-          'paint': {
-            'circle-radius': 3,
-            'circle-color': '#fbb03b'
-          }
-        },
-        // polygon outline stroke
-        // This doesn't style the first edge of the polygon, which uses the line stroke styling instead
-        /*
-        {
-          "id": "gl-draw-polygon-stroke-active",
-          "type": "line",
-          "filter": ["all", ["==", "$type", "Polygon"], ["!=", "mode", "static"]],
-          "layout": {
-            "line-cap": "round",
-            "line-join": "round"
-          },
-          "paint": {
-            //"line-color": "#D20C0C",
-            "line-color": "#283880",
-            "line-dasharray": [0.2, 2],
-            "line-width": 2
-          }
-        },
-        */
-        // vertex point halos
-        {
-          "id": "gl-draw-polygon-and-line-vertex-halo-active",
-          "type": "circle",
-          "filter": ["all", ["==", "meta", "vertex"], ["==", "$type", "Point"], ["!=", "mode", "static"]],
-          "paint": {
-            "circle-radius": 5,
-            "circle-color": "#FFF"
-          }
-        },
-        // vertex points
-        {
-          "id": "gl-draw-polygon-and-line-vertex-active",
-          "type": "circle",
-          "filter": ["all", ["==", "meta", "vertex"], ["==", "$type", "Point"], ["!=", "mode", "static"]],
-          "paint": {
-            "circle-radius": 3,
-            "circle-color": "#D20C0C",
-          }
-        },
-
-        // INACTIVE (static, already drawn)
-        // line stroke
-        {
-          "id": "gl-draw-line-static",
-          "type": "line",
-          "filter": ["all", ["==", "$type", "LineString"], ["==", "mode", "simple_select"]],
-          "layout": {
-            "line-cap": "round",
-            "line-join": "round"
-          },
-          "paint": {
-            "line-color": "#000",
-            "line-width": 3,
-          }
-        },
-        // polygon fill
-        {
-          "id": "gl-draw-polygon-fill-static",
-          "type": "fill",
-          "filter": ["all", ["==", "$type", "Polygon"], ["==", "mode", "simple_select"]],
-          "paint": {
-            "fill-color": "#000",
-            "fill-outline-color": "#000",
-            "fill-opacity": 0.1
-          }
-        },
-        // polygon outline
-        {
-          "id": "gl-draw-polygon-stroke-static",
-          "type": "line",
-          "filter": ["all", ["==", "$type", "Polygon"], ["==", "mode", "simple_select"]],
-          "layout": {
-            "line-cap": "round",
-            "line-join": "round"
-          },
-          "paint": {
-            "line-color": "#000",
-            "line-width": 3,
-          }
-        }
-      ]
+      styles: modifiedDefaultStyle,
     });
     map.addControl(draw);
+    // THIS IS A HACK to change Mapbox Draw component tooltip
+    const drawToolTip = `
+    Click this button to draw a polygon on the map.
+    1) Click the button to change the cursor to a "crosshair" symbol
+    2) Click on the map to create points that will determine the shape of the polygon
+    3) To finish drawing double click or click on an existing point`
+    document
+      .querySelector(".mapbox-gl-draw_ctrl-draw-btn.mapbox-gl-draw_polygon")
+      .setAttribute("title", drawToolTip);
+    const trashToolTip = `To remove all polygons, select a polygon and click.`
+    document
+      .querySelector(".mapbox-gl-draw_ctrl-draw-btn.mapbox-gl-draw_trash")
+      .setAttribute("title", trashToolTip);
 
     map.on('draw.create', (e) => {
-      const result = highlightSelected(e);
-      setTimeout(() => {
-        new mapboxgl.Popup({closeButton:true})
-          .setLngLat(result.lngLat)
-          .setHTML(result.htmlString)
-          .addTo(map);
-
-        setDrawing(false)}, 1000);
+      if (scale.current === 'local') {
+        const result = highlightSelected(e);
+        setTimeout(() => {
+          new mapboxgl.Popup({closeButton:true, anchor:'left', offset:50})
+            .setLngLat(result.lngLat)
+            .setHTML(result.htmlString)
+            .addTo(map);
+          setDrawing(false)}, 1000);
+      }
     });
     map.on('draw.modechange', () => {
       console.log("draw modechange: ", draw.getMode());
       if(draw.getMode() !== 'simple_select') {
         setDrawing(true);
+        //HACK to change the mapboxgl-draw button to stay "highlighted" when
+        //in draw mode
+        document
+          .querySelector(".mapbox-gl-draw_ctrl-draw-btn.mapbox-gl-draw_polygon")
+          .style.backgroundColor = 'rgba(0,0,0,0.1)';
+      }
+      else {
+        //HACK to change the mapboxgl-draw button to remove style set above
+        document
+          .querySelector(".mapbox-gl-draw_ctrl-draw-btn.mapbox-gl-draw_polygon")
+          .removeAttribute('style');//.backgroundColor = 'rgba(0,0,0,0)';
+        setTimeout(() => {
+          setDrawing(false)}, 1000);
       }
     });
-    map.on('draw.delete', removeHighlight);
+    map.on('draw.delete', () => {
+      console.log("draw delete");
+      removeHighlight();
+      draw.deleteAll();
+      setDrawing(false);
+    });
     //map.on('draw.update', updateArea);
 
     function highlightSelected(e) {
@@ -343,18 +255,24 @@ const Map = () => {
         });
 
         const bbox = [[Math.min(...arrayX), Math.max(...arrayY)], [Math.max(...arrayX), Math.min(...arrayY)]];
-        console.log("highlight hybas bbox: ", bbox);
         // The geometry of the query region in pixels: either a single point
         // or bottom left and top right points describing a bounding box,
         // where the origin is at the top left.
         var features = map.queryRenderedFeatures(bbox, {
           layers: ['stats-hybas']
         });
-        console.log("highlight hybas query results: ", features);
+        let popupBbox = turf.bbox(features[0]);
         let featList = [];
         features.forEach((feat) => {
           const featID = feat.properties.HYBAS_ID;
-          featList.push(featID);
+          // Sometimes because of how tiles and zooms work, we could get 
+          // duplicate features returned from the query.
+          if (!(featID in featList)) {
+            featList.push(featID);
+            const curBbox = turf.bbox(feat);
+            popupBbox[2] = Math.max(curBbox[2], popupBbox[2]);
+            popupBbox[3] = Math.max(curBbox[3], popupBbox[3]);
+          }
         });
         console.log("draw hybas selected: ", featList);
 
@@ -368,10 +286,6 @@ const Map = () => {
         // Need to make sure the line layer is on top of the fill layer
         const topLayer = getMapStyleSymbolId(map);
         map.moveLayer('stats-hybas-line', topLayer);
-        //map.setFeatureState(
-        //  { source: 'stats-hybas', sourceLayer: 'hybas_all_stats', id: featId },
-        //  { hover: true }
-        //);
 
         // Format popup with combines highlighted features
         //
@@ -416,8 +330,9 @@ const Map = () => {
                 <h5>No active layer selected. Select a service layer
                 to see aggregated statistics.</h5>`;
           }
-          const popupLngLat = map.unproject(bbox[1]);
-          console.log("popup hybas lnglat: ", popupLngLat);
+          // Prepare the lng lat of where the popup with stats should be
+          // which is to the right of selected features bbox
+          const popupLngLat = [popupBbox[2], popupBbox[3]];
           return {
             htmlString: htmlString,
             lngLat: popupLngLat,
@@ -431,27 +346,9 @@ const Map = () => {
       console.log(e)
       map.setPaintProperty(
         'stats-hybas', 'fill-opacity', 0.8);
-      /*
-      const data = draw.getAll();
-      if (data.features.length > 0) {
-        console.log(e);
-        console.log(data);
-        const geoms = data.features[0].geometry.coordinates[0];
-        console.log(geoms);
-        let arrayX = [];
-        let arrayY = [];
-        geoms.forEach((point) => {
-          arrayX.push(point[0]);
-          arrayY.push(point[1]);
-        });
-
-        const bbox = [Math.min(...arrayX), Math.min(...arrayY), Math.max(...arrayX), Math.max(...arrayY)];
-        console.log(bbox);
-      }
-      */
-
+      map.setPaintProperty(
+        'stats-hybas-line', 'line-opacity', 0.0);
     }
-    //var hoveredStateId = null;
 
     map.on('load', () => {
       scale.current = 'global';
@@ -783,10 +680,10 @@ const Map = () => {
       console.log("map click drawing: ", drawingRef.current);
       if(!drawingRef.current) {
         const htmlString = clickPopupDialogHandler(e);
-        new mapboxgl.Popup({closeButton:true})
-        .setLngLat(e.lngLat)
-        .setHTML(htmlString)
-        .addTo(map);
+        new mapboxgl.Popup({closeButton:true, anchor:'left', offset:50})
+          .setLngLat(e.lngLat)
+          .setHTML(htmlString)
+          .addTo(map);
       }
     });
 
