@@ -21,6 +21,7 @@ import mapLayers from './LayerDefinitions';
 import { coastalHabitats } from './ScaleDefinitions';
 import { protectedLayers } from './ScaleDefinitions';
 import { modifiedDefaultStyle } from './mapboxDrawStyle';
+import { gadm1Carmen } from './gadm1Carmen';
 import { gadm1Names } from './gadm1Names';
 
 //mapboxgl.workerClass = MapboxWorker;
@@ -44,19 +45,13 @@ const protectedIds = [
   'protected-eu-1-fill', 'protected-eu-2-fill'];
 
 const filterGadm1Names = (result) => {
-//{ "NAME_0": "Trinidad and Tobago", "NAME_1": "Mayaro\/Rio Claro" },
-//{ "NAME_0": "Trinidad and Tobago", "NAME_1": "Tunapuna\/Piarco" },
-  console.log("carmen geojson: ", result);
   const placeName = result.place_name;
-  console.log("place name: ", placeName);
   const adminName = placeName.split(',')[0];
-  console.log("admin name: ", adminName);
 
   let nameList = [];
   gadm1Names.forEach((name) => {
     nameList.push(name.NAME_1);
   });
-  console.log("nameList ", nameList);
 
   if (nameList.includes(adminName)) {
     return true;
@@ -64,6 +59,18 @@ const filterGadm1Names = (result) => {
   else {
     return false;
   }
+}
+
+const localGadm1Geocoder = (result) => {
+  const regex = new RegExp(result, "gi");
+  let returnCarmen = [];
+  gadm1Carmen.forEach((gadm1) => {
+
+    const found = gadm1.place_name.match(regex);
+    if (found) returnCarmen.push(gadm1);
+
+  });
+  return returnCarmen;
 }
 
 const Map = () => {
@@ -162,6 +169,7 @@ const Map = () => {
     accessToken: mapboxgl.accessToken,
     types: 'region',
     filter: filterGadm1Names,
+    localGeocoder: localGadm1Geocoder,
     mapboxgl: mapboxgl
   });
 
