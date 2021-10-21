@@ -21,6 +21,7 @@ import mapLayers from './LayerDefinitions';
 import { coastalHabitats } from './ScaleDefinitions';
 import { protectedLayers } from './ScaleDefinitions';
 import { modifiedDefaultStyle } from './mapboxDrawStyle';
+import { gadm1Names } from './gadm1Names';
 
 //mapboxgl.workerClass = MapboxWorker;
 mapboxgl.accessToken =
@@ -42,6 +43,28 @@ const protectedIds = [
   'protected-north-america-fill', 'protected-eu-0-fill',
   'protected-eu-1-fill', 'protected-eu-2-fill'];
 
+const filterGadm1Names = (result) => {
+//{ "NAME_0": "Trinidad and Tobago", "NAME_1": "Mayaro\/Rio Claro" },
+//{ "NAME_0": "Trinidad and Tobago", "NAME_1": "Tunapuna\/Piarco" },
+  console.log("carmen geojson: ", result);
+  const placeName = result.place_name;
+  console.log("place name: ", placeName);
+  const adminName = placeName.split(',')[0];
+  console.log("admin name: ", adminName);
+
+  let nameList = [];
+  gadm1Names.forEach((name) => {
+    nameList.push(name.NAME_1);
+  });
+  console.log("nameList ", nameList);
+
+  if (nameList.includes(adminName)) {
+    return true;
+  }
+  else {
+    return false;
+  }
+}
 
 const Map = () => {
   function getMapStyleSymbolId(map) {
@@ -138,6 +161,7 @@ const Map = () => {
   const geocoderAdmin = new MapboxGeocoder({
     accessToken: mapboxgl.accessToken,
     types: 'region',
+    filter: filterGadm1Names,
     mapboxgl: mapboxgl
   });
 
@@ -197,7 +221,7 @@ const Map = () => {
     document
       .querySelector(".mapbox-gl-draw_ctrl-draw-btn.mapbox-gl-draw_polygon")
       .setAttribute("title", drawToolTip);
-    const trashToolTip = `To remove all polygons, select a polygon and click.`
+    const trashToolTip = `To remove all polygons, click any polygon and trash.`
     document
       .querySelector(".mapbox-gl-draw_ctrl-draw-btn.mapbox-gl-draw_trash")
       .setAttribute("title", trashToolTip);
@@ -299,17 +323,6 @@ const Map = () => {
               if(service === 'coastal-habitat' || service === 'protected-areas') {
                 return;
               }
-              /*
-              else if(service === 'protected-areas') {
-                const protFeat = map.queryRenderedFeatures(e.point, { layers: protectedIds });
-                if(protFeat.length) {
-                  htmlString = htmlString + `
-                   <h5><u>Protected area</u></h5>
-                   <h5>Name:  ${protFeat[0].properties.NAME}</h5>
-                  `
-                }
-              }
-              */
               else {
                 const attrKey = clickPopupKey[service].key;
                 htmlString = htmlString + `
@@ -323,7 +336,7 @@ const Map = () => {
           });
           if(pctNotice) {
             htmlString += `<br/><h5>* percentile is in comparison with the mean value
-            of other regions within the same country.</h5>`;
+            of other hydrobasins within the same country.</h5>`;
           }
           if (!htmlString.includes('h4')) {
               htmlString = htmlString + `
@@ -353,6 +366,22 @@ const Map = () => {
     map.on('load', () => {
       scale.current = 'global';
       console.log("LOAD EVENT");
+
+      const firstSymbolId = getMapStyleSymbolId(map);
+      mapLayers.forEach((layer) => {
+        map.addLayer(layer.mapLayer, firstSymbolId);
+      });
+
+      // Turns all road layers in basemap non-visible
+      map.getStyle().layers.map(function (layer) {
+        if (layer.id.indexOf('road') >= 0) {
+          map.setLayoutProperty(layer.id, 'visibility', 'none');
+        }
+      });
+
+      // Get the admin boundary names to restrict geocoder search
+      const adminLayer = map.getLayer('stats-gadm1');
+      console.log("gadm1 layer: ", adminLayer);
 
       // Add geocoder result to container.
       geocoderNational.on('result', function (e) {
@@ -436,17 +465,6 @@ const Map = () => {
 //        ]);
 //      }
 
-      const firstSymbolId = getMapStyleSymbolId(map);
-      mapLayers.forEach((layer) => {
-        map.addLayer(layer.mapLayer, firstSymbolId);
-      });
-
-      // Turns all road layers in basemap non-visible
-      map.getStyle().layers.map(function (layer) {
-        if (layer.id.indexOf('road') >= 0) {
-          map.setLayoutProperty(layer.id, 'visibility', 'none');
-        }
-      });
 
       setMap(map);
     });
@@ -619,7 +637,7 @@ const Map = () => {
           });
           if(pctNotice) {
             htmlString + `<br/><h5>* percentile is in comparison with the mean value
-            of other regions within the same country.</h5>`;
+            of other hydrobasins within the same country.</h5>`;
           }
           if (!htmlString.includes('h4')) {
               htmlString = htmlString + `
