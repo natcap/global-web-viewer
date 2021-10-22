@@ -28,7 +28,13 @@ export const scales = [
     },
     {
       id: "local",
-      name: "Level 08 Hydrobasins",
+      name: "Draw custom area of focus",
+      label: `Draw an area of focus using the polygon tool to the right
+      and examine ecosystem service values in the surrounding area
+      (intersecting level 8 hydrobasins). Ecosystem services at the hydrobasin
+      level are visible past zoom level 5. See the basemap control for a
+      display of the current zoom level.`,
+      /*
       label:  `Identify hotspots of ecosystem service values within a
       level 08 hydrobasin. Hydrobasins are visible when zoomed past zoom
       level 5. See the basemap control for a display of the current zoom level.
@@ -37,6 +43,7 @@ export const scales = [
       helpText: `Identify hotspots of ecosystem service values within a
       level 08 hydrobasin. Hydrobasins are visible when zoomed past zoom
       level 5. See the basemap control for a display of the current zoom level.`,
+      */
       iconKey: "bimappin",
       defaultChecked: false,
     },

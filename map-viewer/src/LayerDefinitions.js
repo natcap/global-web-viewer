@@ -252,6 +252,31 @@ const mapLayers = [
     }
   },
   {
+    layerID: 'stats-hybas-line',
+    name: 'HydroBASIN Lev08 Sed',
+    serviceType: 'all',
+    scaleID: 'none',
+    mapLayer: {
+      id: 'stats-hybas-line',
+      minzoom: 5,
+      type: 'line',
+      'source-layer': 'hybas_all_stats',
+      paint: {
+        'line-color': '#fcf99f',
+        'line-width': 2,
+        'line-opacity': 0.00,
+      },
+      layout: {
+        visibility: 'visible',
+      },
+      source: {
+        type: 'vector',
+        url: 'mapbox://ddenu.cme0lyel',
+        generatedId: true
+      },
+    }
+  },
+  {
     layerID: 'stats-hybas',
     name: 'HydroBASIN Lev08 Sed',
     serviceType: 'all',

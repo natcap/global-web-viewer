@@ -10,6 +10,7 @@ import MapboxDraw from '@mapbox/mapbox-gl-draw';
 import '@mapbox/mapbox-gl-draw/dist/mapbox-gl-draw.css';
 // Had to npm install @mapbox/mapbox-gl-geocoder and import like below
 import * as MapboxGeocoder from '@mapbox/mapbox-gl-geocoder';
+import * as turf from '@turf/turf';
 
 import './Map.css';
 
@@ -19,6 +20,9 @@ import BasemapControl from './components/BasemapControl';
 import mapLayers from './LayerDefinitions';
 import { coastalHabitats } from './ScaleDefinitions';
 import { protectedLayers } from './ScaleDefinitions';
+import { modifiedDefaultStyle } from './mapboxDrawStyle';
+import { gadm1Carmen } from './gadm1Carmen';
+import { gadm1Names } from './gadm1Names';
 
 //mapboxgl.workerClass = MapboxWorker;
 mapboxgl.accessToken =
@@ -40,6 +44,34 @@ const protectedIds = [
   'protected-north-america-fill', 'protected-eu-0-fill',
   'protected-eu-1-fill', 'protected-eu-2-fill'];
 
+const filterGadm1Names = (result) => {
+  const placeName = result.place_name;
+  const adminName = placeName.split(',')[0];
+
+  let nameList = [];
+  gadm1Names.forEach((name) => {
+    nameList.push(name.NAME_1);
+  });
+
+  if (nameList.includes(adminName)) {
+    return true;
+  }
+  else {
+    return false;
+  }
+}
+
+const localGadm1Geocoder = (result) => {
+  const regex = new RegExp(result, "gi");
+  let returnCarmen = [];
+  gadm1Carmen.forEach((gadm1) => {
+
+    const found = gadm1.place_name.match(regex);
+    if (found) returnCarmen.push(gadm1);
+
+  });
+  return returnCarmen;
+}
 
 const Map = () => {
   function getMapStyleSymbolId(map) {
@@ -95,6 +127,14 @@ const Map = () => {
   const [lng, setLng] = useState(16.8);
   const [lat, setLat] = useState(30.0);
   const [zoom, setZoom] = useState(1.64);
+
+  const [drawing, _setDrawing] = useState(false);
+  const drawingRef = useRef(drawing);
+  const setDrawing = (data) => {
+    drawingRef.current = data;
+    _setDrawing(data);
+  }
+
   const [basemapControl, setBasemapControl] = useState(true);
   const [basemapChev, setBasemapChev] = useState(true);
   //const [mapLayers, setLayers] = useState(layers);
@@ -128,6 +168,8 @@ const Map = () => {
   const geocoderAdmin = new MapboxGeocoder({
     accessToken: mapboxgl.accessToken,
     types: 'region',
+    filter: filterGadm1Names,
+    localGeocoder: localGadm1Geocoder,
     mapboxgl: mapboxgl
   });
 
@@ -175,11 +217,59 @@ const Map = () => {
         polygon: true,
         trash: true,
       },
+      styles: modifiedDefaultStyle,
     });
     map.addControl(draw);
+    // THIS IS A HACK to change Mapbox Draw component tooltip
+    const drawToolTip = `
+    Click this button to draw a polygon on the map.
+    1) Click the button to change the cursor to a "crosshair" symbol
+    2) Click on the map to create points that will determine the shape of the polygon
+    3) To finish drawing double click or click on an existing point`
+    document
+      .querySelector(".mapbox-gl-draw_ctrl-draw-btn.mapbox-gl-draw_polygon")
+      .setAttribute("title", drawToolTip);
+    const trashToolTip = `To remove all polygons, click any polygon and trash.`
+    document
+      .querySelector(".mapbox-gl-draw_ctrl-draw-btn.mapbox-gl-draw_trash")
+      .setAttribute("title", trashToolTip);
 
-    map.on('draw.create', highlightSelected);
-    map.on('draw.delete', removeHighlight);
+    map.on('draw.create', (e) => {
+      if (scale.current === 'local') {
+        const result = highlightSelected(e);
+        setTimeout(() => {
+          new mapboxgl.Popup({closeButton:true, anchor:'left', offset:50})
+            .setLngLat(result.lngLat)
+            .setHTML(result.htmlString)
+            .addTo(map);
+          setDrawing(false)}, 1000);
+      }
+    });
+    map.on('draw.modechange', () => {
+      console.log("draw modechange: ", draw.getMode());
+      if(draw.getMode() !== 'simple_select') {
+        setDrawing(true);
+        //HACK to change the mapboxgl-draw button to stay "highlighted" when
+        //in draw mode
+        document
+          .querySelector(".mapbox-gl-draw_ctrl-draw-btn.mapbox-gl-draw_polygon")
+          .style.backgroundColor = 'rgba(0,0,0,0.1)';
+      }
+      else {
+        //HACK to change the mapboxgl-draw button to remove style set above
+        document
+          .querySelector(".mapbox-gl-draw_ctrl-draw-btn.mapbox-gl-draw_polygon")
+          .removeAttribute('style');//.backgroundColor = 'rgba(0,0,0,0)';
+        setTimeout(() => {
+          setDrawing(false)}, 1000);
+      }
+    });
+    map.on('draw.delete', () => {
+      console.log("draw delete");
+      removeHighlight();
+      draw.deleteAll();
+      setDrawing(false);
+    });
     //map.on('draw.update', updateArea);
 
     function highlightSelected(e) {
@@ -203,22 +293,73 @@ const Map = () => {
         var features = map.queryRenderedFeatures(bbox, {
           layers: ['stats-hybas']
         });
+        let popupBbox = turf.bbox(features[0]);
         let featList = [];
         features.forEach((feat) => {
           const featID = feat.properties.HYBAS_ID;
-          featList.push(featID);
+          // Sometimes because of how tiles and zooms work, we could get 
+          // duplicate features returned from the query.
+          if (!(featID in featList)) {
+            featList.push(featID);
+            const curBbox = turf.bbox(feat);
+            popupBbox[2] = Math.max(curBbox[2], popupBbox[2]);
+            popupBbox[3] = Math.max(curBbox[3], popupBbox[3]);
+          }
         });
+        console.log("draw hybas selected: ", featList);
 
         map.setPaintProperty(
           'stats-hybas', 'fill-opacity', [
             'match', ['get', 'HYBAS_ID'], [...featList], 0.0, 0.8]);
+        map.setPaintProperty(
+          'stats-hybas-line', 'line-opacity', [
+            'match', ['get', 'HYBAS_ID'], [...featList], 1.0, 0.0]);
 
-        //map.setFeatureState(
-        //  { source: 'stats-hybas', sourceLayer: 'hybas_all_stats', id: featId },
-        //  { hover: true }
-        //);
+        // Need to make sure the line layer is on top of the fill layer
+        const topLayer = getMapStyleSymbolId(map);
+        map.moveLayer('stats-hybas-line', topLayer);
+
+        // Format popup with combines highlighted features
+        //
+        if(features.length > 0) {
+          let htmlString = `<h3>Hydrobasin level 08 Stats</h3>`;
+          let pctNotice = false;
+          const currentServices = [...servicesRef.current];
+          features.forEach((feat) => {
+            htmlString += `<h4>HydroBASIN ID ${feat.properties.HYBAS_ID}</h4>`
+            currentServices.forEach((service) => {
+              if(service === 'coastal-habitat' || service === 'protected-areas') {
+                return;
+              }
+              else {
+                const attrKey = clickPopupKey[service].key;
+                htmlString = htmlString + `
+                 <h4><u>${clickPopupKey[service].name}</u></h4>
+                 <h5>Mean:  ${feat.properties[attrKey+'mean'].toExponential(3)}</h5>
+                 <h5>Percentile*:  ${feat.properties[attrKey+'pct'].toFixed(2)}</h5>
+                `
+                pctNotice = true;
+              }
+            });
+          });
+          if(pctNotice) {
+            htmlString += `<br/><h5>* percentile is in comparison with the mean value
+            of other hydrobasins within the same country.</h5>`;
+          }
+          if (!htmlString.includes('h4')) {
+              htmlString = htmlString + `
+                <h5>No active layer selected. Select a service layer
+                to see aggregated statistics.</h5>`;
+          }
+          // Prepare the lng lat of where the popup with stats should be
+          // which is to the right of selected features bbox
+          const popupLngLat = [popupBbox[2], popupBbox[3]];
+          return {
+            htmlString: htmlString,
+            lngLat: popupLngLat,
+          }
+        }
       }
-
     }
 
     function removeHighlight(e) {
@@ -226,31 +367,29 @@ const Map = () => {
       console.log(e)
       map.setPaintProperty(
         'stats-hybas', 'fill-opacity', 0.8);
-      /*
-      const data = draw.getAll();
-      if (data.features.length > 0) {
-        console.log(e);
-        console.log(data);
-        const geoms = data.features[0].geometry.coordinates[0];
-        console.log(geoms);
-        let arrayX = [];
-        let arrayY = [];
-        geoms.forEach((point) => {
-          arrayX.push(point[0]);
-          arrayY.push(point[1]);
-        });
-
-        const bbox = [Math.min(...arrayX), Math.min(...arrayY), Math.max(...arrayX), Math.max(...arrayY)];
-        console.log(bbox);
-      }
-      */
-
+      map.setPaintProperty(
+        'stats-hybas-line', 'line-opacity', 0.0);
     }
-    //var hoveredStateId = null;
 
     map.on('load', () => {
       scale.current = 'global';
       console.log("LOAD EVENT");
+
+      const firstSymbolId = getMapStyleSymbolId(map);
+      mapLayers.forEach((layer) => {
+        map.addLayer(layer.mapLayer, firstSymbolId);
+      });
+
+      // Turns all road layers in basemap non-visible
+      map.getStyle().layers.map(function (layer) {
+        if (layer.id.indexOf('road') >= 0) {
+          map.setLayoutProperty(layer.id, 'visibility', 'none');
+        }
+      });
+
+      // Get the admin boundary names to restrict geocoder search
+      const adminLayer = map.getLayer('stats-gadm1');
+      console.log("gadm1 layer: ", adminLayer);
 
       // Add geocoder result to container.
       geocoderNational.on('result', function (e) {
@@ -334,17 +473,6 @@ const Map = () => {
 //        ]);
 //      }
 
-      const firstSymbolId = getMapStyleSymbolId(map);
-      mapLayers.forEach((layer) => {
-        map.addLayer(layer.mapLayer, firstSymbolId);
-      });
-
-      // Turns all road layers in basemap non-visible
-      map.getStyle().layers.map(function (layer) {
-        if (layer.id.indexOf('road') >= 0) {
-          map.setLayoutProperty(layer.id, 'visibility', 'none');
-        }
-      });
 
       setMap(map);
     });
@@ -372,10 +500,12 @@ const Map = () => {
       });
       console.log("highlight click feats: ", features);
 
-      const featID = features[0].properties[featName];
-      map.setPaintProperty(
-        layerId, 'fill-opacity', [
-          'match', ['get', featName], featID, 0.0, 0.8]);
+      if(features.length > 0) {
+        const featID = features[0].properties[featName];
+        map.setPaintProperty(
+          layerId, 'fill-opacity', [
+            'match', ['get', featName], featID, 0.0, 0.8]);
+      }
     };
 
     const clickPopupDialogHandler = (e) => {
@@ -515,7 +645,7 @@ const Map = () => {
           });
           if(pctNotice) {
             htmlString + `<br/><h5>* percentile is in comparison with the mean value
-            of other regions within the same country.</h5>`;
+            of other hydrobasins within the same country.</h5>`;
           }
           if (!htmlString.includes('h4')) {
               htmlString = htmlString + `
@@ -573,11 +703,16 @@ const Map = () => {
     // layer open a popup at the location of the click, with description HTML
     // from its properties.
     map.on('click', function (e) {
-      const htmlString = clickPopupDialogHandler(e);
-      new mapboxgl.Popup({closeButton:true})
-      .setLngLat(e.lngLat)
-      .setHTML(htmlString)
-      .addTo(map);
+      //if(draw.getMode() === 'simple_select') {
+      console.log("map click draw mode: ", draw.getMode());
+      console.log("map click drawing: ", drawingRef.current);
+      if(!drawingRef.current) {
+        const htmlString = clickPopupDialogHandler(e);
+        new mapboxgl.Popup({closeButton:true, anchor:'left', offset:50})
+          .setLngLat(e.lngLat)
+          .setHTML(htmlString)
+          .addTo(map);
+      }
     });
 
     // Change the cursor to a pointer when the mouse is over the places layer.
