@@ -66,6 +66,7 @@ export const serviceMenuDetails = [
         metric: `Values are a unitless index representing nitrogen retention
         in natural and semi-natural areas multiplied by the number of people
         downstream of those areas.`,
+        nodata: "#404040",
         source: "Natural Capital Project",
         resolution: "~300m",
         date: "2015",
@@ -108,6 +109,7 @@ export const serviceMenuDetails = [
         metric: `Values are a unitless index representing sediment retention
         in natural and semi-natural areas multiplied by the number of people
         downstream of those areas.`,
+        nodata: "#404040",
         source: "Natural Capital Project",
         resolution: "~300m",
         date: "2015",
@@ -187,6 +189,7 @@ export const serviceMenuDetails = [
        is derived from LandScan data.`,
         metric: `Values represent the number of people within 10 km of 
         natural and semi-natural lands.`,
+        nodata: "#404040",
         source: "Natural Capital Project",
         resolution: "~300m",
         date: "2015",
