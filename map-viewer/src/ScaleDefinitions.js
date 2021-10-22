@@ -312,7 +312,8 @@ export const supportMenuDetails = [
         text: `To determine the location and number of people who receive
         various benefits from nature, LandScan population data from 2017 is
         used.`,
-        metric: "N/A",
+        metric: `Number of people per pixel. Population counts representing an
+        average, or ambient, population distribution.`,
         source: "Oak Ridge National Laboratory.",
         resolution: "~1km",
         date: "2017",

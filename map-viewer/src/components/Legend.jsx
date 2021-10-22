@@ -90,8 +90,9 @@ const legendStyle = {
     colors: [
       '#ffffff', '#ffffd4', '#fee9ac', '#fed080', '#feab46', '#f38821',
       '#de6712', '#be4d0a'],
-    info: `Population counts representing an average, or ambient, population
-    distribution. Low = 0-5, Medium = 250-1000, High = 25000+`,
+    info: `Number of people per pixel. Population counts representing an
+    average, or ambient, population distribution.
+    Low = 0-5, Medium = 250-1000, High = 25000+`,
   },
   'coastal-habitat': {
     id: 'coastal-habitat',
