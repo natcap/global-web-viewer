@@ -6,6 +6,8 @@ import Modal from 'react-bootstrap/Modal';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 
+import { BsInfoCircle} from 'react-icons/bs';
+import { GrDrag } from 'react-icons/gr';
 
 const WelcomeModal = (props) => {
   return (
@@ -17,29 +19,39 @@ const WelcomeModal = (props) => {
     >
       <Modal.Header closeButton className="welcome-title">
         <Modal.Title id="contained-modal-title-vcenter">
-          Prototype Natural Capital World Viewer
+          Natural Capital World Viewer (Prototype)
         </Modal.Title>
       </Modal.Header>
       <Modal.Body>
-        <h4>Getting Started</h4>
+        <h4>Welcome!</h4>
         <p>
-          Welcome to the prototype of the NatCap World Viewer, a web map app 
-          to investigate global data. We have uploaded a sample of our data
-          and implemented a subset of features for this demo. Currently a
-          prototype, we hope to gather user feedback and interest for a
-          production version in the future. Enjoy! 
+          The Natural Capital World Viewer is designed to make nature’s diverse
+          benefits to people easily accessible and understandable. To explore
+          the map, use the menu on the left side of the screen. In Step 1,
+          select the level (global, national, or specific local scale) to view
+          data layers. In Step 2, turn on and off different ecosystem services.
+          In Step 3, interact with additional layers. In the legend, reorganize
+          which layers are on top by clicking and dragging
+          <span>  <GrDrag/>  </span>. Click the <span>  <BsInfoCircle/>  </span>
+          to learn more about the data. Change the basemap to your preference
+          in the bottom right of the screen.
         </p>
       </Modal.Body>
       <Modal.Footer>
         <Row>
           <Col>
-            <span> P.S. Because this is a prototype we have not had a 
-              chance to run this through the testing gauntlet. If something breaks,
-              simply hit the browser refresh button. Thanks for understanding.
-            </span>
+            This prototype contains just a sample of the extensive
+            global data that we use at the Natural Capital Project. In this
+            stage, we’re still testing, learning, and gathering user feedback
+            and interest. If something breaks, simply hit the refresh button
+            on your browser (and thanks for understanding!). We are eager to
+            hear your thoughts, so please send us feedback at
+            <a href="naturalcapitalproject@stanford.edu"> naturalcapitalproject@stanford.edu</a>.
           </Col>
+        </Row>
+        <Row>
           <Col xs="auto">
-            <Button onClick={props.onHide}>Close</Button>
+            <Button onClick={props.onHide}>Start Exploring</Button>
           </Col>
         </Row>
       </Modal.Footer>

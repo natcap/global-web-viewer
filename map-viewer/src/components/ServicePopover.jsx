@@ -7,7 +7,7 @@ import OverlayTrigger from 'react-bootstrap/OverlayTrigger';
 import Col from 'react-bootstrap/Col';
 import Form from 'react-bootstrap/Form';
 
-import { BsInfoCircle} from 'react-icons/bs';
+import { BsInfoCircle, BsFillSquareFill } from 'react-icons/bs';
 
 const ServicePopover = (props) => {
   const sourceArray = Array.isArray(props.content.source);
@@ -51,6 +51,10 @@ const ServicePopover = (props) => {
       <Popover.Content>
         <h5>Metric</h5>
         {props.content.metric}
+        {props.content.nodata &&
+          <><br/><br/><BsFillSquareFill color={props.content.nodata}/> = Nodata.
+            Areas in dark gray are not providing a service to the modeled beneficiaries.</>
+        }
         <h5>Desciption</h5>
         {props.content.text}
         <h5>Source</h5>

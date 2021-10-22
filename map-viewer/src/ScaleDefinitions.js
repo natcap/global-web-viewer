@@ -66,6 +66,7 @@ export const serviceMenuDetails = [
         metric: `Values are a unitless index representing nitrogen retention
         in natural and semi-natural areas multiplied by the number of people
         downstream of those areas.`,
+        nodata: "#404040",
         source: "Natural Capital Project",
         resolution: "~300m",
         date: "2015",
@@ -108,6 +109,7 @@ export const serviceMenuDetails = [
         metric: `Values are a unitless index representing sediment retention
         in natural and semi-natural areas multiplied by the number of people
         downstream of those areas.`,
+        nodata: "#404040",
         source: "Natural Capital Project",
         resolution: "~300m",
         date: "2015",
@@ -187,6 +189,7 @@ export const serviceMenuDetails = [
        is derived from LandScan data.`,
         metric: `Values represent the number of people within 10 km of 
         natural and semi-natural lands.`,
+        nodata: "#404040",
         source: "Natural Capital Project",
         resolution: "~300m",
         date: "2015",
@@ -312,7 +315,8 @@ export const supportMenuDetails = [
         text: `To determine the location and number of people who receive
         various benefits from nature, LandScan population data from 2017 is
         used.`,
-        metric: "N/A",
+        metric: `Number of people per pixel. Population counts representing an
+        average, or ambient, population distribution.`,
         source: "Oak Ridge National Laboratory.",
         resolution: "~1km",
         date: "2017",
