@@ -223,6 +223,19 @@ canvas {
     width: 200px!important;
     min-width: 150px!important;
 }
+.disabled-search {
+    width: 200px;
+    min-width: 150px;
+}
+.disabled-search.input-group-prepend {
+}
+.form-control:disabled {
+  color: #000;
+  background-color: #bababa;
+}
+.search-icon {
+  font-size: 18px;
+}
 
 .dep-form-check-label {
   background-color: #99ccff;

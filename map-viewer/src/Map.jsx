@@ -157,7 +157,7 @@ const Map = () => {
 
 
   //const scaleRef = React.useRef(scale);
-  const scale = React.useRef(null);
+  const scale = React.useRef('global');
 
   const geocoderNational = new MapboxGeocoder({
     accessToken: mapboxgl.accessToken,
@@ -170,6 +170,7 @@ const Map = () => {
     types: 'region',
     filter: filterGadm1Names,
     localGeocoder: localGadm1Geocoder,
+    localGeocoderOnly: true,  // Setting this helps avoid duplicates in suggestion results
     mapboxgl: mapboxgl
   });
 
@@ -1017,6 +1018,7 @@ const Map = () => {
           changeScaleState={changeScaleState}
           geocoderNational={geocoderNational}
           geocoderAdmin={geocoderAdmin}
+          scaleState={scale.current}
         />
         <Legend
           layers={visibleLayers}
