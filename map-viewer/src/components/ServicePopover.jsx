@@ -90,7 +90,12 @@ const ServicePopover = (props) => {
 
   return (
     <OverlayTrigger trigger="click" rootClose={true} placement="right" overlay={popover}>
-      <Button id="service-popover" variant="info" className="button-info" bsPrefix="info-btn">
+      <Button
+        id="service-popover"
+        variant="info"
+        className="button-info"
+        bsPrefix="info-btn"
+        disabled={props.disabled}>
         <BsInfoCircle />
       </Button>
     </OverlayTrigger>
@@ -100,6 +105,7 @@ const ServicePopover = (props) => {
 ServicePopover.propTypes = {
   title: PropTypes.string.isRequired,
   content: PropTypes.object.isRequired,
+  disabled: PropTypes.bool.isRequired,
 }
 
 export default ServicePopover;

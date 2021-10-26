@@ -399,7 +399,9 @@ const Map = () => {
         }
         const countryName = e.result.place_name;
         const lngLatBbox = e.result.bbox;
-        map.fitBounds(lngLatBbox, {padding:40}).once('moveend', () => {
+        map.fitBounds(lngLatBbox,
+          {padding: {left: 340, right: 60, top: 20, bottom: 20},
+           speed: 0.3, curve: 1.0}).once('moveend', () => {
         //const resultCenter = e.result.center;
         //const centerPointLike = map.project(resultCenter);
           const bbXYMinLike = map.project([lngLatBbox[0], lngLatBbox[1]]);
@@ -434,7 +436,9 @@ const Map = () => {
         // Get only the admin name, separate from associated country
         const adminName = e.result.place_name.split(',')[0];
         const lngLatBbox = e.result.bbox;
-        map.fitBounds(lngLatBbox, {padding:40}).once('moveend', () => {
+        map.fitBounds(lngLatBbox,
+          {padding: {left: 340, right: 60, top: 20, bottom: 20},
+           speed: 0.3, curve: 1.1}).once('moveend', () => {
         //const resultCenter = e.result.center;
         //const centerPointLike = map.project(resultCenter);
           const bbXYMinLike = map.project([lngLatBbox[0], lngLatBbox[1]]);
