@@ -5,8 +5,12 @@ import { FaGlobe } from 'react-icons/fa';
 import { GiAfrica } from 'react-icons/gi';
 import { BiPolygon, BiMapPin } from 'react-icons/bi';
 import { IoIosArrowDropdown } from 'react-icons/io';
+import { IoSearchSharp } from 'react-icons/io5';
+
 
 import Form from 'react-bootstrap/Form';
+import FormControl from 'react-bootstrap/FormControl';
+import InputGroup from 'react-bootstrap/InputGroup';
 import Col from 'react-bootstrap/Col';
 import Row from 'react-bootstrap/Row';
 import Card from 'react-bootstrap/Card';
@@ -25,6 +29,22 @@ const IconMap = {
 }
 
 const VerticalMenu = (props) => {
+  const disabledSearch = () => {
+    return (
+      <InputGroup className="disabled-search">
+        <InputGroup.Prepend>
+          <InputGroup.Text id="basic-addon1">
+            <IoSearchSharp color="#949494" className="search-icon"/>
+          </InputGroup.Text>
+        </InputGroup.Prepend>
+        <FormControl
+          id="searchDisable"
+          placeholder="Search"
+          disabled={true}
+        />
+      </InputGroup>
+    );
+  }
 
   useEffect(() => {
     props.geocoderNational.addTo('#geocoder-national');
@@ -34,6 +54,22 @@ const VerticalMenu = (props) => {
   function handleScaleChange(event) {
     const { id, checked } = event.target;
     props.changeScaleState(id, checked);
+  }
+  const hiddenAdminStyle = () => {
+    if (props.scaleState === 'admin') {
+      return {visibility: "visible"};
+    }
+    else {
+      return {visibility: "hidden", display: "none"};
+    }
+  }
+  const hiddenNationalStyle = () => {
+    if (props.scaleState === 'national') {
+      return {visibility: "visible"};
+    }
+    else {
+      return {visibility: "hidden", display: "none"};
+    }
   }
 
   //<span className="menu-desc-text">{scaleObj.label}</span>
@@ -78,10 +114,18 @@ const VerticalMenu = (props) => {
                       />
                     </Col>
                   </Form.Row>
-                  <div
-                    key={`geocoder-${scaleObj.id}`}
-                    id={`geocoder-${scaleObj.id}`}>
-                  </div>
+                  {scaleObj.id === 'admin' &&//props.scaleState &&
+                    <div style={hiddenAdminStyle()} key={`geocoder-${scaleObj.id}`} id={`geocoder-${scaleObj.id}`}> </div>
+                  }
+                  {scaleObj.id === 'national' &&//props.scaleState &&
+                    <div style={hiddenNationalStyle()} key={`geocoder-${scaleObj.id}`} id={`geocoder-${scaleObj.id}`}> </div>
+                  }
+                  {scaleObj.id === 'admin' && props.scaleState !== 'admin' &&
+                    disabledSearch()
+                  }
+                  {scaleObj.id === 'national' && props.scaleState !== 'national' &&
+                    disabledSearch()
+                  }
                 </div>
               ))}
             </Card.Body>
@@ -152,6 +196,7 @@ VerticalMenu.propTypes = {
   changeVisibilityState: PropTypes.func.isRequired,
   geocoderNational: PropTypes.object.isRequired,
   geocoderAdmin: PropTypes.object.isRequired,
+  scaleState: PropTypes.string.isRequired,
 }
 
 export default VerticalMenu;
