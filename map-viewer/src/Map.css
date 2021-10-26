@@ -159,6 +159,9 @@ canvas {
   outline-color: transparent;
   box-shadow: none;
 }
+.button-info:disabled {
+  color: #6c757d;
+}
 
 .dropdown-icon {
   font-size: 25px;

@@ -58,6 +58,7 @@ const LayerSelect = (props) => {
           <ServicePopover
             title={service.label}
             content={service.helpText}
+            disabled={service.disable}
           />
         </Col>
       </Form.Row>
