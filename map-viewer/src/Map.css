@@ -241,12 +241,17 @@ canvas {
   z-index: 1001;
 }
 .mapboxgl-ctrl-geocoder {
-    width: 200px!important;
+    width: 250px!important;
     min-width: 150px!important;
+    font-size: 15px;
 }
 .disabled-search {
-    width: 200px;
+    width: 250px;
     min-width: 150px;
+}
+#searchDisable {
+  font-family: 'Source Sans Pro', sans-serif;
+  font-size: 15px;
 }
 .disabled-search.input-group-prepend {
 }

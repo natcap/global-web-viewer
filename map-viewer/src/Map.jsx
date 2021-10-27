@@ -163,11 +163,13 @@ const Map = () => {
     accessToken: mapboxgl.accessToken,
     types: 'country',
     mapboxgl: mapboxgl,
+    placeholder: "Search or click a country",
     //collapsed: true,
   });
   const geocoderAdmin = new MapboxGeocoder({
     accessToken: mapboxgl.accessToken,
     types: 'region',
+    placeholder: "Search or click a region",
     filter: filterGadm1Names,
     localGeocoder: localGadm1Geocoder,
     localGeocoderOnly: true,  // Setting this helps avoid duplicates in suggestion results

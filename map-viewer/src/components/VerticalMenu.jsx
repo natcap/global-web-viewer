@@ -34,7 +34,7 @@ const VerticalMenu = (props) => {
   const [otherOpen, setOtherOpen] = useState(false);
   const [discoverOpen, setDiscoverOpen] = useState(false);
 
-  const disabledSearch = () => {
+  const disabledSearch = (placeholderKey) => {
     return (
       <InputGroup className="disabled-search">
         <InputGroup.Prepend>
@@ -44,7 +44,7 @@ const VerticalMenu = (props) => {
         </InputGroup.Prepend>
         <FormControl
           id="searchDisable"
-          placeholder="Search"
+          placeholder={`Search or click a ${placeholderKey}`}
           disabled={true}
         />
       </InputGroup>
@@ -128,10 +128,10 @@ const VerticalMenu = (props) => {
                     <div style={hiddenNationalStyle()} key={`geocoder-${scaleObj.id}`} id={`geocoder-${scaleObj.id}`}> </div>
                   }
                   {scaleObj.id === 'admin' && props.scaleState !== 'admin' &&
-                    disabledSearch()
+                    disabledSearch('region')
                   }
                   {scaleObj.id === 'national' && props.scaleState !== 'national' &&
-                    disabledSearch()
+                    disabledSearch('country')
                   }
                 </div>
               ))}
