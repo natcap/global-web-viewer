@@ -1,11 +1,11 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 
 import { FaGlobe } from 'react-icons/fa';
 import { GiAfrica } from 'react-icons/gi';
 import { BiPolygon, BiMapPin } from 'react-icons/bi';
-import { IoIosArrowDropdown } from 'react-icons/io';
 import { IoSearchSharp } from 'react-icons/io5';
+import { FaChevronCircleUp, FaChevronCircleDown } from 'react-icons/fa';
 
 
 import Form from 'react-bootstrap/Form';
@@ -29,6 +29,11 @@ const IconMap = {
 }
 
 const VerticalMenu = (props) => {
+  const [scaleOpen, setScaleOpen] = useState(true);
+  const [layersOpen, setLayersOpen] = useState(true);
+  const [otherOpen, setOtherOpen] = useState(false);
+  const [discoverOpen, setDiscoverOpen] = useState(false);
+
   const disabledSearch = () => {
     return (
       <InputGroup className="disabled-search">
@@ -77,10 +82,12 @@ const VerticalMenu = (props) => {
     <Form className="vertical-menu">
       <Accordion defaultActiveKey="0">
         <Card>
-          <Accordion.Toggle as={Card.Header} eventKey="0" className="accordion-header">
+          <Accordion.Toggle as={Card.Header} eventKey="0" className="accordion-header" onClick={() => setScaleOpen(!scaleOpen)}>
             <Row>
               <Col>1) Select Area of Focus</Col>
-              <Col xs="auto"><IoIosArrowDropdown className="dropdown-icon"/></Col>
+              <Col xs="auto">
+                {scaleOpen ? <FaChevronCircleDown/> : <FaChevronCircleUp/> }
+              </Col>
             </Row>
           </Accordion.Toggle>
           <Accordion.Collapse eventKey="0" className="accordion-header scale-accordion">
@@ -135,10 +142,12 @@ const VerticalMenu = (props) => {
 
       <Accordion defaultActiveKey="1">
         <Card>
-          <Accordion.Toggle as={Card.Header} eventKey="1" className="accordion-header">
+          <Accordion.Toggle as={Card.Header} eventKey="1" className="accordion-header" onClick={() => setLayersOpen(!layersOpen)}>
             <Row>
               <Col>2) Explore Ecosystem Services</Col>
-              <Col xs="auto"><IoIosArrowDropdown className="dropdown-icon"/></Col>
+              <Col xs="auto">
+                {layersOpen ? <FaChevronCircleDown/> : <FaChevronCircleUp/> }
+              </Col>
             </Row>
           </Accordion.Toggle>
           <Accordion.Collapse eventKey="1" className="accordion-header">
@@ -154,10 +163,12 @@ const VerticalMenu = (props) => {
 
       <Accordion>
         <Card>
-          <Accordion.Toggle as={Card.Header} eventKey="2" className="accordion-header">
+          <Accordion.Toggle as={Card.Header} eventKey="2" className="accordion-header" onClick={() => setOtherOpen(!otherOpen)}>
             <Row>
               <Col>3) Explore Other Layers</Col>
-              <Col xs="auto"><IoIosArrowDropdown className="dropdown-icon"/></Col>
+              <Col xs="auto">
+                {otherOpen ? <FaChevronCircleDown/> : <FaChevronCircleUp/> }
+              </Col>
             </Row>
           </Accordion.Toggle>
           <Accordion.Collapse eventKey="2" className="accordion-header">
@@ -173,10 +184,12 @@ const VerticalMenu = (props) => {
 
       <Accordion>
         <Card>
-          <Accordion.Toggle as={Card.Header} eventKey="3" className="accordion-header">
+          <Accordion.Toggle as={Card.Header} eventKey="3" className="accordion-header" onClick={() => setDiscoverOpen(!discoverOpen)}>
             <Row>
               <Col>Discover and Case Studies<br/>[ Coming Soon ]</Col>
-              <Col xs="auto"><IoIosArrowDropdown className="dropdown-icon"/></Col>
+              <Col xs="auto">
+                {discoverOpen ? <FaChevronCircleDown/> : <FaChevronCircleUp/> }
+              </Col>
             </Row>
           </Accordion.Toggle>
           <Accordion.Collapse eventKey="3" className="accordion-header">
