@@ -1013,6 +1013,37 @@ const Map = () => {
     setBasemapChev(!basemapChev);
   }
 
+  const handleVisibilityChange = (serviceResult, checked) => {
+    console.log("service ", serviceResult);
+    console.log("checked ", checked);
+    let visibleLayersUpdate = {...layersRef.current};
+    console.log("change vis vis: ", visibleLayersUpdate);
+    let selectedServicesUpdate = [...selectedServices];
+    console.log("servicesRef current: ", selectedServicesUpdate);
+    if(!checked) {
+      if(serviceResult in multiFileLayers) {
+        multiFileLayers[serviceResult].forEach((childLayer) => {
+            map.setLayoutProperty(childLayer.id, 'visibility', 'none');
+        });
+      }
+      else {
+        const layer = layersRef.current[serviceResult];
+        map.setLayoutProperty(layer.layerID, 'visibility', 'none');
+      }
+    }
+    else {
+      if(serviceResult in multiFileLayers) {
+        multiFileLayers[serviceResult].forEach((childLayer) => {
+            map.setLayoutProperty(childLayer.id, 'visibility', 'visible');
+        });
+      }
+      else {
+        const layer = layersRef.current[serviceResult];
+        map.setLayoutProperty(layer.layerID, 'visibility', 'visible');
+      }
+      setMap(map);
+    }
+  }
 
   return (
       <Col className="map-container" >
@@ -1028,6 +1059,7 @@ const Map = () => {
           layers={visibleLayers}
           services={selectedServices}
           changeLayerOrder={changeLayerOrder}
+          handleVisibilityChange={handleVisibilityChange}
         />
         <Button
           onClick={changeBasemapControl}

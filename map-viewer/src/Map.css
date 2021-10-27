@@ -132,6 +132,24 @@ canvas {
   outline: none;
   box-shadow:none;
 }
+.btn-group-toggle>.button-eye input[type=checkbox] {
+  position: absolute;
+  clip: rect(0,0,0,0);
+  pointer-events: none;
+}
+.button-eye {
+  color: #000;
+  background-color:#fff;
+  font-size: 20px;
+  padding: 0;
+  padding-left: 0.0rem;
+  margin: 0;
+  border: 0;
+  outline-style: none;
+}
+.button-eye:hover {
+  cursor: pointer;
+}
 .button-info {
   background-color:transparent;
   font-size: 18px;
@@ -299,15 +317,20 @@ canvas {
 .legend-desc {
   z-index: 1;
   color: #000;
-  padding-left: 2px;
+  padding-left: 0px;
   padding-bottom: 5px;
   font-weight: bold;
   font-size: 13px;
+  margin-left: 0px;
 }
 .d3-legend {
   z-index: 1;
   width: 220px;
   height: auto;
+}
+.d3-legend-row {
+  padding-top: 5px;
+  margin-left: 0px;
 }
 .d3-legend.sequential{
   z-index: 1;
@@ -345,7 +368,7 @@ canvas {
 }
 .legend-item .col {
   padding: 0px;
-  margin-left: 15px;
+  margin-left: 0px;
 }
 .legend-item .col-auto {
   padding-left: 0px;

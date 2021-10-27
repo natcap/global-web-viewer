@@ -10,17 +10,14 @@ import Form from 'react-bootstrap/Form';
 
 import { FaChevronCircleUp, FaChevronCircleDown } from 'react-icons/fa';
 
-import D3Legend from './D3Legend';
-import InfoPopover from './InfoPopover';
+import SortableItem from './SortableItem';
 
 import {
   sortableContainer,
   sortableElement,
-  sortableHandle,
+  //sortableHandle,
 } from 'react-sortable-hoc';
 import {arrayMoveImmutable} from 'array-move';
-
-import { GrDrag } from 'react-icons/gr';
 
 const legendStyle = {
   'sediment': {
@@ -117,32 +114,14 @@ const legendStyle = {
   },
 }
 
-const DragHandle = sortableHandle(() => 
-  <span>{<GrDrag/>}</span>);
 
-const SortableItem = sortableElement(({value, index}) => (
-    <ListGroup.Item key={`legendStyle-${index}`} className="legend-item">
-      <Row>
-        <Col className="drag-handle" xs="auto">
-          <DragHandle />
-        </Col>
-        <Col className="legend-desc" xs="auto">
-          {legendStyle[value].desc}
-        </Col>
-      </Row>
-      <Row>
-        <Col>
-          <D3Legend serviceType={value} legendStyle={legendStyle}/>
-        </Col>
-        <Col xs="auto">
-          <InfoPopover
-            key={`legend-popover-${value}`}
-            title={legendStyle[value].name}
-            content={legendStyle[value].info}
-          />
-        </Col>
-      </Row>
-    </ListGroup.Item>
+const ItemSortable = sortableElement(({value, index, handleVisibilityChange}) => (
+  <SortableItem
+    value={value}
+    index={index}
+    legendStyle={legendStyle}
+    handleVisibilityChange={handleVisibilityChange}
+  />
 ));
 
 const SortableContainer = sortableContainer(({children}) => {
@@ -157,14 +136,19 @@ const Legend = (props) => {
     const sortedServices = arrayMoveImmutable(props.services, oldIndex, newIndex);
     props.changeLayerOrder(sortedServices, oldIndex, newIndex);
   }
+  function handleVisibilityChange(serviceValue, visibilityBool) {
+    console.log("Legend vis change: ", serviceValue, visibilityBool);
+    props.handleVisibilityChange(serviceValue, visibilityBool);
+  }
 
   const renderLegend = (serviceType, i) => {
       return (
-        <SortableItem
+        <ItemSortable
           className="sortable-item"
           key={`item-${serviceType}-${i}`}
-          index={i}
-          value={serviceType} />
+          index={`${i}`}
+          value={serviceType}
+          handleVisibilityChange={handleVisibilityChange}/>
       );
   };
 
@@ -212,6 +196,7 @@ Legend.propTypes = {
   layers: PropTypes.object.isRequired,
   services: PropTypes.array.isRequired,
   changeLayerOrder: PropTypes.func.isRequired,
+  handleVisibilityChange: PropTypes.func.isRequired,
 }
 
 export default Legend;
