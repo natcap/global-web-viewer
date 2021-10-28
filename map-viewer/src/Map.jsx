@@ -1061,13 +1061,13 @@ const Map = () => {
           changeScaleState={changeScaleState}
           geocoderNational={geocoderNational}
           geocoderAdmin={geocoderAdmin}
-          scaleState={scale.current}
         />
         <Legend
           layers={visibleLayers}
           services={selectedServices}
           changeLayerOrder={changeLayerOrder}
           handleVisibilityChange={handleVisibilityChange}
+          scaleState={scale.current}
         />
         <Button
           onClick={changeBasemapControl}

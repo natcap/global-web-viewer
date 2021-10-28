@@ -115,11 +115,12 @@ const legendStyle = {
 }
 
 
-const ItemSortable = sortableElement(({value, index, handleVisibilityChange}) => (
+const ItemSortable = sortableElement(({value, index, handleVisibilityChange, scaleState}) => (
   <SortableItem
     value={value}
     index={index}
     legendStyle={legendStyle}
+    scaleState={scaleState}
     handleVisibilityChange={handleVisibilityChange}
   />
 ));
@@ -148,6 +149,7 @@ const Legend = (props) => {
           key={`item-${serviceType}-${i}`}
           index={`${i}`}
           value={serviceType}
+          scaleState={props.scaleState}
           handleVisibilityChange={handleVisibilityChange}/>
       );
   };
@@ -197,6 +199,7 @@ Legend.propTypes = {
   services: PropTypes.array.isRequired,
   changeLayerOrder: PropTypes.func.isRequired,
   handleVisibilityChange: PropTypes.func.isRequired,
+  scaleState: PropTypes.string.isRequired,
 }
 
 export default Legend;

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 
 import ListGroup from 'react-bootstrap/ListGroup';
@@ -29,6 +29,10 @@ const SortableItem = (props) => {
     console.log("eye target: ", value, checked);
     props.handleVisibilityChange(value, checked);
   }
+
+  useEffect(() => {
+    setChecked(true);
+  }, [props.scaleState]);
 
   const DragHandle = sortableHandle(() =>
     <span>{<GrDrag/>}</span>);
@@ -80,6 +84,7 @@ SortableItem.propTypes = {
   index: PropTypes.string.isRequired,
   legendStyle: PropTypes.object.isRequired,
   handleVisibilityChange: PropTypes.func.isRequired,
+  scaleState: PropTypes.string.isRequired,
 }
 
 export default SortableItem;
