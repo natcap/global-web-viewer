@@ -163,11 +163,13 @@ const Map = () => {
     accessToken: mapboxgl.accessToken,
     types: 'country',
     mapboxgl: mapboxgl,
+    placeholder: "Search or click a country",
     //collapsed: true,
   });
   const geocoderAdmin = new MapboxGeocoder({
     accessToken: mapboxgl.accessToken,
     types: 'region',
+    placeholder: "Search or click a region",
     filter: filterGadm1Names,
     localGeocoder: localGadm1Geocoder,
     localGeocoderOnly: true,  // Setting this helps avoid duplicates in suggestion results
@@ -633,8 +635,14 @@ const Map = () => {
                 htmlString = htmlString + `
                  <h4><u>Protected area</u></h4>
                  <h5>Name:  ${protFeat[0].properties.NAME}</h5>
-                `
+                `;
               }
+            }
+            else if(service === 'coastalProtection') {
+              htmlString = htmlString + `
+               <h4><u>${clickPopupKey[service].name}</u></h4>
+               <h5>Coastal protection not aggregated at this scale.</h5>
+              `;
             }
             else {
               if(feat.length) {
@@ -643,13 +651,13 @@ const Map = () => {
                  <h4><u>${clickPopupKey[service].name}</u></h4>
                  <h5>Mean:  ${feat[0].properties[attrKey+'mean'].toExponential(3)}</h5>
                  <h5>Percentile*:  ${feat[0].properties[attrKey+'pct'].toFixed(2)}</h5>
-                `
+                `;
                 pctNotice = true;
               }
             }
           });
           if(pctNotice) {
-            htmlString + `<br/><h5>* percentile is in comparison with the mean value
+            htmlString += `<br/><h5>* percentile is in comparison with the mean value
             of other hydrobasins within the same country.</h5>`;
           }
           if (!htmlString.includes('h4')) {
@@ -1053,13 +1061,13 @@ const Map = () => {
           changeScaleState={changeScaleState}
           geocoderNational={geocoderNational}
           geocoderAdmin={geocoderAdmin}
-          scaleState={scale.current}
         />
         <Legend
           layers={visibleLayers}
           services={selectedServices}
           changeLayerOrder={changeLayerOrder}
           handleVisibilityChange={handleVisibilityChange}
+          scaleState={scale.current}
         />
         <Button
           onClick={changeBasemapControl}

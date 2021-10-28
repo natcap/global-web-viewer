@@ -526,8 +526,8 @@ const mapLayers = [
       paint: {
         'circle-color': '#8cd11d',
         'circle-opacity': 0,
-        'circle-stroke-color': '#8cd11d',
-        'circle-stroke-width': 1,
+        'circle-stroke-color': '#fbfcac',
+        'circle-stroke-width': 2,
       },
       layout: {
         visibility: 'none',
@@ -548,8 +548,8 @@ const mapLayers = [
       'source-layer': 'protected_polygons_Asia_and_Pacific',
       type: 'line',
       paint: {
-        'line-color': '#8cd11d',
-        'line-width': 1,
+        'line-color': '#fbfcac',
+        'line-width': 2,
       },
       layout: {
         visibility: 'none',
@@ -592,8 +592,8 @@ const mapLayers = [
       'source-layer': 'protected_polygons_LatinAmerica_Caribbean',
       type: 'line',
       paint: {
-        'line-color': '#8cd11d',
-        'line-width': 1,
+        'line-color': '#fbfcac',
+        'line-width': 2,
       },
       layout: {
         visibility: 'none',
@@ -636,8 +636,8 @@ const mapLayers = [
       'source-layer': 'protected_polygons_Africa_Polar_WestAsia',
       type: 'line',
       paint: {
-        'line-color': '#8cd11d',
-        'line-width': 1,
+        'line-color': '#fbfcac',
+        'line-width': 2,
       },
       layout: {
         visibility: 'none',
@@ -680,8 +680,8 @@ const mapLayers = [
       'source-layer': 'protected_polygons_NorthAmerica',
       type: 'line',
       paint: {
-        'line-color': '#8cd11d',
-        'line-width': 1,
+        'line-color': '#fbfcac',
+        'line-width': 2,
       },
       layout: {
         visibility: 'none',
@@ -724,8 +724,8 @@ const mapLayers = [
       'source-layer': 'protected_polygon_Europe_0',
       type: 'line',
       paint: {
-        'line-color': '#8cd11d',
-        'line-width': 1,
+        'line-color': '#fbfcac',
+        'line-width': 2,
       },
       layout: {
         visibility: 'none',
@@ -768,8 +768,8 @@ const mapLayers = [
       'source-layer': 'protected_polygon_Europe_1',
       type: 'line',
       paint: {
-        'line-color': '#8cd11d',
-        'line-width': 1,
+        'line-color': '#fbfcac',
+        'line-width': 2,
       },
       layout: {
         visibility: 'none',
@@ -812,8 +812,8 @@ const mapLayers = [
       'source-layer': 'protected_polygon_Europe_2',
       type: 'line',
       paint: {
-        'line-color': '#8cd11d',
-        'line-width': 1,
+        'line-color': '#fbfcac',
+        'line-width': 2,
       },
       layout: {
         visibility: 'none',

@@ -32,11 +32,17 @@ function App() {
           Prototype Natural Capital World Viewer
         </Col>
         <Col xs="auto">
-          <img 
-            src="./icons/NatCap-Logo-2016.jpg" 
-            alt="NatCap"
-            className="img-fluid banner-logo"
-          />
+          <a
+            href="https://naturalcapitalproject.stanford.edu/natural-capital-world-viewer"
+            target="_blank"
+            rel="noreferrer"
+          >
+            <img
+              src="./icons/NatCap-Logo-2016.jpg" 
+              alt="NatCap"
+              className="img-fluid banner-logo"
+            />
+          </a>
         </Col>
       </Row>
       <Row className="h-100">
