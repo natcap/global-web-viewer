@@ -109,7 +109,7 @@ const legendStyle = {
     desc: 'Protected areas',
     type: 'ordinal',
     colorKeys: ['Protected'],
-    colors: ['#8cd11d'],
+    colors: ['#fbfcac'],
     info: 'Terrestrial and coastal protected areas',
   },
 }
