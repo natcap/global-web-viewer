@@ -241,22 +241,38 @@ const Map = () => {
       if (scale.current === 'local') {
         const result = highlightSelected(e);
         setTimeout(() => {
-          new mapboxgl.Popup({closeButton:true, anchor:'left', offset:50})
+          new mapboxgl.Popup({closeButton:true, offset:50})
             .setLngLat(result.lngLat)
             .setHTML(result.htmlString)
             .addTo(map);
-          setDrawing(false)}, 1000);
+          setDrawing(false);
+        }, 1000);
       }
     });
     map.on('draw.modechange', () => {
-      console.log("draw modechange: ", draw.getMode());
+      //console.log("draw modechange: ", draw.getMode());
       if(draw.getMode() !== 'simple_select') {
         setDrawing(true);
+        const data = draw.getAll();
+        var pids = []
+
+        // ID of the added template empty feature
+        const lid = data.features[data.features.length - 1].id
+
+        data.features.forEach((f) => {
+          if (f.geometry.type === 'Polygon' && f.id !== lid) {
+            pids.push(f.id)
+          }
+        })
+        draw.delete(pids)
+        removeHighlight();
+
         //HACK to change the mapboxgl-draw button to stay "highlighted" when
         //in draw mode
         document
           .querySelector(".mapbox-gl-draw_ctrl-draw-btn.mapbox-gl-draw_polygon")
           .style.backgroundColor = 'rgba(0,0,0,0.1)';
+        //draw.deleteAll();
       }
       else {
         //HACK to change the mapboxgl-draw button to remove style set above
@@ -268,7 +284,7 @@ const Map = () => {
       }
     });
     map.on('draw.delete', () => {
-      console.log("draw delete");
+      //console.log("draw delete");
       removeHighlight();
       draw.deleteAll();
       setDrawing(false);
@@ -276,8 +292,7 @@ const Map = () => {
     //map.on('draw.update', updateArea);
 
     function highlightSelected(e) {
-      console.log("draw.create")
-      console.log(e);
+      //console.log("draw.create")
       const data = draw.getAll();
       if (data.features.length > 0) {
         const geoms = data.features[0].geometry.coordinates[0];
@@ -300,16 +315,17 @@ const Map = () => {
         let featList = [];
         features.forEach((feat) => {
           const featID = feat.properties.HYBAS_ID;
+          //console.log('highlight selected featID: ', featID);
           // Sometimes because of how tiles and zooms work, we could get 
           // duplicate features returned from the query.
-          if (!(featID in featList)) {
+          if (!featList.includes(featID)) {
             featList.push(featID);
             const curBbox = turf.bbox(feat);
             popupBbox[2] = Math.max(curBbox[2], popupBbox[2]);
             popupBbox[3] = Math.max(curBbox[3], popupBbox[3]);
           }
         });
-        console.log("draw hybas selected: ", featList);
+        //console.log("draw hybas selected: ", featList);
 
         map.setPaintProperty(
           'stats-hybas', 'fill-opacity', [
@@ -356,18 +372,22 @@ const Map = () => {
           }
           // Prepare the lng lat of where the popup with stats should be
           // which is to the right of selected features bbox
-          const popupLngLat = [popupBbox[2], popupBbox[3]];
+          //const popupLngLat = [popupBbox[2], popupBbox[3]];
+          const popupPoints = turf.points([
+            [popupBbox[0], popupBbox[1]], [popupBbox[0], popupBbox[3]],
+            [popupBbox[2], popupBbox[3]], [popupBbox[2], popupBbox[1]]]);
+          const popupLngLat = turf.center(popupPoints);
+
           return {
             htmlString: htmlString,
-            lngLat: popupLngLat,
+            lngLat: popupLngLat.geometry.coordinates,
           }
         }
       }
     }
 
     function removeHighlight(e) {
-      console.log("draw.delete")
-      console.log(e)
+      //console.log("draw.delete")
       map.setPaintProperty(
         'stats-hybas', 'fill-opacity', 0.8);
       map.setPaintProperty(
@@ -376,7 +396,7 @@ const Map = () => {
 
     map.on('load', () => {
       scale.current = 'global';
-      console.log("LOAD EVENT");
+      //console.log("LOAD EVENT");
 
       const firstSymbolId = getMapStyleSymbolId(map);
       mapLayers.forEach((layer) => {
@@ -392,7 +412,6 @@ const Map = () => {
 
       // Get the admin boundary names to restrict geocoder search
       const adminLayer = map.getLayer('stats-gadm1');
-      console.log("gadm1 layer: ", adminLayer);
 
       // Add geocoder result to container.
       geocoderNational.on('result', function (e) {
@@ -505,7 +524,7 @@ const Map = () => {
       const features = map.queryRenderedFeatures(centerPointLike, {
         layers: [layerId]
       });
-      console.log("highlight click feats: ", features);
+      //console.log("highlight click feats: ", features);
 
       if(features.length > 0) {
         const featID = features[0].properties[featName];
@@ -516,10 +535,9 @@ const Map = () => {
     };
 
     const clickPopupDialogHandler = (e) => {
-      console.log("scale current: ", scale.current);
-      console.log("clickPopup e: ", e);
+      //console.log("scale current: ", scale.current);
       let currentServices = [...servicesRef.current];
-      if (currentServices.length === 1 && 'coastal-habitat' in currentServices) {
+      if (currentServices.length === 1 && currentServices.includes('coastal-habitat')) {
         const feat = map.queryRenderedFeatures(e.point, { layers: ['stats-gadm0'] });
         let htmlString = `<h3>${feat[0].properties.NAME_0}</h3>`;
         htmlString = htmlString + `<h5>Select a service layer to see
@@ -716,12 +734,11 @@ const Map = () => {
     // layer open a popup at the location of the click, with description HTML
     // from its properties.
     map.on('click', function (e) {
-      //if(draw.getMode() === 'simple_select') {
-      console.log("map click draw mode: ", draw.getMode());
-      console.log("map click drawing: ", drawingRef.current);
+      //console.log("map click draw mode: ", draw.getMode());
+      //console.log("map click drawing: ", drawingRef.current);
       if(!drawingRef.current) {
         const htmlString = clickPopupDialogHandler(e);
-        new mapboxgl.Popup({closeButton:true, anchor:'left', offset:50})
+        new mapboxgl.Popup({closeButton:true, offset:50})
           .setLngLat(e.lngLat)
           .setHTML(htmlString)
           .addTo(map);
@@ -738,7 +755,7 @@ const Map = () => {
     //  map.getCanvas().style.cursor = '';
     //});
 
-    console.log("main useeffect");
+    //console.log("main useeffect");
     // Clean up on unmount
     return () => map.remove();
   }, []);
@@ -756,7 +773,7 @@ const Map = () => {
   */
   useEffect(() => {
     if (map == null) return; // wait for map to initialize
-    console.log('rcp-points radius useffect');
+    //console.log('rcp-points radius useffect');
     //if (map.getLayer('rcp-points')) {
 //      map.setPaintProperty('rcp-points', 'circle-radius', [
 //        'interpolate',
@@ -772,21 +789,21 @@ const Map = () => {
 
 
   useEffect(() => {
-    console.log("mapLayers change");
+    //console.log("mapLayers change");
 
   }, [visibleLayers]);
 
   const changeScaleState = (scaleResult, checked) => {
-    console.log("scaleResult ", scaleResult);
-    console.log("checked ", checked);
+    //console.log("scaleResult ", scaleResult);
+    //console.log("checked ", checked);
     scale.current = scaleResult;
     //handleScale(scaleResult);
     //scaleState = scaleResult;
     let visibleLayersUpdate = {};
     let visibleVar = 'none';
     const currentServices = [...selectedServices];
-    console.log("change scale sel serv: ", currentServices);
-    console.log("change scale vis lay: ", layersRef.current);
+    //console.log("change scale sel serv: ", currentServices);
+    //console.log("change scale vis lay: ", layersRef.current);
     mapLayers.forEach((layer) => {
       if(layer.scaleID === scaleResult && currentServices.includes(layer.serviceType)) {
         visibleLayersUpdate[layer.serviceType] = layer;
@@ -866,12 +883,12 @@ const Map = () => {
   };
 
   const changeVisibilityState = (serviceResult, checked) => {
-    console.log("service ", serviceResult);
-    console.log("checked ", checked);
+    //console.log("service ", serviceResult);
+    //console.log("checked ", checked);
     let visibleLayersUpdate = {...layersRef.current};
-    console.log("change vis vis: ", visibleLayersUpdate);
+    //console.log("change vis vis: ", visibleLayersUpdate);
     let selectedServicesUpdate = [...selectedServices];
-    console.log("servicesRef current: ", selectedServicesUpdate);
+    //console.log("servicesRef current: ", selectedServicesUpdate);
     if(!checked) {
       const removeIndex = selectedServicesUpdate.indexOf(serviceResult);
       if (removeIndex > -1) {
@@ -881,13 +898,13 @@ const Map = () => {
 
       const layer = layersRef.current[serviceResult];
       if(serviceResult in multiFileLayers) {
-        console.log("vis layer update: ", visibleLayersUpdate);
+        //console.log("vis layer update: ", visibleLayersUpdate);
         multiFileLayers[serviceResult].forEach((childLayer) => {
             map.setLayoutProperty(childLayer.id, 'visibility', 'none');
             //delete visibleLayersUpdate[serviceResult][childLayer.id];
         });
         delete visibleLayersUpdate[serviceResult];
-        console.log("vis layer update: ", visibleLayersUpdate);
+        //console.log("vis layer update: ", visibleLayersUpdate);
         setLayers({...visibleLayersUpdate});
       }
       else {
@@ -905,28 +922,28 @@ const Map = () => {
       //hasn't changed; the new array is the old array. 
       //One easy way to avoid this is by spreading the array into a new array:
       setServices([...selectedServicesUpdate]);
-      console.log("change Vis State sel serv: ", selectedServicesUpdate);
-      console.log("change Vis State: ", scale.current);
+      //console.log("change Vis State sel serv: ", selectedServicesUpdate);
+      //console.log("change Vis State: ", scale.current);
       mapLayers.forEach((layer) => {
         // Check 'all' for coastal protection case where we want this one 
         // layer visible across all scales
         if((layer.scaleID === scale.current || layer.scaleID === 'all') && layer.serviceType === serviceResult) {
           map.setLayoutProperty(layer.layerID, 'visibility', 'visible');
           visibleLayersUpdate[serviceResult] = {...layer};
-          console.log("change vis update layer : ", layer.layerID);
+          //console.log("change vis update layer : ", layer.layerID);
 
           setLayers({...visibleLayersUpdate});
         }
       });
       changeLayerOrder(selectedServicesUpdate);
     }
-    console.log("selectedServices: after visibility change ", [...selectedServices]);
+    //console.log("selectedServices: after visibility change ", [...selectedServices]);
     setMap(map);
   };
 
   async function changeBasemapState(newBasemapId, checked){
-    console.log("new basemapId ", newBasemapId);
-    console.log("checked ", checked);
+    //console.log("new basemapId ", newBasemapId);
+    //console.log("checked ", checked);
     map.setStyle('mapbox://styles/mapbox/' + newBasemapId).once('styledata', () => {
       // Turns all road layers in basemap non-visible
       map.getStyle().layers.map(function (layer) {
@@ -940,9 +957,9 @@ const Map = () => {
       mapLayers.forEach((layer) => {
         map.addLayer(layer.mapLayer);
       });
-      console.log("change basemap sel serv: ", selectedServices);
+      //console.log("change basemap sel serv: ", selectedServices);
       const reversedServices = selectedServices.slice().reverse();
-      console.log("change base vis layers: ", layersRef.current);
+      //console.log("change base vis layers: ", layersRef.current);
       reversedServices.forEach((serviceType) => {
         const layerId = layersRef.current[serviceType].layerID;
         // Add all layers from a service type if there are multiple of them
@@ -958,27 +975,27 @@ const Map = () => {
         }
       });
       // Make sure to move the stats vector mask up front.
-      console.log("scale.current is ", scale.current);
+      //console.log("scale.current is ", scale.current);
       if(scale.current !== 'global') {
         map.setLayoutProperty(statsScaleMap[scale.current], 'visibility', 'visible');
         map.setPaintProperty(statsScaleMap[scale.current], 'fill-opacity', 0.60);
-        console.log("basemap move mask: ", statsScaleMap[scale.current]);
+        //console.log("basemap move mask: ", statsScaleMap[scale.current]);
         map.moveLayer(statsScaleMap[scale.current], firstSymbolId);
       }
     });
-    console.log("change BM visible layers:");
-    console.log(layersRef.current);
+    //console.log("change BM visible layers:");
+    //console.log(layersRef.current);
 
     setMap(map);
   }
 
   const changeLayerOrder = (servicesSorted) => {
-    console.log("change order");
-    console.log("change order serv: ", servicesSorted);
-    console.log("change order vis lay: ", layersRef.current);
+    //console.log("change order");
+    //console.log("change order serv: ", servicesSorted);
+    //console.log("change order vis lay: ", layersRef.current);
     const firstSymbolId = getMapStyleSymbolId(map);
     let zIndex = [firstSymbolId];
-    console.log("change order zindex: ", zIndex);
+    //console.log("change order zindex: ", zIndex);
 
     servicesSorted.forEach((serviceType, i) => {
       let curIds = [];
@@ -1012,7 +1029,7 @@ const Map = () => {
     }
 
     setServices([...servicesSorted]);
-    console.log("servicesSorted ", servicesSorted);
+    //console.log("servicesSorted ", servicesSorted);
     setMap(map);
   };
 
@@ -1022,12 +1039,12 @@ const Map = () => {
   }
 
   const handleVisibilityChange = (serviceResult, checked) => {
-    console.log("service ", serviceResult);
-    console.log("checked ", checked);
+    //console.log("service ", serviceResult);
+    //console.log("checked ", checked);
     let visibleLayersUpdate = {...layersRef.current};
-    console.log("change vis vis: ", visibleLayersUpdate);
+    //console.log("change vis vis: ", visibleLayersUpdate);
     let selectedServicesUpdate = [...selectedServices];
-    console.log("servicesRef current: ", selectedServicesUpdate);
+    //console.log("servicesRef current: ", selectedServicesUpdate);
     if(!checked) {
       if(serviceResult in multiFileLayers) {
         multiFileLayers[serviceResult].forEach((childLayer) => {
