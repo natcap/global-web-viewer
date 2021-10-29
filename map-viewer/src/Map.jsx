@@ -241,7 +241,7 @@ const Map = () => {
       if (scale.current === 'local') {
         const result = highlightSelected(e);
         setTimeout(() => {
-          new mapboxgl.Popup({closeButton:true, offset:50})
+          new mapboxgl.Popup({closeButton:true, offset:100})
             .setLngLat(result.lngLat)
             .setHTML(result.htmlString)
             .addTo(map);
@@ -291,7 +291,7 @@ const Map = () => {
     });
     //map.on('draw.update', updateArea);
 
-    function highlightSelected(e) {
+    function highlightSelected() {
       //console.log("draw.create")
       const data = draw.getAll();
       if (data.features.length > 0) {
@@ -386,7 +386,7 @@ const Map = () => {
       }
     }
 
-    function removeHighlight(e) {
+    function removeHighlight() {
       //console.log("draw.delete")
       map.setPaintProperty(
         'stats-hybas', 'fill-opacity', 0.8);
@@ -409,9 +409,6 @@ const Map = () => {
           map.setLayoutProperty(layer.id, 'visibility', 'none');
         }
       });
-
-      // Get the admin boundary names to restrict geocoder search
-      const adminLayer = map.getLayer('stats-gadm1');
 
       // Add geocoder result to container.
       geocoderNational.on('result', function (e) {
@@ -794,8 +791,8 @@ const Map = () => {
   }, [visibleLayers]);
 
   const changeScaleState = (scaleResult, checked) => {
-    //console.log("scaleResult ", scaleResult);
-    //console.log("checked ", checked);
+    console.log("scaleResult ", scaleResult);
+    console.log("checked ", checked);
     scale.current = scaleResult;
     //handleScale(scaleResult);
     //scaleState = scaleResult;
@@ -942,8 +939,8 @@ const Map = () => {
   };
 
   async function changeBasemapState(newBasemapId, checked){
-    //console.log("new basemapId ", newBasemapId);
-    //console.log("checked ", checked);
+    console.log("new basemapId ", newBasemapId);
+    console.log("checked ", checked);
     map.setStyle('mapbox://styles/mapbox/' + newBasemapId).once('styledata', () => {
       // Turns all road layers in basemap non-visible
       map.getStyle().layers.map(function (layer) {
@@ -1041,10 +1038,6 @@ const Map = () => {
   const handleVisibilityChange = (serviceResult, checked) => {
     //console.log("service ", serviceResult);
     //console.log("checked ", checked);
-    let visibleLayersUpdate = {...layersRef.current};
-    //console.log("change vis vis: ", visibleLayersUpdate);
-    let selectedServicesUpdate = [...selectedServices];
-    //console.log("servicesRef current: ", selectedServicesUpdate);
     if(!checked) {
       if(serviceResult in multiFileLayers) {
         multiFileLayers[serviceResult].forEach((childLayer) => {
