@@ -183,24 +183,6 @@ def create_percentile_raster_from_vector_feature(
 
     os.remove(clipped_raster_path)
 
-def gdaldem_color_relief(input_raster_path, color_file_path, out_raster_path):
-    """Conver input raster to a stylized RGB raster using gdaldem.
-
-    Args:
-        input_raster_path (string):
-        color_file_path (string):
-        out_raster_path (string):
-
-    Returns:
-        None
-    """
-    gdaldem_options = gdal.DEMProcessingOptions(
-        colorFilename=color_file_path, format="GTiff", addAlpha=True,
-        creationOptions=["COMPRESS=LZW"])
-    gdal.DEMProcessing(
-        out_raster_path, input_raster_path, "color-relief",
-        options=gdaldem_options)
-
 def stitch_rasters_wrapper(
         input_path_band_list, target_base_path, output_path):
     """ """
