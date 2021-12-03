@@ -4,7 +4,7 @@ import Col from 'react-bootstrap/Col';
 import Button from 'react-bootstrap/Button';
 import { FaChevronCircleUp, FaChevronCircleDown } from 'react-icons/fa';
 
-import mapboxgl from 'mapbox-gl';
+import mapboxgl from '!mapbox-gl';
 // Had to npm install @mapbox/mapbox-gl-draw and import like below
 import MapboxDraw from '@mapbox/mapbox-gl-draw';
 import '@mapbox/mapbox-gl-draw/dist/mapbox-gl-draw.css';
