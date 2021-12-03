@@ -339,18 +339,15 @@ const Map = () => {
         map.moveLayer('stats-hybas-line', topLayer);
 
         // Format popup with combines highlighted features
-        //
         if(features.length > 0) {
           let htmlString = `<h3>Hydrobasin level 08 Stats</h3>`;
           let pctNotice = false;
           const currentServices = [...servicesRef.current];
+          const validLocalServices = ['sediment', 'nitrogen', 'natureAccess'];
           features.forEach((feat) => {
             htmlString += `<h4>HydroBASIN ID ${feat.properties.HYBAS_ID}</h4>`
             currentServices.forEach((service) => {
-              if(service === 'coastal-habitat' || service === 'protected-areas') {
-                return;
-              }
-              else {
+              if(validLocalServices.includes(service)) {
                 const attrKey = clickPopupKey[service].key;
                 htmlString = htmlString + `
                  <h4><u>${clickPopupKey[service].name}</u></h4>
@@ -359,13 +356,22 @@ const Map = () => {
                 `
                 pctNotice = true;
               }
+              else if(service === 'coastalProtection') {
+                htmlString = htmlString + `
+                 <h4><u>${clickPopupKey[service].name}</u></h4>
+                 <h5>Coastal protection not aggregated at this scale.</h5>
+                `;
+              }
+              else {
+                return;
+              }
             });
           });
           if(pctNotice) {
             htmlString += `<br/><h5>* percentile is in comparison with the mean value
             of other hydrobasins within the same country.</h5>`;
           }
-          if (!htmlString.includes('h4')) {
+          if(!htmlString.includes('h4')) {
               htmlString = htmlString + `
                 <h5>No active layer selected. Select a service layer
                 to see aggregated statistics.</h5>`;
@@ -542,6 +548,8 @@ const Map = () => {
         return htmlString;
       }
       if (currentServices.length > 0) {
+        const validStatsServices = [
+          'sediment', 'nitrogen', 'natureAccess', 'coastalProtection'];
         if ('national' === scale.current) {
           highlightClickHandler(e, 'stats-gadm0', 'NAME_0');
           const feat = map.queryRenderedFeatures(e.point, { layers: ['stats-gadm0'] });
@@ -550,10 +558,7 @@ const Map = () => {
             htmlString = `<h3>${feat[0].properties.NAME_0}</h3>`;
           }
           currentServices.forEach((service) => {
-            if(service === 'coastal-habitat') {
-              return;
-            }
-            else if(service === 'protected-areas') {
+            if(service === 'protected-areas') {
               const protFeat = map.queryRenderedFeatures(e.point, { layers: protectedIds });
               if(protFeat.length) {
                 htmlString = htmlString + `
@@ -562,7 +567,7 @@ const Map = () => {
                 `
               }
             }
-            else {
+            else if(validStatsServices.includes(service)) {
               if(feat.length) {
                 const attrKey = clickPopupKey[service].key;
                 htmlString = htmlString + `
@@ -570,6 +575,9 @@ const Map = () => {
                  <h5>Mean:  ${feat[0].properties[attrKey+'mean'].toExponential(3)}</h5>
                 `
               }
+            }
+            else {
+              return;
             }
           });
           if (!htmlString.includes('h4')) {
@@ -588,10 +596,7 @@ const Map = () => {
           }
           let pctNotice = false;
           currentServices.forEach((service) => {
-            if(service === 'coastal-habitat') {
-              return;
-            }
-            else if(service === 'protected-areas') {
+            if(service === 'protected-areas') {
               const protFeat = map.queryRenderedFeatures(e.point, { layers: protectedIds });
               if(protFeat.length) {
                 htmlString = htmlString + `
@@ -600,7 +605,7 @@ const Map = () => {
                 `
               }
             }
-            else {
+            else if(validStatsServices.includes(service)) {
               if(feat.length) {
                 const attrKey = clickPopupKey[service].key;
                 htmlString = htmlString + `
@@ -614,6 +619,9 @@ const Map = () => {
                   pctNotice = true;
                 }
               }
+            }
+            else {
+              return;
             }
           });
           if(pctNotice) {
@@ -641,10 +649,7 @@ const Map = () => {
           }
           let pctNotice = false;
           currentServices.forEach((service) => {
-            if(service === 'coastal-habitat') {
-              return;
-            }
-            else if(service === 'protected-areas') {
+            if(service === 'protected-areas') {
               const protFeat = map.queryRenderedFeatures(e.point, { layers: protectedIds });
               if(protFeat.length) {
                 htmlString = htmlString + `
@@ -659,7 +664,7 @@ const Map = () => {
                <h5>Coastal protection not aggregated at this scale.</h5>
               `;
             }
-            else {
+            else if(validStatsServices.includes(service)) {
               if(feat.length) {
                 const attrKey = clickPopupKey[service].key;
                 htmlString = htmlString + `
@@ -669,6 +674,9 @@ const Map = () => {
                 `;
                 pctNotice = true;
               }
+            }
+            else {
+              return;
             }
           });
           if(pctNotice) {
