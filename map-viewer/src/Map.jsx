@@ -24,6 +24,8 @@ import { modifiedDefaultStyle } from './mapboxDrawStyle';
 import { gadm1Carmen } from './gadm1Carmen';
 import { gadm1Names } from './gadm1Names';
 
+mapboxgl.workerClass =
+  require("worker-loader!mapbox-gl/dist/mapbox-gl-csp-worker").default
 //mapboxgl.workerClass = MapboxWorker;
 mapboxgl.accessToken =
   'pk.eyJ1IjoiZGRlbnUiLCJhIjoiY2ttZjQwamU2MTE1bjJ3bGpmZGZncG52NCJ9.u2cSHaEPPDgZH7PYBZNhWw';
